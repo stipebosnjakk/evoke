@@ -1,12 +1,14 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Provider } from "react-redux";
+
+import { store } from "@/store/store";
+import TaskScreen from "@/components/TaskScreen";
 
 const index = () => {
   return (
-    <View className='bg-black'>
-      <Text className="text-lg font-bold text-red-500">index</Text>
-    </View>
-  )
-}
+    <Provider store={store}>
+      <TaskScreen />
+    </Provider>
+  );
+};
 
-export default index
+export default index;
