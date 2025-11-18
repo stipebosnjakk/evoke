@@ -1,7 +1,9 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
 export default function TabLayout() {
+  const router = useRouter();
+
   return (
     <Tabs
       screenOptions={{
@@ -43,6 +45,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="create"
+        listeners={() => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            router.push("/create-modal");
+          },
+        })}
         options={{
           tabBarIcon: ({ color, focused }) => (
             <SymbolView
