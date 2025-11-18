@@ -18,9 +18,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <SymbolView
-              name="square.and.pencil"
+              name={focused ? "house.fill" : "house"}
               size={30}
               type="monochrome"
               tintColor={color}
@@ -31,9 +31,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="focus"
         options={{
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <SymbolView
-              name={focused ? "eye.fill" : "eye"}
+              name="target"
               size={30}
               type="monochrome"
               tintColor={color}
