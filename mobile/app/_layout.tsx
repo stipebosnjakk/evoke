@@ -9,9 +9,9 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
-          name="create-modal"
+          name="create-slider"
           options={{
-            presentation: "modal",
+            presentation: "card",
           }}
         />
       </Stack>
