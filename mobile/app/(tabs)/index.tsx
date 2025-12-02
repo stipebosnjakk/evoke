@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Text>Home screen</Text>
-      <Link href="/create-modal" style={styles.link}>
+      <Link href="/create-slider" style={styles.link}>
         Open modal
       </Link>
     </View>

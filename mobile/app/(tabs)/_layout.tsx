@@ -48,7 +48,7 @@ export default function TabLayout() {
         listeners={() => ({
           tabPress: (e) => {
             e.preventDefault();
-            router.push("/create-modal");
+            router.push("/create-slider");
           },
         })}
         options={{
