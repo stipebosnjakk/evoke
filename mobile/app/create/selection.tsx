@@ -2,10 +2,23 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { SymbolView } from "expo-symbols/build/SymbolView";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useColorTheme } from "@/hooks/useColorTheme";
-import { ColorTheme } from "@/app/types/theme";
+import { ColorTheme } from "@/types/theme";
+import { CreateType } from "@/types/create-types";
+import ScreenContainer from "@/components/custom/ScreenContainer";
+
+type CreateOption = {
+  type: CreateType;
+  label: string;
+  iconName: SymbolName;
+};
+
+const CREATE_OPTIONS: CreateOption[] = [
+  { type: "task", label: "Task", iconName: "list.bullet" },
+  { type: "habit", label: "Habit", iconName: "repeat" },
+  { type: "goal", label: "Goal", iconName: "flag" },
+];
 
 type SymbolName = React.ComponentProps<typeof SymbolView>["name"];
 
@@ -17,9 +30,9 @@ type CardWrapperProps = {
   colors: ColorTheme;
 };
 
-const Slider = () => {
+const CreateSlider = () => {
   const isPresented = router.canGoBack();
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<CreateType | null>(null);
 
   const { colors } = useColorTheme();
 
@@ -29,12 +42,18 @@ const Slider = () => {
     }
   };
 
-  const handleSelectOption = (option: string) => {
+  const handleSelectOption = (option: CreateType) => {
     setSelectedOption(option);
   };
 
+  const handleContinueButton = () => {
+    if (selectedOption) {
+      router.push(`/create/${selectedOption}`);
+    }
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={[styles.title, { color: colors.text }]}>
           What do you want to create?
@@ -43,27 +62,16 @@ const Slider = () => {
           Choose an item type to set things up.
         </Text>
         <View className="w-full mt-6 gap-4">
-          <CardWrapper
-            onPress={() => handleSelectOption("task")}
-            isSelected={selectedOption === "task"}
-            label="Task"
-            iconName="list.bullet"
-            colors={colors}
-          />
-          <CardWrapper
-            onPress={() => handleSelectOption("habit")}
-            isSelected={selectedOption === "habit"}
-            label="Habit"
-            iconName="repeat"
-            colors={colors}
-          />
-          <CardWrapper
-            onPress={() => handleSelectOption("goal")}
-            isSelected={selectedOption === "goal"}
-            label="Goal"
-            iconName="flag"
-            colors={colors}
-          />
+          {CREATE_OPTIONS.map((option) => (
+            <CardWrapper
+              key={option.type}
+              onPress={() => handleSelectOption(option.type)}
+              isSelected={selectedOption === option.type}
+              label={option.label}
+              iconName={option.iconName}
+              colors={colors}
+            />
+          ))}
         </View>
       </View>
       <View
@@ -88,7 +96,7 @@ const Slider = () => {
         </Pressable>
         <Pressable
           disabled={!selectedOption}
-          onPress={() => console.log("Continue")}
+          onPress={handleContinueButton}
           className="w-[48%] flex-row items-center justify-center px-6 py-3 rounded-full"
           style={{
             backgroundColor: selectedOption ? colors.primary : colors.muted,
@@ -107,7 +115,7 @@ const Slider = () => {
           />
         </Pressable>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 
@@ -145,7 +153,6 @@ const CardWrapper = ({
           tintColor={isSelected ? colors.primary : colors.secondary}
         />
       </View>
-
       <Text
         style={{
           fontSize: 16,
@@ -156,7 +163,6 @@ const CardWrapper = ({
         {label}
       </Text>
     </View>
-
     {isSelected && (
       <SymbolView
         name="checkmark.circle.fill"
@@ -188,4 +194,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Slider;
+export default CreateSlider;

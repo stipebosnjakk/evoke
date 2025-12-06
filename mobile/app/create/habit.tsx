@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const ScreenContainer = () => {
+const Habit = () => {
   return (
     <View>
-      <Text>ScreenContainer</Text>
+      <Text>Habit</Text>
     </View>
   )
 }
 
-export default ScreenContainer
+export default Habit

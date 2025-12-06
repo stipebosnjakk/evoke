@@ -1,0 +1,4 @@
+-add fire streaks,
+-change tabs order (progress, home, create, focus, profile)
+-change focus icon to flame name icon
+-add focus option to schemas

@@ -48,7 +48,7 @@ export default function TabLayout() {
         listeners={() => ({
           tabPress: (e) => {
             e.preventDefault();
-            router.push("/create-slider");
+            router.push("/create/selection");
           },
         })}
         options={{

@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, type Theme } from "@react-navigation/native";
 
-import { ColorTheme } from "@/app/types/theme";
+import { ColorTheme } from "@/types/theme";
 
 export const THEME = {
   light: {
@@ -93,6 +93,9 @@ export const APP_THEME: Record<"light" | "dark", ColorTheme> = {
     secondary: "#64748B",
     muted: "#94A3B8",
     shadow: "#000000",
+    difficultyEasy: "#22C55E",
+    difficultyMedium: "#3B82F6",
+    difficultyHard: "#EF4444",
   },
   dark: {
     background: "#0F172A",
@@ -104,5 +107,8 @@ export const APP_THEME: Record<"light" | "dark", ColorTheme> = {
     secondary: "#CBD5E1",
     muted: "#94A3B8",
     shadow: "#00000080",
+    difficultyEasy: "#22C55E",
+    difficultyMedium: "#60A5FA",
+    difficultyHard: "#F97316",
   },
 };
