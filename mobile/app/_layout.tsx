@@ -3,17 +3,15 @@ import { PortalHost } from "@rn-primitives/portal";
 
 import "@/global.css";
 
+export const unstable_settings = {
+  initialRouteName: '(tabs)/today',
+};
+
 export default function RootLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="/create/selection"
-          options={{
-            presentation: "card",
-          }}
-        />
       </Stack>
       <PortalHost />
     </>

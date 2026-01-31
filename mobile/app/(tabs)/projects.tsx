@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const progress = () => {
+const profile = () => {
   return (
     <View>
-      <Text>progress</Text>
+      <Text>projects</Text>
     </View>
   )
 }
 
-export default progress
+export default profile
