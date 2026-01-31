@@ -4,7 +4,7 @@ import React from 'react'
 const focus = () => {
   return (
     <View>
-      <Text>focus</Text>
+      <Text>Plan</Text>
     </View>
   )
 }

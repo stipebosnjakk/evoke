@@ -1,15 +1,15 @@
-import { Tabs, useRouter } from "expo-router";
+import Header from "@/components/custom/Header";
+import { Tabs } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
 export default function TabLayout() {
-  const router = useRouter();
-
   return (
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: "black",
         tabBarInactiveTintColor: "gray",
+        header: (props) => <Header {...props} />,
         tabBarStyle: {
           paddingTop: 6,
           borderTopWidth: 1,
@@ -20,9 +20,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          title: "Today",
           tabBarIcon: ({ color, focused }) => (
             <SymbolView
-              name={focused ? "house.fill" : "house"}
+              name={focused ? "sun.max.fill" : "sun.max"}
               size={30}
               type="monochrome"
               tintColor={color}
@@ -31,11 +32,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="focus"
+        name="plan"
         options={{
-          tabBarIcon: ({ color }) => (
+          title: "Plan",
+          tabBarIcon: ({ color, focused }) => (
             <SymbolView
-              name="target"
+              name={focused ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2"}
               size={30}
               type="monochrome"
               tintColor={color}
@@ -44,17 +46,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="create"
-        listeners={() => ({
-          tabPress: (e) => {
-            e.preventDefault();
-            router.push("/create/selection");
-          },
-        })}
+        name="inbox"
         options={{
+          title: "Inbox",
           tabBarIcon: ({ color, focused }) => (
             <SymbolView
-              name={focused ? "plus.app.fill" : "plus.app"}
+              name={focused ? "tray.fill" : "tray"}
               size={30}
               type="monochrome"
               tintColor={color}
@@ -63,24 +60,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="progress"
+        name="projects"
         options={{
+          title: "Projects",
           tabBarIcon: ({ color, focused }) => (
             <SymbolView
-              name={focused ? "chart.bar.fill" : "chart.bar"}
-              size={30}
-              type="monochrome"
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <SymbolView
-              name={focused ? "person.fill" : "person"}
+              name={focused ? "folder.fill" : "folder"}
               size={30}
               type="monochrome"
               tintColor={color}
