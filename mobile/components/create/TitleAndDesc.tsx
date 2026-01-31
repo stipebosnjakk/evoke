@@ -10,7 +10,7 @@ import {
 import { useColorTheme } from "@/hooks/useColorTheme";
 
 // TODO: check the best forms on github
-// TODO: check the blueprint form for creating post
+// TODO: check the bluesky form for creating post
 
 const TitleAndDesc = () => {
   const { colors } = useColorTheme();
