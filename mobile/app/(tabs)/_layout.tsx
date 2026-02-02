@@ -1,78 +1,97 @@
-import Header from "@/components/custom/Header";
-import { Tabs } from "expo-router";
+import { View, StyleSheet } from "react-native";
+import { Tabs, useSegments } from "expo-router";
 import { SymbolView } from "expo-symbols";
+import Header from "@/components/custom/Header";
+import { TITLE_BY_ROUTE } from "@/lib/routeTitle";
 
 export default function TabLayout() {
+  const segments = useSegments();
+  const active = segments[segments.length - 1] ?? "index";
+  const title = TITLE_BY_ROUTE[active] ?? "Today";
+
   return (
-    <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: "black",
-        tabBarInactiveTintColor: "gray",
-        header: (props) => <Header {...props} />,
-        tabBarStyle: {
-          paddingTop: 6,
-          borderTopWidth: 1,
-          borderTopColor: "#e5e7eb",
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Today",
-          tabBarIcon: ({ color, focused }) => (
-            <SymbolView
-              name={focused ? "sun.max.fill" : "sun.max"}
-              size={30}
-              type="monochrome"
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="plan"
-        options={{
-          title: "Plan",
-          tabBarIcon: ({ color, focused }) => (
-            <SymbolView
-              name={focused ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2"}
-              size={30}
-              type="monochrome"
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="inbox"
-        options={{
-          title: "Inbox",
-          tabBarIcon: ({ color, focused }) => (
-            <SymbolView
-              name={focused ? "tray.fill" : "tray"}
-              size={30}
-              type="monochrome"
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="projects"
-        options={{
-          title: "Projects",
-          tabBarIcon: ({ color, focused }) => (
-            <SymbolView
-              name={focused ? "folder.fill" : "folder"}
-              size={30}
-              type="monochrome"
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+    <View style={styles.root}>
+      <Header title={title} />
+      <View style={styles.tabsWrap}>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarShowLabel: false,
+            tabBarActiveTintColor: "black",
+            tabBarInactiveTintColor: "gray",
+            tabBarStyle: {
+              paddingTop: 6,
+              borderTopWidth: 1,
+              borderTopColor: "#e5e7eb",
+            },
+          }}
+        >
+          <Tabs.Screen
+            name="index"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <SymbolView
+                  name={focused ? "sun.max.fill" : "sun.max"}
+                  size={30}
+                  type="monochrome"
+                  tintColor={color}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="plan"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <SymbolView
+                  name={
+                    focused ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2"
+                  }
+                  size={30}
+                  type="monochrome"
+                  tintColor={color}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="inbox"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <SymbolView
+                  name={focused ? "tray.fill" : "tray"}
+                  size={30}
+                  type="monochrome"
+                  tintColor={color}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="projects"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <SymbolView
+                  name={focused ? "folder.fill" : "folder"}
+                  size={30}
+                  type="monochrome"
+                  tintColor={color}
+                />
+              ),
+            }}
+          />
+        </Tabs>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  tabsWrap: {
+    flex: 1,
+  },
+});
