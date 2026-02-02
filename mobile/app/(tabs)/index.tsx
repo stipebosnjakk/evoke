@@ -1,21 +1,30 @@
-import { StyleSheet, Text, View } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 
-export default function Home() {
+const TodayScreen = () => {
   return (
-    <View style={styles.container}>
-      <Text>Today screen</Text>
+    <View style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={{
+          minHeight: Dimensions.get("window").height * 2,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "white",
+            borderWidth: 1,
+            borderColor: "#e5e7eb",
+            padding: 16,
+          }}
+        >
+          <Text>Some random text</Text>
+        </View>
+      </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  link: {
-    paddingTop: 20,
-    fontSize: 20,
-  },
+  screen: { flex: 1, backgroundColor: "white" },
 });
+
+export default TodayScreen;
