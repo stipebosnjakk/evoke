@@ -2,16 +2,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { LinearGradient } from "expo-linear-gradient";
-import IconButton from "@/components/ui/IconButton";
 import { easeGradient } from "react-native-easing-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { BlurView } from "expo-blur";
+import { useRouter } from "expo-router";
+
+import IconButton from "@/components/ui/IconButton";
 
 type HeaderProps = { title: string };
 
 const Header = ({ title }: HeaderProps) => {
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
+
+  const router = useRouter();
 
   const { colors, locations } = easeGradient({
     colorStops: {
@@ -20,6 +24,10 @@ const Header = ({ title }: HeaderProps) => {
       0.5: { color: "white" },
     },
   });
+
+  const openQuickAddModal = () => {
+    router.push("/quick-add");
+  };
 
   return (
     <>
@@ -79,7 +87,7 @@ const Header = ({ title }: HeaderProps) => {
         </View>
         <View style={styles.right}>
           <View style={styles.rightActions}>
-            <IconButton onPress={() => {}} style={styles.iconBtnMr}>
+            <IconButton onPress={openQuickAddModal} style={styles.iconBtnMr}>
               <SymbolView
                 name="bolt.fill"
                 size={22}

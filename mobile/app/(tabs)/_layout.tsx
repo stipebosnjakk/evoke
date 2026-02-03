@@ -4,6 +4,11 @@ import { SymbolView } from "expo-symbols";
 import Header from "@/components/custom/Header";
 import { TITLE_BY_ROUTE } from "@/lib/routeTitle";
 
+type TabBarIconProps = {
+  color: string;
+  focused: boolean;
+};
+
 export default function TabLayout() {
   const segments = useSegments();
   const active = segments[segments.length - 1] ?? "index";
@@ -29,7 +34,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="index"
             options={{
-              tabBarIcon: ({ color, focused }) => (
+              tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
                   name={focused ? "sun.max.fill" : "sun.max"}
                   size={30}
@@ -42,7 +47,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="plan"
             options={{
-              tabBarIcon: ({ color, focused }) => (
+              tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
                   name={
                     focused ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2"
@@ -57,7 +62,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="inbox"
             options={{
-              tabBarIcon: ({ color, focused }) => (
+              tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
                   name={focused ? "tray.fill" : "tray"}
                   size={30}
@@ -70,7 +75,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="projects"
             options={{
-              tabBarIcon: ({ color, focused }) => (
+              tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
                   name={focused ? "folder.fill" : "folder"}
                   size={30}
