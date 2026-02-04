@@ -1,12 +1,7 @@
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
-import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite";
 
 import "@/global.css";
-
-const expo = openDatabaseSync("db.db");
-const db = drizzle(expo);
 
 const RootLayout = () => {
   return (
