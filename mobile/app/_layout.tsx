@@ -3,11 +3,7 @@ import { PortalHost } from "@rn-primitives/portal";
 
 import "@/global.css";
 
-export const unstable_settings = {
-  initialRouteName: "(tabs)/today",
-};
-
-export default function RootLayout() {
+const RootLayout = () => {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
@@ -27,4 +23,6 @@ export default function RootLayout() {
       <PortalHost />
     </>
   );
-}
+};
+
+export default RootLayout;
