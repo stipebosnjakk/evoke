@@ -1,13 +1,14 @@
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { openDatabaseSync } from "expo-sqlite";
 
 import "@/global.css";
 
-export const unstable_settings = {
-  initialRouteName: "(tabs)/today",
-};
+const expo = openDatabaseSync("db.db");
+const db = drizzle(expo);
 
-export default function RootLayout() {
+const RootLayout = () => {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
@@ -27,4 +28,6 @@ export default function RootLayout() {
       <PortalHost />
     </>
   );
-}
+};
+
+export default RootLayout;
