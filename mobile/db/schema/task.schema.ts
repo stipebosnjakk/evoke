@@ -10,13 +10,11 @@ export const tasks = t.sqliteTable("tasks", {
     .$defaultFn(() => createId()),
   title: t.text("title").notNull(),
   created_at: t
-    .integer("created_at", { mode: "timestamp_ms" })
+    .integer("created_at")
     .notNull()
-    .$defaultFn(() => new Date()),
-  updated_at: t
-    .integer("updated_at", { mode: "timestamp_ms" })
-    .$onUpdateFn(() => new Date()),
-  completed_at: t.integer("completed_at", { mode: "timestamp_ms" }),
+    .$defaultFn(() => Date.now()),
+  updated_at: t.integer("updated_at").$onUpdateFn(() => Date.now()),
+  completed_at: t.integer("completed_at"),
   is_deleted: t
     .integer("is_deleted", { mode: "boolean" })
     .notNull()

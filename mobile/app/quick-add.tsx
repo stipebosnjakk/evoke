@@ -1,23 +1,38 @@
+import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
+
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { quickAddTask } from "@/store/actions/tasks.actions";
 
 const QuickAddModal = () => {
-  const [title, setTitle] = useState("");
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const submit = () => {
-    const t = title.trim();
-    if (!t) return;
-    console.log("Submitted:", t);
+  const [title, setTitle] = useState<string>("");
+
+  const { loading, error } = useAppSelector((state) => state.tasks);
+
+  const goBack = () => {
+    setTitle("");
     router.back();
+  };
+
+  const onSubmit = async () => {
+    if (title.trim().length === 0) return;
+
+    const result = await dispatch(quickAddTask({ title }));
+    if (quickAddTask.fulfilled.match(result)) {
+      goBack();
+      return;
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Quick Add</Text>
       <Text style={styles.helper}>
-        Use #Project, “tomorrow”, or “every week”.
+        Try #Project, “tomorrow”, or “every week”.
       </Text>
       <TextInput
         value={title}
@@ -26,14 +41,21 @@ const QuickAddModal = () => {
         placeholderTextColor="rgba(0,0,0,0.35)"
         autoFocus
         returnKeyType="done"
-        onSubmitEditing={submit}
+        onSubmitEditing={onSubmit}
         style={styles.input}
       />
       <View style={styles.actions}>
-        <Pressable onPress={() => router.back()} style={styles.btnSecondary}>
+        <Pressable onPress={goBack} style={styles.btnSecondary}>
           <Text style={styles.btnSecondaryText}>Close</Text>
         </Pressable>
-        <Pressable onPress={submit} style={styles.btnPrimary}>
+        <Pressable
+          onPress={onSubmit}
+          disabled={title.trim().length === 0 || loading}
+          style={[
+            styles.btnPrimary,
+            { opacity: title.trim().length === 0 || loading ? 0.6 : 1 },
+          ]}
+        >
           <Text style={styles.btnPrimaryText}>Add</Text>
         </Pressable>
       </View>

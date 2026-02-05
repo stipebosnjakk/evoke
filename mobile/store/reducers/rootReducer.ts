@@ -1,9 +1,9 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
-import taskReducer from "@/store/features/tasks/taskSlice";
+import taskReducer from "@/store/slices/tasks.slices";
 
 const rootReducer = combineReducers({
-    tasks: taskReducer
-})
+  tasks: taskReducer,
+});
 
 export default rootReducer;

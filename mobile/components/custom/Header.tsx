@@ -12,10 +12,10 @@ import IconButton from "@/components/ui/IconButton";
 type HeaderProps = { title: string };
 
 const Header = ({ title }: HeaderProps) => {
+  const router = useRouter();
+
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
-
-  const router = useRouter();
 
   const { colors, locations } = easeGradient({
     colorStops: {
