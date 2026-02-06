@@ -8,6 +8,13 @@
       "when": 1770223410108,
       "tag": "0000_empty_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1770352570911,
+      "tag": "0001_bright_magik",
+      "breakpoints": true
     }
   ]
 }
