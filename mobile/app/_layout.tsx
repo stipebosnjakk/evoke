@@ -1,34 +1,27 @@
+import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { Provider } from "react-redux";
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
-
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import * as SQLite from "expo-sqlite";
 
-// TODO: check if drizle folder and migrations should be inside .env file
-// TODO: check this migration what to do with it 
 // TODO: quick add creation inbox placement task
-
-// TODO: push changes for .env file to gitignore
 
 import "@/global.css";
 import { store } from "@/store/store";
 import migrations from "@/drizzle/migrations";
 import { db } from "@/db/client";
-import { useEffect } from "react";
 
 const RootLayout = () => {
+  // TODO: on loading data, check if migrations = success, then render DB and Redux
   const { success, error } = useMigrations(db, migrations);
-  console.log("Migration status - success:", success, "error:", error);
 
   useEffect(() => {
+    if (!__DEV__) return;
     const deleteDb = async () => {
       await SQLite.deleteDatabaseAsync(process.env.EXPO_PUBLIC_DATABASE_NAME!);
-      console.log("Database deleted");
     };
-
-    // Uncomment the following line to delete the database on app start
     // deleteDb();
   }, []);
 

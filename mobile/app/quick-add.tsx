@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { quickAddTask } from "@/store/actions/tasks.actions";
 
+// TODO: add toast message after creation, and on error
+
 const QuickAddModal = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();

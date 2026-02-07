@@ -1,16 +1,27 @@
+import { View } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
+
 import { useColorTheme } from "@/hooks/useColorTheme";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 type ScreenContainerProps = {
   children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
 };
 
-const ScreenContainer = ({ children }: ScreenContainerProps) => {
+const ScreenContainer = ({ children, style }: ScreenContainerProps) => {
   const { colors } = useColorTheme();
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <View
+      style={[
+        {
+          flex: 1,
+          backgroundColor: colors.background,
+        },
+        style,
+      ]}
+    >
       {children}
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Text } from "react-native";
 
-const profile = () => {
+import ScreenContainer from "@/components/custom/ScreenContainer";
+
+const ProjectsScreen = () => {
   return (
-    <View>
+    <ScreenContainer>
       <Text>projects</Text>
-    </View>
-  )
-}
+    </ScreenContainer>
+  );
+};
 
-export default profile
+export default ProjectsScreen;

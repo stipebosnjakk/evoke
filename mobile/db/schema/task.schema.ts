@@ -3,6 +3,8 @@ import { createId } from "@paralleldrive/cuid2";
 import { TaskStatus } from "@/types/create.types";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
+// FIX: on task creation, task has defined updated_at, on create by default it should be null
+
 export const tasks = t.sqliteTable("tasks", {
   id: t
     .text("id")
@@ -28,6 +30,7 @@ export const tasks = t.sqliteTable("tasks", {
   sort_order: t.real("sort_order").notNull(),
   duration_min: t.integer("duration_min"),
   recurrence_rule: t.text("recurrence_rule"),
+  is_inbox: t.integer("is_inbox", { mode: "boolean" }).notNull().default(false),
 });
 
 export type Task = InferSelectModel<typeof tasks>;

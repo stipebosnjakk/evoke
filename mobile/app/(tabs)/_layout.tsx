@@ -1,18 +1,26 @@
+import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Tabs, useSegments } from "expo-router";
 import { SymbolView } from "expo-symbols";
+
 import Header from "@/components/custom/Header";
-import { TITLE_BY_ROUTE } from "@/lib/routeTitle";
+import { TITLE_BY_ROUTE } from "@/lib/routes";
 
 type TabBarIconProps = {
   color: string;
   focused: boolean;
 };
 
-export default function TabLayout() {
+const TabLayout = () => {
   const segments = useSegments();
-  const active = segments[segments.length - 1] ?? "index";
-  const title = TITLE_BY_ROUTE[active] ?? "Today";
+  const activeRaw = segments[segments.length - 1];
+  const active = activeRaw === "(tabs)" ? "index" : activeRaw;
+
+  const [title, setTitle] = useState(TITLE_BY_ROUTE[active] || TITLE_BY_ROUTE.index);
+
+  useEffect(() => {
+    setTitle((prev) => TITLE_BY_ROUTE[active] ?? prev);
+  }, [active]);
 
   return (
     <View style={styles.root}>
@@ -89,7 +97,7 @@ export default function TabLayout() {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   root: {
@@ -100,3 +108,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+export default TabLayout;

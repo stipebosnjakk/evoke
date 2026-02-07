@@ -8,8 +8,11 @@ import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 
 import IconButton from "@/components/ui/IconButton";
+import { routes } from "@/lib/routes";
 
 type HeaderProps = { title: string };
+
+// FIX: on click for quick-add modal, label of the screen changes to Today
 
 const Header = ({ title }: HeaderProps) => {
   const router = useRouter();
@@ -19,14 +22,13 @@ const Header = ({ title }: HeaderProps) => {
 
   const { colors, locations } = easeGradient({
     colorStops: {
+      0.55: { color: "white" },
       1: { color: "transparent" },
-      0: { color: "rgba(255,255,255, 0.99)" },
-      0.5: { color: "white" },
     },
   });
 
   const openQuickAddModal = () => {
-    router.push("/quick-add");
+    router.push(routes.quickAdd.href);
   };
 
   return (
@@ -38,7 +40,7 @@ const Header = ({ title }: HeaderProps) => {
           top: 0,
           left: 0,
           right: 0,
-          height: headerH + 60,
+          height: headerH + 40,
           zIndex: 10,
         }}
       >

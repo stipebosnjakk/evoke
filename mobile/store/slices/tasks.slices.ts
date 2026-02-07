@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { Task } from "@/db/schema/index";
-import { quickAddTask } from "@/store/actions/tasks.actions";
+import { fetchAllTasks, quickAddTask } from "@/store/actions/tasks.actions";
 
 type TasksState = {
   tasks: Task[];
@@ -15,12 +15,26 @@ const initialState: TasksState = {
   error: null,
 };
 
+// TODO: return better error messages
+
 const taskSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchAllTasks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllTasks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
+      })
+      .addCase(fetchAllTasks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = "Failed to load tasks";
+      })
       .addCase(quickAddTask.pending, (state, action) => {
         state.loading = true;
         state.error = null;

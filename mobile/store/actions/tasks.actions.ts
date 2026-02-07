@@ -4,6 +4,11 @@ import { eq } from "drizzle-orm";
 
 import { db, tasks, type Task } from "@/db";
 
+export const fetchAllTasks = createAsyncThunk("tasks/fetchAll", async () => {
+  const rows = await db.select().from(tasks);
+  return rows as Task[];
+});
+
 export const quickAddTask = createAsyncThunk(
   "tasks/quickAdd",
   async ({ title }: { title: string }, { rejectWithValue }) => {

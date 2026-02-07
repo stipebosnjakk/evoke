@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Text } from "react-native";
 
-const focus = () => {
+import ScreenContainer from "@/components/custom/ScreenContainer";
+
+const PlanScreen = () => {
   return (
-    <View>
+    <ScreenContainer>
       <Text>Plan</Text>
-    </View>
-  )
-}
+    </ScreenContainer>
+  );
+};
 
-export default focus
+export default PlanScreen;

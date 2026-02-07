@@ -1,8 +1,10 @@
-import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
+import ScreenContainer from "@/components/custom/ScreenContainer";
+
+import { View, Text, ScrollView, Dimensions } from "react-native";
 
 const TodayScreen = () => {
   return (
-    <View style={styles.screen}>
+    <ScreenContainer>
       <ScrollView
         contentContainerStyle={{
           minHeight: Dimensions.get("window").height * 2,
@@ -19,12 +21,8 @@ const TodayScreen = () => {
           <Text>Some random text</Text>
         </View>
       </ScrollView>
-    </View>
+    </ScreenContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "white" },
-});
 
 export default TodayScreen;
