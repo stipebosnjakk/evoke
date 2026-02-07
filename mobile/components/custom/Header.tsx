@@ -12,8 +12,6 @@ import { routes } from "@/lib/routes";
 
 type HeaderProps = { title: string };
 
-// FIX: on click for quick-add modal, label of the screen changes to Today
-
 const Header = ({ title }: HeaderProps) => {
   const router = useRouter();
 
