@@ -1,11 +1,10 @@
+import { useState } from "react";
 import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { quickAddTask } from "@/store/actions/tasks.actions";
-
-// TODO: add toast message after creation, and on error
 
 const QuickAddModal = () => {
   const router = useRouter();
@@ -13,20 +12,29 @@ const QuickAddModal = () => {
 
   const [title, setTitle] = useState<string>("");
 
-  const { loading, error } = useAppSelector((state) => state.tasks);
-
-  const goBack = () => {
-    setTitle("");
-    router.back();
-  };
+  const { loading } = useAppSelector((state) => state.tasks);
 
   const onSubmit = async () => {
+    if (loading) return;
     if (title.trim().length === 0) return;
 
     const result = await dispatch(quickAddTask({ title }));
     if (quickAddTask.fulfilled.match(result)) {
-      goBack();
+      Toast.show({
+        type: "success",
+        text1: "Task added",
+        text2: title,
+      });
+      setTitle("");
+      router.back();
       return;
+    }
+    if (quickAddTask.rejected.match(result)) {
+      Toast.show({
+        type: "error",
+        text1: "Couldn’t add task",
+        text2: result.error?.message || "Try again",
+      });
     }
   };
 
@@ -45,9 +53,14 @@ const QuickAddModal = () => {
         returnKeyType="done"
         onSubmitEditing={onSubmit}
         style={styles.input}
+        blurOnSubmit={true}
       />
       <View style={styles.actions}>
-        <Pressable onPress={goBack} style={styles.btnSecondary}>
+        <Pressable
+          disabled={loading}
+          onPress={() => router.back()}
+          style={styles.btnSecondary}
+        >
           <Text style={styles.btnSecondaryText}>Close</Text>
         </Pressable>
         <Pressable

@@ -4,6 +4,8 @@ import { Provider } from "react-redux";
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "@/components/ui/ToastConfig";
 import * as SQLite from "expo-sqlite";
 
 // TODO: quick add creation inbox placement task
@@ -56,6 +58,7 @@ const RootLayout = () => {
         />
       </Stack>
       <PortalHost />
+      <Toast config={toastConfig} />
     </Provider>
   );
 };

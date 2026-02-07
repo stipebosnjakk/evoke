@@ -15,13 +15,15 @@ import { fetchAllTasks } from "@/store/actions/tasks.actions";
 import { routes } from "@/lib/routes";
 import { type Task } from "@/db";
 import ScreenContainer from "@/components/custom/ScreenContainer";
+import { createdAtFormat } from "@/lib/dateFormat";
+import Toast from "react-native-toast-message";
 
 type RenderTaskItem = {
   item: Task;
 };
 
-// TODO: create a file where you set all possible routes so you can use them as variables across the app, instead of hardcoding strings everywhere. This will help avoid typos and make it easier to refactor routes in the future. For example, you can create a file called routes.ts and export constants for each route:
-
+// TODO: create a toast message (error/success)
+// TODO: filter tasks for inbox, set is_inbox true ,...
 const InboxScreen = () => {
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
@@ -35,19 +37,6 @@ const InboxScreen = () => {
     dispatch(fetchAllTasks());
   }, [dispatch]);
 
-  if (loading)
-    return (
-      <ScreenContainer>
-        <ActivityIndicator />
-      </ScreenContainer>
-    );
-  if (error)
-    return (
-      <ScreenContainer>
-        <Text>{error}</Text>
-      </ScreenContainer>
-    );
-
   const onQuickAdd = () => {
     router.push(routes.quickAdd.href);
   };
@@ -60,9 +49,25 @@ const InboxScreen = () => {
       <Text numberOfLines={1} style={styles.inboxTaskTitleText}>
         {item.title}
       </Text>
-      <Text>Created at: {new Date(item.created_at).toLocaleDateString()}</Text>
+      <Text style={styles.inboxTaskCreatedDateText}>
+        {createdAtFormat(item.created_at)}
+      </Text>
     </TouchableOpacity>
   );
+
+  if (loading)
+    return (
+      <ScreenContainer>
+        <ActivityIndicator />
+      </ScreenContainer>
+    );
+
+  if (error)
+    return (
+      <ScreenContainer>
+        <Text>{error}</Text>
+      </ScreenContainer>
+    );
 
   return (
     <ScreenContainer>
@@ -115,8 +120,8 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
     borderColor: "#E6EAF0",
-    paddingHorizontal: 22,
-    paddingVertical: 18,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
     elevation: 1,
   },
   inboxTaskTitleText: {
@@ -182,6 +187,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
     color: "#0F172A",
+  },
+  inboxTaskCreatedDateText: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: "#7B8798",
+    marginTop: 4,
   },
 });
 
