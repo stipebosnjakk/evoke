@@ -15,6 +15,13 @@
       "when": 1770352570911,
       "tag": "0001_bright_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1770572144585,
+      "tag": "0002_drop_is_inbox",
+      "breakpoints": true
     }
   ]
 }

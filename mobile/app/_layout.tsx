@@ -1,46 +1,41 @@
 import { useEffect } from "react";
-import { Text, View } from "react-native";
 import { Provider } from "react-redux";
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "@/components/ui/ToastConfig";
-import * as SQLite from "expo-sqlite";
-
-// TODO: quick add creation inbox placement task
+import { ActivityIndicator } from "react-native";
 
 import "@/global.css";
 import { store } from "@/store/store";
 import migrations from "@/drizzle/migrations";
 import { db } from "@/db/client";
+import ScreenContainer from "@/components/custom/ScreenContainer";
 
 const RootLayout = () => {
-  // TODO: on loading data, check if migrations = success, then render DB and Redux
+  // TODO: on loading, check if migrations = success, then render DB and Redux
   const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
-    if (!__DEV__) return;
-    const deleteDb = async () => {
-      await SQLite.deleteDatabaseAsync(process.env.EXPO_PUBLIC_DATABASE_NAME!);
-    };
-    // deleteDb();
-  }, []);
+    if (!error) return;
+    Toast.show({
+      type: "error",
+      text1: "Database error",
+      text2: error.message || "Try reinstalling the app",
+    });
+  }, [error]);
 
-  if (error) {
-    return (
-      <View>
-        <Text>Migration error: {error.message}</Text>
-      </View>
-    );
-  }
   if (!success) {
     return (
-      <View>
-        <Text>Migration is in progress...</Text>
-      </View>
+      <ScreenContainer
+        style={{ justifyContent: "center", alignItems: "center" }}
+      >
+        <ActivityIndicator />
+      </ScreenContainer>
     );
   }
+
   return (
     <Provider store={store}>
       <Stack screenOptions={{ headerShown: false }}>
@@ -54,6 +49,7 @@ const RootLayout = () => {
             sheetCornerRadius: 16,
             sheetLargestUndimmedDetentIndex: "none",
             headerShown: false,
+            contentStyle: { backgroundColor: "white" },
           }}
         />
       </Stack>

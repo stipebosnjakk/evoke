@@ -22,7 +22,7 @@ const QuickAddModal = () => {
     if (quickAddTask.fulfilled.match(result)) {
       Toast.show({
         type: "success",
-        text1: "Task added",
+        text1: "Task created",
         text2: title,
       });
       setTitle("");

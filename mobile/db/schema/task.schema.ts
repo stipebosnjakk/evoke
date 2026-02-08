@@ -28,7 +28,6 @@ export const tasks = t.sqliteTable("tasks", {
   sort_order: t.real("sort_order").notNull(),
   duration_min: t.integer("duration_min"),
   recurrence_rule: t.text("recurrence_rule"),
-  is_inbox: t.integer("is_inbox", { mode: "boolean" }).notNull().default(false),
 });
 
 export type Task = InferSelectModel<typeof tasks>;

@@ -6,12 +6,12 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { fetchAllTasks } from "@/store/actions/tasks.actions";
+import { fetchInboxTasks } from "@/store/actions/tasks.actions";
 import { routes } from "@/lib/routes";
 import { type Task } from "@/db";
 import ScreenContainer from "@/components/custom/ScreenContainer";
@@ -22,20 +22,40 @@ type RenderTaskItem = {
   item: Task;
 };
 
-// TODO: create a toast message (error/success)
-// TODO: filter tasks for inbox, set is_inbox true ,...
 const InboxScreen = () => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
   const headerFadeExtra = 12;
 
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { tasks, loading, error } = useAppSelector((state) => state.tasks);
+  const limit = useAppSelector((s) => s.tasks.lists.inbox.limit);
+  const offset = useAppSelector((s) => s.tasks.lists.inbox.offset);
+  const loading = useAppSelector((s) => s.tasks.lists.inbox.loading);
+  const error = useAppSelector((s) => s.tasks.lists.inbox.error);
+  const hasMore = useAppSelector((s) => s.tasks.lists.inbox.hasMore);
+
+  const ids = useAppSelector((s) => s.tasks.lists.inbox.ids);
+  const byId = useAppSelector((s) => s.tasks.tasks.byId);
+  const inboxTasks = ids.map((id) => byId[id]).filter(Boolean);
 
   useEffect(() => {
-    dispatch(fetchAllTasks());
-  }, [dispatch]);
+    dispatch(fetchInboxTasks({ limit, offset: 0 }));
+  }, [dispatch, limit]);
+
+  useEffect(() => {
+    if (!error) return;
+    Toast.show({
+      type: "error",
+      text1: "Couldn't load inbox",
+      text2: error ?? "Try again later",
+    });
+  }, [error]);
+
+  const loadMore = () => {
+    if (!loading && hasMore) dispatch(fetchInboxTasks({ limit, offset }));
+  };
 
   const onQuickAdd = () => {
     router.push(routes.quickAdd.href);
@@ -44,38 +64,42 @@ const InboxScreen = () => {
     router.push(routes.plan.href);
   };
 
-  const renderTaskItem = ({ item }: RenderTaskItem) => (
-    <TouchableOpacity activeOpacity={0.2} style={styles.inboxTaskCardContainer}>
-      <Text numberOfLines={1} style={styles.inboxTaskTitleText}>
-        {item.title}
-      </Text>
-      <Text style={styles.inboxTaskCreatedDateText}>
-        {createdAtFormat(item.created_at)}
-      </Text>
-    </TouchableOpacity>
+  const renderTaskItem = useCallback(
+    ({ item }: RenderTaskItem) => (
+      <TouchableOpacity
+        activeOpacity={0.2}
+        style={styles.inboxTaskCardContainer}
+      >
+        <Text numberOfLines={1} style={styles.inboxTaskTitleText}>
+          {item.title}
+        </Text>
+        <Text style={styles.inboxTaskCreatedDateText}>
+          {createdAtFormat(item.created_at)}
+        </Text>
+      </TouchableOpacity>
+    ),
+    [],
   );
 
-  if (loading)
+  if (loading && ids.length === 0)
     return (
-      <ScreenContainer>
+      <ScreenContainer
+        style={{ justifyContent: "center", alignItems: "center" }}
+      >
         <ActivityIndicator />
-      </ScreenContainer>
-    );
-
-  if (error)
-    return (
-      <ScreenContainer>
-        <Text>{error}</Text>
       </ScreenContainer>
     );
 
   return (
     <ScreenContainer>
-      {tasks && tasks.length > 0 ? (
+      {inboxTasks && inboxTasks.length > 0 ? (
         <FlatList
-          data={tasks}
+          data={inboxTasks}
           keyExtractor={(item) => item.id}
           renderItem={renderTaskItem}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.6}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.inboxTaskListContentContainer,
             { paddingTop: headerH + headerFadeExtra },
@@ -83,7 +107,6 @@ const InboxScreen = () => {
           ItemSeparatorComponent={() => (
             <View style={styles.inboxTaskRowSpacer} />
           )}
-          showsVerticalScrollIndicator={false}
         />
       ) : (
         <View style={styles.emptyContainer}>
@@ -110,6 +133,13 @@ const InboxScreen = () => {
           </View>
         </View>
       )}
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="small" />
+        </View>
+      ) : null}
     </ScreenContainer>
   );
 };
