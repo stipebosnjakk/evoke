@@ -54,7 +54,8 @@ const InboxScreen = () => {
   }, [error]);
 
   const loadMore = () => {
-    if (!loading && hasMore) dispatch(fetchInboxTasks({ limit, offset }));
+    if (loading || !hasMore) return;
+    dispatch(fetchInboxTasks({ limit, offset }));
   };
 
   const onQuickAdd = () => {
@@ -98,7 +99,7 @@ const InboxScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={renderTaskItem}
           onEndReached={loadMore}
-          onEndReachedThreshold={0.6}
+          onEndReachedThreshold={0.2}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.inboxTaskListContentContainer,
@@ -107,6 +108,9 @@ const InboxScreen = () => {
           ItemSeparatorComponent={() => (
             <View style={styles.inboxTaskRowSpacer} />
           )}
+          ListFooterComponent={
+            loading ? <ActivityIndicator size="small" /> : null
+          }
         />
       ) : (
         <View style={styles.emptyContainer}>
@@ -133,13 +137,6 @@ const InboxScreen = () => {
           </View>
         </View>
       )}
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="small" />
-        </View>
-      ) : null}
     </ScreenContainer>
   );
 };
