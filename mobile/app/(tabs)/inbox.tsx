@@ -22,6 +22,8 @@ type RenderTaskItem = {
   item: Task;
 };
 
+// TODO: start a manual order sorting
+
 const InboxScreen = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -39,6 +41,7 @@ const InboxScreen = () => {
   const ids = useAppSelector((s) => s.tasks.lists.inbox.ids);
   const byId = useAppSelector((s) => s.tasks.tasks.byId);
   const inboxTasks = ids.map((id) => byId[id]).filter(Boolean);
+  console.log(inboxTasks[0])
 
   useEffect(() => {
     dispatch(fetchInboxTasks({ limit, offset: 0 }));

@@ -32,7 +32,7 @@ export const fetchInboxTasks = createAsyncThunk<
       .where(where)
       .limit(limit)
       .offset(offset)
-      .orderBy(tasks.sort_order, tasks.created_at);
+      .orderBy(tasks.created_at);
 
     const totalResult = await db
       .select({ total: sql<number>`count(*)` })
@@ -60,7 +60,7 @@ export const quickAddTask = createAsyncThunk(
       return rejectWithValue("Title must be less than 255 characters");
 
     const id = createId();
-    await db.insert(tasks).values({ id, title: trimmed, sort_order: 0 });
+    await db.insert(tasks).values({ id, title: trimmed });
 
     const rows = await db.select().from(tasks).where(eq(tasks.id, id)).limit(1);
     const task = rows[0];
