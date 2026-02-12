@@ -13,7 +13,7 @@ export const tasks = t.sqliteTable("tasks", {
     .integer("created_at")
     .notNull()
     .$defaultFn(() => Date.now()),
-  updated_at:t.integer("updated_at"),
+  updated_at: t.integer("updated_at"),
   completed_at: t.integer("completed_at"),
   is_deleted: t
     .integer("is_deleted", { mode: "boolean" })
