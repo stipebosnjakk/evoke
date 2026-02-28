@@ -6,10 +6,11 @@ export const list_order = t.sqliteTable(
     container_id: t.text("container_id").notNull(),
     task_id: t.text("task_id").notNull(),
     order_key: t.real("order_key").notNull(),
-    updated_at: t
-      .integer("updated_at")
+    created_at: t
+      .integer("created_at")
       .notNull()
       .$defaultFn(() => Date.now()),
+    updated_at: t.integer("updated_at"),
   },
   (table) => [
     t.primaryKey({ columns: [table.container_id, table.task_id] }),

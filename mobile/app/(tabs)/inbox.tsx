@@ -1,50 +1,52 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { useCallback, useEffect } from "react";
 import { useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { fetchInboxTasks } from "@/store/actions/tasks.actions";
-import { routes } from "@/lib/routes";
-import { type Task } from "@/db";
-import ScreenContainer from "@/components/custom/ScreenContainer";
-import { createdAtFormat } from "@/lib/dateFormat";
 import Toast from "react-native-toast-message";
 
-type RenderTaskItem = {
-  item: Task;
-};
-
-// TODO: start a manual order sorting
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { routes } from "@/utils/routes";
+import ScreenContainer from "@/components/custom/ScreenContainer";
+import { changeContainerId } from "@/store/tasks/tasks.slice";
+import { INBOX_CONTAINER_ID } from "@/utils/containerIds";
+import { TaskWithOrderKey } from "@/types/task.types";
+import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
+import DraggableTaskList from "@/components/tasks/DraggableTaskList";
 
 const InboxScreen = () => {
-  const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const insets = useSafeAreaInsets();
-  const headerH = insets.top + 44;
-  const headerFadeExtra = 12;
+  const loading = useAppSelector((state) => state.tasks.lists.inbox.loading);
+  const error = useAppSelector((state) => state.tasks.lists.inbox.error);
+  const limit = useAppSelector((state) => state.tasks.lists.inbox.limit);
+  const ids = useAppSelector((state) => state.tasks.lists.inbox.ids);
+  const byId = useAppSelector((state) => state.tasks.tasks.byId);
 
-  const limit = useAppSelector((s) => s.tasks.lists.inbox.limit);
-  const offset = useAppSelector((s) => s.tasks.lists.inbox.offset);
-  const loading = useAppSelector((s) => s.tasks.lists.inbox.loading);
-  const error = useAppSelector((s) => s.tasks.lists.inbox.error);
-  const hasMore = useAppSelector((s) => s.tasks.lists.inbox.hasMore);
+  const inboxTasks = useMemo(
+    () =>
+      ids
+        .map(({ id, order_key }) => {
+          const task = byId[id];
+          return task ? { ...task, order_key } : null;
+        })
+        .filter((task): task is TaskWithOrderKey => Boolean(task)),
+    [ids, byId],
+  );
 
-  const ids = useAppSelector((s) => s.tasks.lists.inbox.ids);
-  const byId = useAppSelector((s) => s.tasks.tasks.byId);
-  const inboxTasks = ids.map((id) => byId[id]).filter(Boolean);
-  console.log(inboxTasks[0])
+  const [data, setData] = useState<TaskWithOrderKey[]>([]);
 
   useEffect(() => {
-    dispatch(fetchInboxTasks({ limit, offset: 0 }));
+    setData(inboxTasks);
+  }, [inboxTasks]);
+
+  useEffect(() => {
+    dispatch(changeContainerId({ containerId: INBOX_CONTAINER_ID }));
+    dispatch(getInboxTasksAction({ limit, offset: 0 }));
   }, [dispatch, limit]);
 
   useEffect(() => {
@@ -56,36 +58,7 @@ const InboxScreen = () => {
     });
   }, [error]);
 
-  const loadMore = () => {
-    if (loading || !hasMore) return;
-    dispatch(fetchInboxTasks({ limit, offset }));
-  };
-
-  const onQuickAdd = () => {
-    router.push(routes.quickAdd.href);
-  };
-  const onGoToPlan = () => {
-    router.push(routes.plan.href);
-  };
-
-  const renderTaskItem = useCallback(
-    ({ item }: RenderTaskItem) => (
-      <TouchableOpacity
-        activeOpacity={0.2}
-        style={styles.inboxTaskCardContainer}
-      >
-        <Text numberOfLines={1} style={styles.inboxTaskTitleText}>
-          {item.title}
-        </Text>
-        <Text style={styles.inboxTaskCreatedDateText}>
-          {createdAtFormat(item.created_at)}
-        </Text>
-      </TouchableOpacity>
-    ),
-    [],
-  );
-
-  if (loading && ids.length === 0)
+  if (loading || (ids.length > 0 && data.length === 0)) {
     return (
       <ScreenContainer
         style={{ justifyContent: "center", alignItems: "center" }}
@@ -93,79 +66,65 @@ const InboxScreen = () => {
         <ActivityIndicator />
       </ScreenContainer>
     );
+  }
+
+  if (!loading && !data.length && !error) {
+    return (
+      <ScreenContainer>
+        <NoTasksView />
+      </ScreenContainer>
+    );
+  }
 
   return (
     <ScreenContainer>
-      {inboxTasks && inboxTasks.length > 0 ? (
-        <FlatList
-          data={inboxTasks}
-          keyExtractor={(item) => item.id}
-          renderItem={renderTaskItem}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.2}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.inboxTaskListContentContainer,
-            { paddingTop: headerH + headerFadeExtra },
-          ]}
-          ItemSeparatorComponent={() => (
-            <View style={styles.inboxTaskRowSpacer} />
-          )}
-          ListFooterComponent={
-            loading ? <ActivityIndicator size="small" /> : null
-          }
-        />
-      ) : (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.titleText}>Your inbox is clear</Text>
-          <Text style={styles.subtitleText}>
-            Inbox holds unprocessed tasks.{"\n"}Capture tasks here and organize
-            {"\n"}them later.
-          </Text>
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={onQuickAdd}
-              style={styles.primaryButton}
-            >
-              <Text style={styles.primaryButtonText}>Quick Add</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={onGoToPlan}
-              style={styles.secondaryButton}
-            >
-              <Text style={styles.secondaryButtonText}>Go to Plan</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      <DraggableTaskList
+        data={data}
+        setData={setData}
+        loading={loading}
+        limit={limit}
+      />
     </ScreenContainer>
   );
 };
 
+const NoTasksView = () => {
+  const router = useRouter();
+
+  const onQuickAdd = () => {
+    router.push(routes.quickAdd.href);
+  };
+  const onGoToPlan = () => {
+    router.push(routes.plan.href);
+  };
+  return (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.titleText}>Your inbox is clear</Text>
+      <Text style={styles.subtitleText}>
+        Inbox holds unprocessed tasks.{"\n"}Capture tasks here and organize
+        {"\n"}them later.
+      </Text>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={onQuickAdd}
+          style={styles.primaryButton}
+        >
+          <Text style={styles.primaryButtonText}>Quick Add</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={onGoToPlan}
+          style={styles.secondaryButton}
+        >
+          <Text style={styles.secondaryButtonText}>Go to Plan</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
-  inboxTaskCardContainer: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: "#E6EAF0",
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    elevation: 1,
-  },
-  inboxTaskTitleText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "black",
-    letterSpacing: 0.2,
-  },
-  inboxTaskListContentContainer: {
-    padding: 16,
-  },
-  inboxTaskRowSpacer: {
-    height: 14,
-  },
   emptyContainer: {
     flex: 1,
     alignItems: "center",
@@ -217,12 +176,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
     color: "#0F172A",
-  },
-  inboxTaskCreatedDateText: {
-    fontSize: 12,
-    fontWeight: "400",
-    color: "#7B8798",
-    marginTop: 4,
   },
 });
 

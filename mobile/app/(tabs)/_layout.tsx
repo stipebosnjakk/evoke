@@ -4,7 +4,7 @@ import { Tabs, useSegments } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
 import Header from "@/components/custom/Header";
-import { TITLE_BY_ROUTE } from "@/lib/routes";
+import { TITLE_BY_ROUTE } from "@/utils/routes";
 
 type TabBarIconProps = {
   color: string;
@@ -16,7 +16,9 @@ const TabLayout = () => {
   const activeRaw = segments[segments.length - 1];
   const active = activeRaw === "(tabs)" ? "index" : activeRaw;
 
-  const [title, setTitle] = useState(TITLE_BY_ROUTE[active] || TITLE_BY_ROUTE.index);
+  const [title, setTitle] = useState(
+    TITLE_BY_ROUTE[active] || TITLE_BY_ROUTE.index,
+  );
 
   useEffect(() => {
     setTitle((prev) => TITLE_BY_ROUTE[active] ?? prev);

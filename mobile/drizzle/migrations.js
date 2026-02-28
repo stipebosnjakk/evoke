@@ -5,6 +5,7 @@ import m0000 from './0000_empty_moonstone.sql';
 import m0001 from './0001_bright_magik.sql';
 import m0002 from './0002_drop_is_inbox.sql';
 import m0003 from './0003_shocking_true_believers.sql';
+import m0004 from './0004_real_pretty_boy.sql';
 
   export default {
     journal,
@@ -12,7 +13,8 @@ import m0003 from './0003_shocking_true_believers.sql';
       m0000,
 m0001,
 m0002,
-m0003
+m0003,
+m0004
     }
   }
   

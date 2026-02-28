@@ -4,7 +4,10 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { quickAddTask } from "@/store/actions/tasks.actions";
+import { quickAddTaskAction } from "@/store/tasks/thunks/create.thunks";
+import { handleErrorMessage } from "@/utils/handleErrorMessage";
+
+// FIX: make error toast appear in front of modal background
 
 const QuickAddModal = () => {
   const router = useRouter();
@@ -12,29 +15,40 @@ const QuickAddModal = () => {
 
   const [title, setTitle] = useState<string>("");
 
-  const { loading } = useAppSelector((state) => state.tasks);
+  const loading = useAppSelector((state) => state.tasks.loading);
+
+  const showErrorToast = (message: string) => {
+    Toast.show({
+      type: "error",
+      text1: "Failed to create a task",
+      text2: message || "Something went wrong.",
+    });
+  };
 
   const onSubmit = async () => {
     if (loading) return;
-    if (title.trim().length === 0) return;
 
-    const result = await dispatch(quickAddTask({ title }));
-    if (quickAddTask.fulfilled.match(result)) {
+    const trimmed = title.trim();
+    if (trimmed.length === 0) {
+      showErrorToast("Title is required");
+      return;
+    }
+    if (trimmed.length > 255) {
+      showErrorToast("Title must be less than 255 characters");
+      return;
+    }
+
+    try {
+      await dispatch(quickAddTaskAction({ title: trimmed })).unwrap();
       Toast.show({
         type: "success",
         text1: "Task created",
-        text2: title,
+        text2: trimmed,
       });
       setTitle("");
       router.back();
-      return;
-    }
-    if (quickAddTask.rejected.match(result)) {
-      Toast.show({
-        type: "error",
-        text1: "Couldn’t add task",
-        text2: result.error?.message || "Try again",
-      });
+    } catch (error: unknown) {
+      showErrorToast(handleErrorMessage(error, "Something went wrong."));
     }
   };
 
