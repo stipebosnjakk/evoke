@@ -10,5 +10,5 @@ export const routes = {
   plan: { title: "Plan", href: "/(tabs)/plan" },
   inbox: { title: "Inbox", href: "/(tabs)/inbox" },
   projects: { title: "Projects", href: "/(tabs)/projects" },
-  quickAdd: { title: "Quick Add", href: "/quick-add" },
+  create: { title: "Create Task", href: "/create-task" },
 } as const;

@@ -4,12 +4,12 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { quickAddTaskAction } from "@/store/tasks/thunks/create.thunks";
+import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
 
 // FIX: make error toast appear in front of modal background
 
-const QuickAddModal = () => {
+const CreateTaskModal = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -39,7 +39,7 @@ const QuickAddModal = () => {
     }
 
     try {
-      await dispatch(quickAddTaskAction({ title: trimmed })).unwrap();
+      await dispatch(createTaskAction({ title: trimmed })).unwrap();
       Toast.show({
         type: "success",
         text1: "Task created",
@@ -54,7 +54,6 @@ const QuickAddModal = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quick Add</Text>
       <Text style={styles.helper}>
         Try #Project, “tomorrow”, or “every week”.
       </Text>
@@ -143,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QuickAddModal;
+export default CreateTaskModal;

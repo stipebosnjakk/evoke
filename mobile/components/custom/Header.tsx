@@ -25,8 +25,8 @@ const Header = ({ title }: HeaderProps) => {
     },
   });
 
-  const openQuickAddModal = () => {
-    router.push(routes.quickAdd.href);
+  const navigateToCreateModal = () => {
+    router.push(routes.create.href);
   };
 
   return (
@@ -87,15 +87,7 @@ const Header = ({ title }: HeaderProps) => {
         </View>
         <View style={styles.right}>
           <View style={styles.rightActions}>
-            <IconButton onPress={openQuickAddModal} style={styles.iconBtnMr}>
-              <SymbolView
-                name="bolt.fill"
-                size={22}
-                type="monochrome"
-                tintColor="#111827"
-              />
-            </IconButton>
-            <IconButton onPress={() => {}} style={styles.alignEnd}>
+            <IconButton onPress={navigateToCreateModal} style={styles.alignEnd}>
               <SymbolView
                 name="plus"
                 size={22}

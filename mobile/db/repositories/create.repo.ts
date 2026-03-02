@@ -8,7 +8,7 @@ import { INBOX_CONTAINER_ID } from "@/utils/containerIds";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
-export const quickAddTask = async (
+export const createTaskRepo = async (
   title: string,
 ): Promise<TaskWithOrderKey> => {
   try {

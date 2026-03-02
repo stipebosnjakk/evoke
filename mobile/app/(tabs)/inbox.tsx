@@ -91,10 +91,10 @@ const InboxScreen = () => {
 const NoTasksView = () => {
   const router = useRouter();
 
-  const onQuickAdd = () => {
-    router.push(routes.quickAdd.href);
+  const navigateToCreateModal = () => {
+    router.push(routes.create.href);
   };
-  const onGoToPlan = () => {
+  const navigateToPlan = () => {
     router.push(routes.plan.href);
   };
   return (
@@ -107,14 +107,14 @@ const NoTasksView = () => {
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={onQuickAdd}
+          onPress={navigateToCreateModal}
           style={styles.primaryButton}
         >
-          <Text style={styles.primaryButtonText}>Quick Add</Text>
+          <Text style={styles.primaryButtonText}>Create Task</Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={onGoToPlan}
+          onPress={navigateToPlan}
           style={styles.secondaryButton}
         >
           <Text style={styles.secondaryButtonText}>Go to Plan</Text>

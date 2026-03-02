@@ -1,22 +1,22 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 import { TasksState } from "@/types/initialState";
-import { quickAddTaskAction } from "@/store/tasks/thunks/create.thunks";
+import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { isInboxTask, isPlanTask, isTodayTask } from "@/store/tasks/routing";
 
 export const addCreationExtraReducers = (
   builder: ActionReducerMapBuilder<TasksState>,
 ) => {
   builder
-    .addCase(quickAddTaskAction.pending, (state, _) => {
+    .addCase(createTaskAction.pending, (state, _) => {
       state.loading = true;
       state.error = null;
     })
-    .addCase(quickAddTaskAction.rejected, (state, action) => {
+    .addCase(createTaskAction.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload?.message || "Failed to create task";
     })
-    .addCase(quickAddTaskAction.fulfilled, (state, action) => {
+    .addCase(createTaskAction.fulfilled, (state, action) => {
       state.loading = false;
       state.error = null;
 
