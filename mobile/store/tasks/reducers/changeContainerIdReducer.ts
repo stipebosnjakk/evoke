@@ -1,4 +1,4 @@
-import { ContainerIdType } from "@/types/create.types";
+import { ContainerIdType } from "@/types/task.types";
 import { TasksState } from "@/types/initialState";
 
 type ActionPayload = {

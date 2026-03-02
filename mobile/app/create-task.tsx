@@ -1,19 +1,32 @@
-import { useState } from "react";
-import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-
-// FIX: make error toast appear in front of modal background
+import { SymbolView } from "expo-symbols";
+import Chip from "@/components/ui/Chip";
+import { TaskStatusOption } from "@/types/task.types";
+import DropdownStatus from "@/components/custom/DropdownStatus";
 
 const CreateTaskModal = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  const descriptionRef = useRef<TextInput>(null);
+
   const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [status, setStatus] = useState<TaskStatusOption | null>(null);
 
   const loading = useAppSelector((state) => state.tasks.loading);
 
@@ -28,24 +41,31 @@ const CreateTaskModal = () => {
   const onSubmit = async () => {
     if (loading) return;
 
-    const trimmed = title.trim();
-    if (trimmed.length === 0) {
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (trimmedTitle.length === 0) {
       showErrorToast("Title is required");
       return;
     }
-    if (trimmed.length > 255) {
+    if (trimmedTitle.length > 255) {
       showErrorToast("Title must be less than 255 characters");
+      return;
+    }
+    if (trimmedDescription.length > 5000) {
+      showErrorToast("Description must be less than 5000 characters");
       return;
     }
 
     try {
-      await dispatch(createTaskAction({ title: trimmed })).unwrap();
+      await dispatch(createTaskAction({ title: trimmedTitle })).unwrap();
       Toast.show({
         type: "success",
         text1: "Task created",
-        text2: trimmed,
+        text2: trimmedTitle,
       });
       setTitle("");
+      setDescription("");
       router.back();
     } catch (error: unknown) {
       showErrorToast(handleErrorMessage(error, "Something went wrong."));
@@ -53,41 +73,65 @@ const CreateTaskModal = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.helper}>
-        Try #Project, “tomorrow”, or “every week”.
-      </Text>
-      <TextInput
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Task title"
-        placeholderTextColor="rgba(0,0,0,0.35)"
-        autoFocus
-        returnKeyType="done"
-        onSubmitEditing={onSubmit}
-        style={styles.input}
-        blurOnSubmit={true}
-      />
-      <View style={styles.actions}>
-        <Pressable
-          disabled={loading}
-          onPress={() => router.back()}
-          style={styles.btnSecondary}
-        >
-          <Text style={styles.btnSecondaryText}>Close</Text>
-        </Pressable>
-        <Pressable
-          onPress={onSubmit}
-          disabled={title.trim().length === 0 || loading}
-          style={[
-            styles.btnPrimary,
-            { opacity: title.trim().length === 0 || loading ? 0.6 : 1 },
-          ]}
-        >
-          <Text style={styles.btnPrimaryText}>Add</Text>
-        </Pressable>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
+    >
+      <View style={styles.container}>
+        <Text style={styles.helper}>
+          Try #Project, “tomorrow”, or “every week”.
+        </Text>
+        <View style={styles.fields}>
+          <TextInput
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Task title"
+            placeholderTextColor="rgba(0,0,0,0.35)"
+            autoFocus
+            returnKeyType="next"
+            onSubmitEditing={() => descriptionRef.current?.focus()}
+            style={styles.titleInput}
+            blurOnSubmit={false}
+          />
+          <TextInput
+            ref={descriptionRef}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Description"
+            placeholderTextColor="rgba(0,0,0,0.35)"
+            multiline
+            style={styles.descriptionInput}
+            textAlignVertical="top"
+          />
+        </View>
       </View>
-    </View>
+      <View>
+        <View style={styles.row}>
+          <DropdownStatus status={status} setStatus={setStatus} />
+          <Chip icon="calendar" label="Schedule" />
+          <Chip icon="repeat" label="Repeat" />
+        </View>
+        <View style={styles.actions}>
+          <Pressable
+            onPress={onSubmit}
+            disabled={title.trim().length === 0 || loading}
+            style={[
+              styles.btnPrimary,
+              { opacity: title.trim().length === 0 || loading ? 0.6 : 1 },
+            ]}
+          >
+            <SymbolView
+              name="plus"
+              weight="medium"
+              size={18}
+              type="monochrome"
+              tintColor="white"
+            />
+          </Pressable>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -95,50 +139,51 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-  },
   helper: {
     marginTop: 6,
     fontSize: 14,
     opacity: 0.6,
   },
-  input: {
+  fields: {
     marginTop: 16,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    backgroundColor: "rgba(0,0,0,0.04)",
-    fontSize: 16,
+    gap: 10,
+  },
+  titleInput: {
+    fontSize: 18,
+    fontWeight: "600",
+    paddingVertical: 6,
+    paddingHorizontal: 0,
+    backgroundColor: "transparent",
+  },
+  descriptionInput: {
+    fontSize: 15,
+    lineHeight: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 0,
+    backgroundColor: "transparent",
+    minHeight: 80,
+    opacity: 0.9,
+    maxHeight: 130,
   },
   actions: {
     flexDirection: "row",
-    gap: 12,
     justifyContent: "flex-end",
-    marginTop: 16,
-  },
-  btnSecondary: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 999,
-    backgroundColor: "rgba(0,0,0,0.06)",
-  },
-  btnSecondaryText: {
-    fontSize: 16,
-    fontWeight: "600",
-    opacity: 0.75,
+    padding: 16,
   },
   btnPrimary: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 999,
+    padding: 15,
+    borderRadius: "50%",
     backgroundColor: "rgba(0,0,0,0.9)",
   },
-  btnPrimaryText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "white",
+  row: {
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottomWidth: 1,
+    paddingBottom: 20,
+    paddingLeft: 16,
   },
 });
 

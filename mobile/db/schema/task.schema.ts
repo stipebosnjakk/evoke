@@ -1,6 +1,6 @@
 import * as t from "drizzle-orm/sqlite-core";
 import { createId } from "@paralleldrive/cuid2";
-import { TaskStatus } from "@/types/create.types";
+import { TaskStatus } from "@/types/task.types";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
 export const tasks = t.sqliteTable("tasks", {

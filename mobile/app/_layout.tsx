@@ -39,7 +39,7 @@ const RootLayout = () => {
 
   return (
     <Provider store={store}>
-      <GestureHandlerRootView>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen

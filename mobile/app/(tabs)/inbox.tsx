@@ -10,7 +10,7 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { routes } from "@/utils/routes";
+import { routes } from "@/utils/consts";
 import ScreenContainer from "@/components/custom/ScreenContainer";
 import { changeContainerId } from "@/store/tasks/tasks.slice";
 import { INBOX_CONTAINER_ID } from "@/utils/containerIds";

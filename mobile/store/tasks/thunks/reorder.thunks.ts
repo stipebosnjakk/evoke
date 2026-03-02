@@ -4,9 +4,12 @@ import {
   updateTaskOrderKey,
   rebalanceOrderKeys,
 } from "@/db/repositories/reorder.repo";
-import { OrderTaskItem, RejectWithValue } from "@/types/task.types";
+import {
+  OrderTaskItem,
+  RejectWithValue,
+  ContainerIdType,
+} from "@/types/task.types";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-import { ContainerIdType } from "@/types/create.types";
 
 export const updateTaskOrderKeyAction = createAsyncThunk<
   OrderTaskItem,

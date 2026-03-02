@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { APP_THEME } from "@/utils/theme";
+import { APP_THEME } from "@/lib/theme";
 
 type ThemeMode = "light" | "dark";
 
