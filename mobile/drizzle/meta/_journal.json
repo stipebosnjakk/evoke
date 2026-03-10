@@ -36,6 +36,20 @@
       "when": 1771084157470,
       "tag": "0004_real_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1773075596173,
+      "tag": "0005_harsh_toad",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1773076675495,
+      "tag": "0006_abandoned_nightshade",
+      "breakpoints": true
     }
   ]
 }

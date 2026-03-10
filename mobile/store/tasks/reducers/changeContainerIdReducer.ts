@@ -1,15 +1,12 @@
 import { ContainerIdType } from "@/types/task.types";
 import { TasksState } from "@/types/initialState";
+import { PayloadAction } from "@reduxjs/toolkit";
 
-type ActionPayload = {
-  payload: {
-    containerId: ContainerIdType;
-  };
-};
+// TODO: this function does not make any logic
 
 export const changeContainerIdReducer = (
   state: TasksState,
-  action: ActionPayload,
+  action: PayloadAction<{ containerId: ContainerIdType }>,
 ) => {
   const { containerId } = action.payload;
 

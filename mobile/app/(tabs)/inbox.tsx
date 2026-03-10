@@ -1,21 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
-import { useRouter } from "expo-router";
+import { ActivityIndicator } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { routes } from "@/utils/consts";
-import ScreenContainer from "@/components/custom/ScreenContainer";
-import { changeContainerId } from "@/store/tasks/tasks.slice";
-import { INBOX_CONTAINER_ID } from "@/utils/containerIds";
+import { changeContainerId } from "@/store/tasks/slices/tasks.slice";
+import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
 import { TaskWithOrderKey } from "@/types/task.types";
 import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
+import { NoInboxTasksView } from "@/components/tasks/NoInboxTasksView";
+import ScreenContainer from "@/components/custom/ScreenContainer";
 import DraggableTaskList from "@/components/tasks/DraggableTaskList";
 
 const InboxScreen = () => {
@@ -53,7 +46,7 @@ const InboxScreen = () => {
     if (!error) return;
     Toast.show({
       type: "error",
-      text1: "Couldn't load inbox",
+      text1: "Something went wrong",
       text2: error ?? "Try again later",
     });
   }, [error]);
@@ -68,115 +61,18 @@ const InboxScreen = () => {
     );
   }
 
-  if (!loading && !data.length && !error) {
-    return (
-      <ScreenContainer>
-        <NoTasksView />
-      </ScreenContainer>
-    );
+  if (!loading && !error && !data.length) {
+    return <NoInboxTasksView />;
   }
 
   return (
-    <ScreenContainer>
-      <DraggableTaskList
-        data={data}
-        setData={setData}
-        loading={loading}
-        limit={limit}
-      />
-    </ScreenContainer>
+    <DraggableTaskList
+      data={data}
+      setData={setData}
+      loading={loading}
+      limit={limit}
+    />
   );
 };
-
-const NoTasksView = () => {
-  const router = useRouter();
-
-  const navigateToCreateModal = () => {
-    router.push(routes.create.href);
-  };
-  const navigateToPlan = () => {
-    router.push(routes.plan.href);
-  };
-  return (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.titleText}>Your inbox is clear</Text>
-      <Text style={styles.subtitleText}>
-        Inbox holds unprocessed tasks.{"\n"}Capture tasks here and organize
-        {"\n"}them later.
-      </Text>
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={navigateToCreateModal}
-          style={styles.primaryButton}
-        >
-          <Text style={styles.primaryButtonText}>Create Task</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={navigateToPlan}
-          style={styles.secondaryButton}
-        >
-          <Text style={styles.secondaryButtonText}>Go to Plan</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  emptyContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-  },
-  titleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#0F172A",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  subtitleText: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "600",
-    color: "#7B8798",
-    textAlign: "center",
-  },
-  buttonsContainer: {
-    width: "100%",
-    marginTop: 28,
-    alignItems: "center",
-    gap: 14,
-  },
-  primaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(0,0,0,0.9)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#FFFFFF",
-  },
-  secondaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(0,0,0,0.06)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#0F172A",
-  },
-});
 
 export default InboxScreen;

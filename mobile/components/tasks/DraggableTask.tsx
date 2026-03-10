@@ -2,7 +2,7 @@ import { memo } from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 
 import { TaskWithOrderKey } from "@/types/task.types";
-import { createdAtFormat } from "@/utils/dateFormat";
+import { createdAtFormat } from "@/utils/date";
 
 export type RenderTaskItem = {
   item: TaskWithOrderKey;

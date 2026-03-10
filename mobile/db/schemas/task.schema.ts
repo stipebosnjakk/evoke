@@ -1,7 +1,8 @@
 import * as t from "drizzle-orm/sqlite-core";
 import { createId } from "@paralleldrive/cuid2";
-import { TaskStatus } from "@/types/task.types";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+
+import { TaskStatus, IsoDate } from "@/types/task.types";
 
 export const tasks = t.sqliteTable("tasks", {
   id: t
@@ -9,6 +10,7 @@ export const tasks = t.sqliteTable("tasks", {
     .primaryKey()
     .$defaultFn(() => createId()),
   title: t.text("title").notNull(),
+  description: t.text("description"),
   created_at: t
     .integer("created_at")
     .notNull()
@@ -23,10 +25,11 @@ export const tasks = t.sqliteTable("tasks", {
   project_id: t.text("project_id"),
   section_id: t.text("section_id"),
   area_id: t.text("area_id"),
-  start_date: t.integer("start_date"),
-  due_date: t.integer("due_date"),
-  duration_min: t.integer("duration_min"),
-  recurrence_rule: t.text("recurrence_rule"),
+  start_date: t.text("start_date").$type<IsoDate | null>(),
+  start_time_min: t.integer("start_time_min"),
+  due_time_min: t.integer("due_time_min"),
+  deadline: t.text("deadline").$type<IsoDate | null>(),
+  repeat: t.text("repeat"),
 });
 
 export type Task = InferSelectModel<typeof tasks>;

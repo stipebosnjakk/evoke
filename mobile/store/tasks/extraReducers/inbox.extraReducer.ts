@@ -14,6 +14,7 @@ export const addInboxExtraReducers = (
 
       const isRefresh = action.meta.arg.offset === 0;
 
+      // TODO: make a logic for hasMore
       if (isRefresh) {
         state.lists.inbox.ids = [];
         state.lists.inbox.offset = 0;
@@ -22,6 +23,7 @@ export const addInboxExtraReducers = (
       }
     })
     .addCase(getInboxTasksAction.rejected, (state, action) => {
+      console.log(action.payload?.message);
       state.lists.inbox.loading = false;
       state.lists.inbox.error =
         action.payload?.message || "Failed to load Inbox tasks";

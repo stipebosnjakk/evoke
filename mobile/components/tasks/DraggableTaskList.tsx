@@ -1,15 +1,10 @@
 import { useCallback } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, {
   DragEndParams,
 } from "react-native-draggable-flatlist";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { TaskWithOrderKey } from "@/types/task.types";
-import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
-import DraggableTask, { RenderTaskItem } from "./DraggableTask";
-import { INBOX_CONTAINER_ID } from "@/utils/containerIds";
 import {
   rebalanceOrderKeysAction,
   updateTaskOrderKeyAction,
@@ -19,6 +14,12 @@ import {
   checkForRebalance,
   handleRebalance,
 } from "@/utils/rebalance";
+import { TaskWithOrderKey } from "@/types/task.types";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
+import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
+import DraggableTask, { type RenderTaskItem } from "./DraggableTask";
+import ScreenContainer from "@/components/custom/ScreenContainer";
 
 type DraggableTaskListProps = {
   data: TaskWithOrderKey[];
@@ -116,21 +117,23 @@ const DraggableTaskList = ({
   };
 
   return (
-    <DraggableFlatList
-      data={data}
-      keyExtractor={(task) => task.id}
-      activationDistance={12}
-      contentContainerStyle={[
-        styles.inboxTaskListContentContainer,
-        { paddingTop: headerH + headerFadeExtra },
-      ]}
-      onEndReached={loadMore}
-      onEndReachedThreshold={0.2}
-      showsVerticalScrollIndicator={false}
-      ListFooterComponent={ListFooterComponent}
-      onDragEnd={handleOnDragEnd}
-      renderItem={renderItem}
-    />
+    <ScreenContainer>
+      <DraggableFlatList
+        data={data}
+        keyExtractor={(task) => task.id}
+        activationDistance={12}
+        contentContainerStyle={[
+          styles.inboxTaskListContentContainer,
+          { paddingTop: headerH + headerFadeExtra },
+        ]}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.2}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={ListFooterComponent}
+        onDragEnd={handleOnDragEnd}
+        renderItem={renderItem}
+      />
+    </ScreenContainer>
   );
 };
 

@@ -2,11 +2,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 
-import { tasks } from "@/db/schema/task.schema";
+import { tasks } from "@/db/schemas/task.schema";
 import { db } from "@/db/client";
 import { RejectWithValue, TaskWithOrderKey } from "@/types/task.types";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-import { INBOX_CONTAINER_ID } from "@/utils/containerIds";
+import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
 import { list_order } from "@/db";
 
 export const deleteAllTasksAction = createAsyncThunk<
@@ -16,6 +16,7 @@ export const deleteAllTasksAction = createAsyncThunk<
 >("tasks/deleteAll", async (_, { rejectWithValue }) => {
   try {
     await db.delete(tasks);
+    await db.delete(list_order);
   } catch (error: unknown) {
     return rejectWithValue({
       message: handleErrorMessage(error, "Failed to delete all tasks"),
@@ -59,9 +60,10 @@ export const seedInboxOrderKeysTestAction = createAsyncThunk<
           section_id: null,
           area_id: null,
           start_date: null,
-          due_date: null,
-          duration_min: null,
-          recurrence_rule: null,
+          start_time_min: null,
+          due_time_min: null,
+          deadline: null,
+          repeat: null,
         });
 
         await tx.insert(list_order).values({

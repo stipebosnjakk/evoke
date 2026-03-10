@@ -1,6 +1,12 @@
-import { Task } from "@/db";
-import { OrderTaskItem, ContainerIdType } from "@/types/task.types";
+import type { Task } from "@/db";
+import {
+  OrderTaskItem,
+  ContainerIdType,
+  TaskStatusOptionsArray,
+  TaskWithOrderKey,
+} from "@/types/task.types";
 
+// TODO: maybe replace this type with IsoType from task types
 type ErrorType = string | null;
 type ISODate = string;
 
@@ -44,4 +50,25 @@ export type TasksState = {
     inbox: PagedIdList;
     plan: PlanState;
   };
+};
+
+export type NewTaskType = {
+  title: string | null;
+  description: string | null;
+  status: TaskStatusOptionsArray | null;
+  start_date: string | null;
+  start_time_min: number | null;
+  due_time_min: number | null;
+  deadline: string | null;
+  repeat: string | null;
+};
+
+export type NewTaskInitialState = {
+  loading: boolean;
+  error: string | null;
+  inputs: {
+    title: string | null;
+    description: string | null;
+  };
+  task: TaskWithOrderKey;
 };

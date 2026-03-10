@@ -37,26 +37,38 @@ const RootLayout = () => {
     );
   }
 
+  const modalOptions = {
+    presentation: "formSheet" as const,
+    sheetAllowedDetents: "fitToContents",
+    sheetInitialDetentIndex: 0,
+    sheetGrabberVisible: true,
+    contentStyle: { backgroundColor: "white" },
+  } as const;
+
   return (
     <Provider store={store}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
-            name="create-task"
-            options={{
-              presentation: "formSheet",
-              sheetAllowedDetents: "fitToContents",
-              sheetGrabberVisible: true,
-              sheetCornerRadius: 16,
-              sheetLargestUndimmedDetentIndex: "none",
-              headerShown: false,
-              contentStyle: { backgroundColor: "white" },
-            }}
+            name="(modals)/create/task/create"
+            options={modalOptions}
+          />
+          <Stack.Screen
+            name="(modals)/create/task/date"
+            options={modalOptions}
+          />
+          <Stack.Screen
+            name="(modals)/create/task/deadline"
+            options={modalOptions}
+          />
+          <Stack.Screen
+            name="(modals)/create/task/repeat"
+            options={modalOptions}
           />
         </Stack>
-        <PortalHost />
         <Toast config={toastConfig} />
+        <PortalHost />
       </GestureHandlerRootView>
     </Provider>
   );

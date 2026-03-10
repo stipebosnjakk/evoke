@@ -10,22 +10,8 @@ export const routes = {
   plan: { title: "Plan", href: "/(tabs)/plan" },
   inbox: { title: "Inbox", href: "/(tabs)/inbox" },
   projects: { title: "Projects", href: "/(tabs)/projects" },
-  create: { title: "Create Task", href: "/create-task" },
+  create: { title: "Create Task", href: "/(modals)/create/task/create" },
+  date: { title: "Date", href: "/(modals)/create/task/date" },
+  deadline: { title: "Deadline", href: "/(modals)/create/task/deadline" },
+  repeat: { title: "Repeat1", href: "/(modals)/create/task/repeat" },
 } as const;
-
-export const TASK_STATUSES = [
-  { label: "Next", 
-    value: "next", 
-    icon: "tag" 
-  },
-  {
-    label: "Someday",
-    value: "someday",
-    icon: "clock",
-  },
-  {
-    label: "Waiting",
-    value: "waiting",
-    icon: "hourglass",
-  },
-] as const;

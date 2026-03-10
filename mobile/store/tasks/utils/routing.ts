@@ -9,8 +9,10 @@ export const isInboxTask = (task: TaskWithOrderKey) => {
 
   const noDates =
     task.start_date == null &&
-    task.due_date == null &&
-    task.recurrence_rule == null;
+    task.start_time_min == null &&
+    task.due_time_min == null &&
+    task.deadline == null &&
+    task.repeat == null;
 
   if (noDestination && noDates && task.status == null) return true;
 

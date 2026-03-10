@@ -2,7 +2,7 @@ import { and, eq, isNull, desc, sql } from "drizzle-orm";
 
 import { DataReturnType } from "@/types/task.types";
 import { db, tasks, list_order } from "@/db";
-import { INBOX_CONTAINER_ID } from "@/utils/containerIds";
+import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
 import { throwDbError } from "@/utils/handleErrorMessage";
 
 export const fetchInboxTasks = async (
@@ -18,8 +18,11 @@ export const fetchInboxTasks = async (
       isNull(tasks.section_id),
       isNull(tasks.status),
       isNull(tasks.start_date),
-      isNull(tasks.due_date),
+      isNull(tasks.start_time_min),
+      isNull(tasks.due_time_min),
+      isNull(tasks.deadline),
       isNull(tasks.completed_at),
+      isNull(tasks.repeat),
     );
 
     const [rows, totalResult] = await Promise.all([

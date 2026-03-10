@@ -7,7 +7,7 @@ import {
   PLAN_INRANGE_WAITING_CONTAINER_ID,
   PLAN_OVERDUE_CONTAINER_ID,
   TODAY_CONTAINER_ID,
-} from "@/utils/containerIds";
+} from "@/consts/containerIds";
 
 /**
  * Merges newly fetched tasks into the existing list while ensuring there are no duplicates.

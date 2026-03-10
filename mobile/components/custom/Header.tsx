@@ -7,8 +7,8 @@ import MaskedView from "@react-native-masked-view/masked-view";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 
-import IconButton from "@/components/ui/IconButton";
-import { routes } from "@/utils/consts";
+import Button from "@/components/ui/Button";
+import { routes } from "@/consts/routes";
 
 type HeaderProps = { title: string };
 
@@ -71,14 +71,14 @@ const Header = ({ title }: HeaderProps) => {
         ]}
       >
         <View style={styles.left}>
-          <IconButton onPress={() => {}} style={styles.alignStart}>
+          <Button iconOnly={true} onPress={() => {}} style={styles.alignStart}>
             <SymbolView
               name="magnifyingglass"
               size={22}
               type="monochrome"
               tintColor="#111827"
             />
-          </IconButton>
+          </Button>
         </View>
         <View style={styles.center} pointerEvents="none">
           <Text style={styles.title} numberOfLines={1}>
@@ -87,14 +87,18 @@ const Header = ({ title }: HeaderProps) => {
         </View>
         <View style={styles.right}>
           <View style={styles.rightActions}>
-            <IconButton onPress={navigateToCreateModal} style={styles.alignEnd}>
+            <Button
+              iconOnly={true}
+              onPress={navigateToCreateModal}
+              style={styles.alignEnd}
+            >
               <SymbolView
                 name="plus"
                 size={22}
                 type="monochrome"
                 tintColor="#111827"
               />
-            </IconButton>
+            </Button>
           </View>
         </View>
       </View>

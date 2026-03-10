@@ -1,34 +1,32 @@
-import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   Pressable,
   StyleSheet,
   TextInput,
-  KeyboardAvoidingView,
-  Platform,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
+
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-import { SymbolView } from "expo-symbols";
+import { routes } from "@/consts/routes";
+import DropdownStatus from "@/components/create/task/DropdownStatus";
 import Chip from "@/components/ui/Chip";
-import { TaskStatusOption } from "@/types/task.types";
-import DropdownStatus from "@/components/custom/DropdownStatus";
+import { setDescription, setTitle } from "@/store/tasks/slices/newTask.slice";
 
 const CreateTaskModal = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const descriptionRef = useRef<TextInput>(null);
-
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [status, setStatus] = useState<TaskStatusOption | null>(null);
-
   const loading = useAppSelector((state) => state.tasks.loading);
+  const title = useAppSelector((state) => state.newTask.inputs.title);
+  const description = useAppSelector(
+    (state) => state.newTask.inputs.description,
+  );
 
   const showErrorToast = (message: string) => {
     Toast.show({
@@ -41,84 +39,92 @@ const CreateTaskModal = () => {
   const onSubmit = async () => {
     if (loading) return;
 
-    const trimmedTitle = title.trim();
-    const trimmedDescription = description.trim();
-
-    if (trimmedTitle.length === 0) {
-      showErrorToast("Title is required");
-      return;
-    }
-    if (trimmedTitle.length > 255) {
-      showErrorToast("Title must be less than 255 characters");
-      return;
-    }
-    if (trimmedDescription.length > 5000) {
-      showErrorToast("Description must be less than 5000 characters");
-      return;
-    }
-
     try {
-      await dispatch(createTaskAction({ title: trimmedTitle })).unwrap();
+      await dispatch(createTaskAction()).unwrap();
       Toast.show({
         type: "success",
         text1: "Task created",
-        text2: trimmedTitle,
       });
-      setTitle("");
-      setDescription("");
-      router.back();
     } catch (error: unknown) {
       showErrorToast(handleErrorMessage(error, "Something went wrong."));
     }
   };
 
+  // NEXT TODO: organize this code
+  // TODO: after creation keep modal active so user can create more tasks instantlly
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
-    >
+    <View>
       <View style={styles.container}>
         <Text style={styles.helper}>
           Try #Project, “tomorrow”, or “every week”.
         </Text>
         <View style={styles.fields}>
           <TextInput
-            value={title}
-            onChangeText={setTitle}
+            value={title || ""}
+            onChangeText={(text) => dispatch(setTitle({ title: text }))}
             placeholder="Task title"
             placeholderTextColor="rgba(0,0,0,0.35)"
             autoFocus
             returnKeyType="next"
-            onSubmitEditing={() => descriptionRef.current?.focus()}
             style={styles.titleInput}
             blurOnSubmit={false}
+            keyboardType="twitter"
           />
           <TextInput
-            ref={descriptionRef}
-            value={description}
-            onChangeText={setDescription}
+            value={description || ""}
+            onChangeText={(text) =>
+              dispatch(setDescription({ description: text }))
+            }
             placeholder="Description"
             placeholderTextColor="rgba(0,0,0,0.35)"
             multiline
             style={styles.descriptionInput}
             textAlignVertical="top"
+            keyboardType="twitter"
           />
         </View>
       </View>
       <View>
-        <View style={styles.row}>
-          <DropdownStatus status={status} setStatus={setStatus} />
-          <Chip icon="calendar" label="Schedule" />
-          <Chip icon="repeat" label="Repeat" />
+        <View collapsable={false}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.row}>
+              <DropdownStatus />
+              <Chip
+                icon="calendar"
+                label="Date"
+                onPress={() => {
+                  router.push(routes.date.href);
+                }}
+              />
+              <Chip
+                icon="calendar.badge.clock"
+                label="Deadline"
+                onPress={() => {
+                  router.push(routes.deadline.href);
+                }}
+              />
+              <Chip
+                icon="repeat"
+                label="Repeat"
+                onPress={() => {
+                  router.push(routes.repeat.href);
+                }}
+              />
+            </View>
+          </ScrollView>
         </View>
         <View style={styles.actions}>
           <Pressable
             onPress={onSubmit}
-            disabled={title.trim().length === 0 || loading}
+            disabled={title?.trim().length === 0 || loading}
             style={[
               styles.btnPrimary,
-              { opacity: title.trim().length === 0 || loading ? 0.6 : 1 },
+              { opacity: title?.trim().length === 0 || loading ? 0.6 : 1 },
             ]}
           >
             <SymbolView
@@ -131,7 +137,7 @@ const CreateTaskModal = () => {
           </Pressable>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -172,18 +178,16 @@ const styles = StyleSheet.create({
   },
   btnPrimary: {
     padding: 15,
-    borderRadius: "50%",
+    borderRadius: 999,
     backgroundColor: "rgba(0,0,0,0.9)",
   },
   row: {
-    width: "100%",
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
     borderBottomColor: "rgba(0,0,0,0.06)",
     borderBottomWidth: 1,
     paddingBottom: 20,
-    paddingLeft: 16,
+    paddingHorizontal: 16,
   },
 });
 

@@ -1,9 +1,14 @@
-import { type Task } from "@/db";
-import { TASK_STATUSES } from "@/utils/consts";
+import { TASK_STATUSES } from "@/consts/statuses";
+import type { Task } from "@/db";
 
-export const TASK_STATUS = ["next", "waiting", "someday"] as const;
-export type TaskStatus = "next" | "someday" | "waiting";
+export type TaskStatusOptionsArray = {
+  label: string;
+  value: TaskStatus;
+  icon: string;
+};
 
+export type TaskStatus = "next" | "waiting" | "someday";
+// TODO: check this type
 export type TaskStatusOption = (typeof TASK_STATUSES)[number];
 
 export type ContainerIdType =
@@ -33,3 +38,5 @@ export type OrderTaskItem = {
   id: string;
   order_key: number;
 };
+
+export type IsoDate = `${number}-${number}-${number}`;
