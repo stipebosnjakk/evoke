@@ -1,4 +1,4 @@
-import { NewTaskInitialState } from "@/types/initialState";
+import { NewTaskInitialState } from "@/types/initialState.types";
 
 export const initialState: NewTaskInitialState = {
   loading: false,

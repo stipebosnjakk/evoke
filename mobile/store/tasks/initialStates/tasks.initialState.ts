@@ -1,4 +1,4 @@
-import { TasksState } from "@/types/initialState";
+import { TasksState } from "@/types/initialState.types";
 
 const listsInitialState = {
   ids: [],

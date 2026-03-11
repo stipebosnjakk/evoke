@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 
-import { NewTaskInitialState } from "@/types/initialState";
-import { TaskStatusOption } from "@/types/task.types";
+import { NewTaskInitialState } from "@/types/initialState.types";
+import { IsoDate, TaskStatusOption } from "@/types/task.types";
 import {
   validateTaskDeadline,
   validateTaskDescription,
@@ -35,17 +35,22 @@ export const setStatusReducer = (
 
   if (!res.ok) {
     state.error = res.message;
-
     return;
   }
 
-  state.task.status = res.data;
+  if (!res.data) {
+    state.task.status = null;
+    state.error = null;
+    return;
+  }
+
+  state.task.status = res.data.value;
   state.error = null;
 };
 
 export const setStartDateReducer = (
   state: NewTaskInitialState,
-  action: PayloadAction<{ start_date: string | null }>,
+  action: PayloadAction<{ start_date: IsoDate | null }>,
 ) => {
   const res = validateTaskStartDate(
     action.payload.start_date,
@@ -71,7 +76,7 @@ export const setStartDateReducer = (
 
 export const setDeadlineReducer = (
   state: NewTaskInitialState,
-  action: PayloadAction<{ deadline: string | null }>,
+  action: PayloadAction<{ deadline: IsoDate | null }>,
 ) => {
   const res = validateTaskDeadline(
     action.payload.deadline,
@@ -143,8 +148,8 @@ export const validateTextInputsReducer = (state: NewTaskInitialState) => {
     return;
   }
 
-  console.log(titleRes.ok)
-  console.log(descriptionRes.ok)
+  console.log(titleRes.ok);
+  console.log(descriptionRes.ok);
 
   state.task.title = titleRes.data;
   state.task.description = descriptionRes.data;

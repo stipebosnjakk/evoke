@@ -1,4 +1,4 @@
-import { PagedIdList, TasksState } from "@/types/initialState";
+import { PagedIdList, TasksState } from "@/types/initialState.types";
 import { TaskWithOrderKey } from "@/types/task.types";
 import {
   INBOX_CONTAINER_ID,

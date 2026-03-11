@@ -1,6 +1,6 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
-import { TasksState } from "@/types/initialState";
+import { TasksState } from "@/types/initialState.types";
 import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
 import { mergeNewListItems } from "./helper";
 

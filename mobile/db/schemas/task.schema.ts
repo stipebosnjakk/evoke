@@ -9,7 +9,7 @@ export const tasks = t.sqliteTable("tasks", {
     .text("id")
     .primaryKey()
     .$defaultFn(() => createId()),
-  title: t.text("title").notNull(),
+  title: t.text("title"),
   description: t.text("description"),
   created_at: t
     .integer("created_at")

@@ -1,16 +1,14 @@
 import { eq, desc } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 
-import { db, list_order, tasks } from "@/db";
+import { db, list_order, NewTask, tasks } from "@/db";
 import { TaskWithOrderKey } from "@/types/task.types";
 import { throwDbError } from "@/utils/handleErrorMessage";
 import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
-export const createTaskRepo = async (
-  task: TaskWithOrderKey,
-): Promise<TaskWithOrderKey> => {
+export const createTaskRepo = async (task: NewTask): Promise<NewTask> => {
   try {
     return await db.transaction(async (tx) => {
       const id = createId();

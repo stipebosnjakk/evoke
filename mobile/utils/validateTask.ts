@@ -1,6 +1,6 @@
 import { TASK_STATUSES } from "@/consts/statuses";
-import { TaskStatusOptionsArray } from "@/types/task.types";
-import { isValidIsoDate } from "./date";
+import { IsoDate, TaskStatusOptionsArray } from "@/types/task.types";
+import { isValidIsoDate } from "@/utils/date";
 
 type ValidationResult<T> =
   | {
@@ -109,9 +109,9 @@ export const validateTaskDescription = (
 };
 
 export const validateTaskStartDate = (
-  data: string | null,
-  deadline: string | null,
-): ValidationResult<string | null> => {
+  data: IsoDate | null,
+  deadline?: IsoDate | null,
+): ValidationResult<IsoDate | null> => {
   const startDate = data?.trim() || null;
   const taskDeadline = deadline?.trim() || null;
 
@@ -151,15 +151,15 @@ export const validateTaskStartDate = (
 
   return {
     ok: true,
-    data: startDate,
+    data: startDate as IsoDate,
     message: "Start date saved successfully",
   };
 };
 
 export const validateTaskDeadline = (
-  data: string | null,
-  startDate: string | null,
-): ValidationResult<string | null> => {
+  data: IsoDate | null,
+  startDate?: IsoDate | null,
+): ValidationResult<IsoDate | null> => {
   const deadline = data?.trim() || null;
   const taskStartDate = startDate?.trim() || null;
 
@@ -199,14 +199,14 @@ export const validateTaskDeadline = (
 
   return {
     ok: true,
-    data: deadline,
+    data: deadline as IsoDate,
     message: "Deadline saved successfully",
   };
 };
 
 export const validateTaskStartTime = (
   data: number | null,
-  due_time_min: number | null,
+  due_time_min?: number | null,
 ): ValidationResult<number | null> => {
   if (data === null) {
     return {
@@ -235,7 +235,7 @@ export const validateTaskStartTime = (
     };
   }
 
-  if (due_time_min !== null) {
+  if (due_time_min) {
     if (!Number.isInteger(due_time_min)) {
       return {
         ok: false,
@@ -270,7 +270,7 @@ export const validateTaskStartTime = (
 
 export const validateTaskDueTime = (
   data: number | null,
-  start_time_min: number | null,
+  start_time_min?: number | null,
 ): ValidationResult<number | null> => {
   if (data === null) {
     return {
@@ -299,7 +299,7 @@ export const validateTaskDueTime = (
     };
   }
 
-  if (start_time_min !== null) {
+  if (start_time_min) {
     if (!Number.isInteger(start_time_min)) {
       return {
         ok: false,

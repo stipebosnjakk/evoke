@@ -1,4 +1,4 @@
-import type { Task } from "@/db";
+import type { NewTask, Task } from "@/db";
 import {
   OrderTaskItem,
   ContainerIdType,
@@ -70,5 +70,5 @@ export type NewTaskInitialState = {
     title: string | null;
     description: string | null;
   };
-  task: TaskWithOrderKey;
+  task: NewTask;
 };

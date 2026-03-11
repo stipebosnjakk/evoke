@@ -1,6 +1,6 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
-import { TasksState } from "@/types/initialState";
+import { TasksState } from "@/types/initialState.types";
 import {
   rebalanceOrderKeysAction,
   updateTaskOrderKeyAction,

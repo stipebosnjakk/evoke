@@ -1,8 +1,12 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
-import { TasksState } from "@/types/initialState";
+import { TasksState } from "@/types/initialState.types";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
-import { isInboxTask, isPlanTask, isTodayTask } from "@/store/tasks/utils/routing";
+import {
+  isInboxTask,
+  isPlanTask,
+  isTodayTask,
+} from "@/store/tasks/utils/routing";
 
 export const addCreationExtraReducers = (
   builder: ActionReducerMapBuilder<TasksState>,

@@ -1,5 +1,7 @@
 import * as Localization from "expo-localization";
 
+import { IsoDate } from "@/types/task.types";
+
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
 
 export const createdAtFormat = (ms: number) =>
@@ -23,10 +25,10 @@ export const isValidIsoDate = (value: string): boolean => {
   );
 };
 
-export const getTodayIsoDate = (): string => {
+export const getTodayIsoDate = (): IsoDate => {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}` as IsoDate;
 };

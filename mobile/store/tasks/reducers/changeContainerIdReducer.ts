@@ -1,5 +1,5 @@
 import { ContainerIdType } from "@/types/task.types";
-import { TasksState } from "@/types/initialState";
+import { TasksState } from "@/types/initialState.types";
 import { PayloadAction } from "@reduxjs/toolkit";
 
 // TODO: this function does not make any logic
