@@ -12,6 +12,7 @@ import {
   validateTaskTitle,
 } from "@/utils/validateTask";
 import { getTodayIsoDate } from "@/utils/date";
+import { initialState } from "@/store/tasks/initialStates/newTask.initialState";
 
 export const setTitleReducer = (
   state: NewTaskInitialState,
@@ -155,3 +156,5 @@ export const validateTextInputsReducer = (state: NewTaskInitialState) => {
   state.task.description = descriptionRes.data;
   state.error = null;
 };
+
+export const clearStateReducer = () => initialState;

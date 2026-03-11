@@ -10,6 +10,7 @@ import {
   setStatusReducer,
   setTitleReducer,
   validateTextInputsReducer,
+  clearStateReducer,
 } from "@/store/tasks/reducers/createTaskReducer";
 
 const newTaskSlice = createSlice({
@@ -24,6 +25,7 @@ const newTaskSlice = createSlice({
     setDueTime: setDueTimeReducer,
     setDeadline: setDeadlineReducer,
     validateTextInputs: validateTextInputsReducer,
+    clearState: clearStateReducer
   },
 });
 
@@ -36,5 +38,6 @@ export const {
   setDueTime,
   setDeadline,
   validateTextInputs,
+  clearState,
 } = newTaskSlice.actions;
 export default newTaskSlice.reducer;

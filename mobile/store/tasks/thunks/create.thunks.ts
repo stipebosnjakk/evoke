@@ -3,12 +3,15 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createTaskRepo } from "@/db/repositories/create.repo";
 import { RejectWithValue } from "@/types/task.types";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-import { validateTextInputs } from "@/store/tasks/slices/newTask.slice";
+import {
+  clearState,
+  validateTextInputs,
+} from "@/store/tasks/slices/newTask.slice";
 import { RootState } from "@/store/store";
 import { NewTask } from "@/db";
 
 export const createTaskAction = createAsyncThunk<
-  { task: Partial<NewTask> },
+  { task: NewTask },
   void,
   { rejectValue: RejectWithValue }
 >("tasks/create", async (_, { dispatch, getState, rejectWithValue }) => {
@@ -25,6 +28,15 @@ export const createTaskAction = createAsyncThunk<
     }
 
     const task = await createTaskRepo(newTask.task);
+
+    if (!task || !task.id) {
+      return rejectWithValue({
+        message: "Task was not created properly",
+      });
+    }
+
+    dispatch(clearState());
+
     return { task };
   } catch (error: unknown) {
     return rejectWithValue({
