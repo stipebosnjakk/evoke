@@ -65,7 +65,12 @@ const DateModal = () => {
           />
         </Button>
         <Text style={styles.title}>Date</Text>
-        <Button iconOnly onPress={() => {}}>
+        <Button
+          style={{ opacity: isDateInputOpen ? 0 : 1 }}
+          disabled={isDateInputOpen}
+          iconOnly
+          onPress={() => {}}
+        >
           <SymbolView
             name="checkmark"
             weight="medium"

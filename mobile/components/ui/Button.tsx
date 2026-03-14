@@ -4,21 +4,21 @@ import {
   StyleProp,
   ViewStyle,
   StyleSheet,
+  PressableProps,
 } from "react-native";
 import { useRef, ReactNode } from "react";
 
-type ButtonProps = {
-  onPress: () => void;
+type ButtonProps = PressableProps & {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   iconOnly?: boolean;
 };
 
 const Button = ({
-  onPress,
   children,
   style,
   iconOnly = false,
+  ...props
 }: ButtonProps) => {
   const value = useRef(new Animated.Value(0)).current;
   const isAnimated = () => {
@@ -37,7 +37,7 @@ const Button = ({
   };
   return (
     <Pressable
-      onPress={onPress}
+      {...props}
       onPressIn={isAnimated}
       onPressOut={outAnimated}
       hitSlop={10}

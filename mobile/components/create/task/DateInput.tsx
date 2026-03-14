@@ -1,6 +1,5 @@
 import { RefObject, useMemo, useState } from "react";
 import { View, TextInput, StyleSheet, Text, Pressable } from "react-native";
-import debounce from "lodash.debounce";
 import { SymbolView } from "expo-symbols";
 
 import { IsoDate } from "@/types/task.types";
@@ -38,7 +37,20 @@ const DateInput = ({
 
   const handleOnChangeText = (text: string) => {
     setDateInput(text);
-    debouncedSearch(text);
+    const getSmartInputDateDay = smartDateInput(text);
+
+    if (getSmartInputDateDay) {
+      setAvailableDate({
+        isoDate: toIsoDate(getSmartInputDateDay),
+        uiDate: format(getSmartInputDateDay, "EEEE d MMM"),
+      });
+      return;
+    }
+
+    setAvailableDate({
+      isoDate: null,
+      uiDate: null,
+    });
   };
 
   const handleTypedDateSubmit = () => {
@@ -53,26 +65,6 @@ const DateInput = ({
       return;
     }
   };
-
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((text) => {
-        const getSmartInputDateDay = smartDateInput(text);
-        if (getSmartInputDateDay) {
-          setAvailableDate({
-            isoDate: toIsoDate(getSmartInputDateDay),
-            uiDate: format(getSmartInputDateDay, "EEEE d MMM"),
-          });
-          return;
-        }
-
-        setAvailableDate({
-          isoDate: null,
-          uiDate: null,
-        });
-      }, 300),
-    [],
-  );
 
   return (
     <>
@@ -109,6 +101,11 @@ const DateInput = ({
           <Text style={styles.dateText}>{availableDate.uiDate}</Text>
         </Pressable>
       )}
+      {isOpen && !availableDate.isoDate && (
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>Try today, tomorrow, or next Friday</Text>
+        </View>
+      )}
     </>
   );
 };
@@ -144,6 +141,15 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     letterSpacing: -0.1,
     color: "black",
+  },
+  textContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  text: {
+    color: "rgba(0, 0, 0, 0.5)",
+    fontSize: 14,
   },
 });
 

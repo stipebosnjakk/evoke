@@ -11,6 +11,9 @@ import {
   addDays,
   nextDay,
   startOfDay,
+  startOfToday,
+  isYesterday,
+  isBefore,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 
@@ -24,9 +27,9 @@ import { weekdays } from "@/consts/date";
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-export function isValidIsoDate(value: string) {
+export const isValidIsoDate = (value: string) => {
   return isMatch(value, "yyyy-MM-dd") && isValid(parseISO(value));
-}
+};
 
 export const formatIsoDate = (date: IsoDate): string =>
   format(parseISO(date), "d MMM");
@@ -35,17 +38,19 @@ export const toIsoDate = (date: Date): IsoDate => {
   return format(date, "yyyy-MM-dd") as IsoDate;
 };
 
-export function getDateLabel(value: IsoDate) {
+export const getDateLabel = (value: IsoDate) => {
   const date = parseISO(value);
+  const today = startOfToday();
 
   if (isToday(date)) return "Today";
   if (isTomorrow(date)) return "Tomorrow";
+  if (isYesterday(date)) return "Yesterday";
+  if (isBefore(date, today)) return format(date, "d MMM");
   if (isThisWeek(date, { weekStartsOn: 1 })) return format(date, "EEEE");
 
   return format(date, "d MMM");
-}
+};
 
-// FIX: check if typed date is before current time like 12.12.2012.
 const parseFromPatterns = (
   value: string,
   referenceDate: Date,
