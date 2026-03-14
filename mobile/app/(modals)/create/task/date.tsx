@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TextInput } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useNavigation, useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import { format, nextSaturday, nextMonday, addDays, isDate } from "date-fns";
+import { format, nextSaturday, nextMonday, addDays } from "date-fns";
 
 import { setStartDate } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
@@ -11,6 +11,9 @@ import { toIsoDate } from "@/utils/date";
 import { useAppSelector } from "@/hooks/storeHooks";
 import Button from "@/components/ui/Button";
 import DateInput from "@/components/create/task/DateInput";
+import CalendarView from "@/components/create/task/CalendarView";
+
+type OpenModalType = "input" | "calendar" | "time";
 
 const DateModal = () => {
   const dispatch = useDispatch();
@@ -20,19 +23,25 @@ const DateModal = () => {
   const startDate = useAppSelector((state) => state.newTask.task.start_date);
 
   const inputRef = useRef<TextInput>(null);
+
   const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
+  const [isTimeSelectorOpen, setIsTimeSelectorOpen] = useState<boolean>(false);
 
   const today = toIsoDate(new Date());
   const tomorrow = toIsoDate(addDays(new Date(), 1));
   const thisWeekend = toIsoDate(nextSaturday(new Date()));
   const nextWeek = toIsoDate(nextMonday(new Date()));
 
+  const isSubModalOpen =
+    isDateInputOpen || isCalendarOpen || isTimeSelectorOpen;
+
   useEffect(() => {
-    if (!isDateInputOpen) return;
+    if (!isSubModalOpen) return;
     navigation.setOptions({
       sheetAllowedDetents: [1],
     });
-  }, [isDateInputOpen, navigation]);
+  }, [isSubModalOpen, navigation]);
 
   const handleUpdateStartDate = (date: IsoDate | null) => {
     dispatch(setStartDate({ start_date: date }));
@@ -52,6 +61,12 @@ const DateModal = () => {
     router.back();
   };
 
+  const handleSubOpenModal = (type: OpenModalType) => {
+    setIsDateInputOpen(type === "input");
+    setIsCalendarOpen(type === "calendar");
+    setIsTimeSelectorOpen(type === "time");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -66,8 +81,10 @@ const DateModal = () => {
         </Button>
         <Text style={styles.title}>Date</Text>
         <Button
-          style={{ opacity: isDateInputOpen ? 0 : 1 }}
-          disabled={isDateInputOpen}
+          style={{
+            opacity: isSubModalOpen ? 0 : 1,
+          }}
+          disabled={isSubModalOpen}
           iconOnly
           onPress={() => {}}
         >
@@ -83,16 +100,21 @@ const DateModal = () => {
       <DateInput
         inputRef={inputRef}
         isOpen={isDateInputOpen}
-        onFocusChange={setIsDateInputOpen}
+        onFocusOpen={() => {
+          handleSubOpenModal("input");
+        }}
         updateDate={handleUpdateStartDate}
         dateValue={startDate}
       />
-      {!isDateInputOpen && (
+      {!isDateInputOpen && isCalendarOpen && <CalendarView />}
+      {!isSubModalOpen && (
         <View style={styles.shortcutsContainer}>
           {startDate !== today && (
             <Button
               style={styles.button}
-              onPress={() => handleUpdateStartDate(today)}
+              onPress={() => {
+                handleUpdateStartDate(today);
+              }}
             >
               <View style={styles.ButtonContainer}>
                 <View style={styles.iconContainer}>
@@ -183,7 +205,12 @@ const DateModal = () => {
               </View>
             </Button>
           )}
-          <Button style={styles.button} onPress={() => {}}>
+          <Button
+            style={styles.button}
+            onPress={() => {
+              handleSubOpenModal("calendar");
+            }}
+          >
             <View style={styles.ButtonContainer}>
               <View style={styles.iconContainer}>
                 <SymbolView
@@ -193,7 +220,7 @@ const DateModal = () => {
                   type="monochrome"
                   tintColor="rgba(0, 0, 0, 0.45)"
                 />
-                <Text style={styles.shortcutLabel}>Custom</Text>
+                <Text style={styles.shortcutLabel}>Calendar</Text>
               </View>
               <SymbolView
                 name="chevron.right"

@@ -9,7 +9,7 @@ import { format } from "date-fns";
 type DateInputType = {
   inputRef: RefObject<TextInput | null>;
   isOpen: boolean;
-  onFocusChange: (isFocused: boolean) => void;
+  onFocusOpen: () => void;
   updateDate: (date: IsoDate | null) => void;
   dateValue?: IsoDate | null;
 };
@@ -22,7 +22,7 @@ type AvailableDateType = {
 const DateInput = ({
   inputRef,
   isOpen,
-  onFocusChange,
+  onFocusOpen,
   updateDate,
   dateValue,
 }: DateInputType) => {
@@ -86,7 +86,7 @@ const DateInput = ({
           autoCapitalize="none"
           style={styles.input}
           onChangeText={(text) => handleOnChangeText(text)}
-          onFocus={() => onFocusChange(true)}
+          onFocus={onFocusOpen}
         />
       </View>
       {isOpen && availableDate.isoDate && (
