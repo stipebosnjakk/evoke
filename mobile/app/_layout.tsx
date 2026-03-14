@@ -6,6 +6,7 @@ import { PortalHost } from "@rn-primitives/portal";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import Toast from "react-native-toast-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 
 import "@/global.css";
 import { toastConfig } from "@/components/ui/ToastConfig";
@@ -37,13 +38,13 @@ const RootLayout = () => {
     );
   }
 
-  const modalOptions = {
-    presentation: "formSheet" as const,
+  const modalOptions: NativeStackNavigationOptions = {
+    presentation: "formSheet",
     sheetAllowedDetents: "fitToContents",
     sheetInitialDetentIndex: 0,
     sheetGrabberVisible: true,
     contentStyle: { backgroundColor: "white" },
-  } as const;
+  };
 
   return (
     <Provider store={store}>

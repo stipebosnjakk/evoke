@@ -1,21 +1,61 @@
-import { View, StyleSheet, TextInput, Text } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, Text, TextInput } from "react-native";
 import { SymbolView } from "expo-symbols";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
+import { format, nextSaturday, nextMonday, addDays, isDate } from "date-fns";
 
+import { setStartDate } from "@/store/tasks/slices/newTask.slice";
+import { IsoDate } from "@/types/task.types";
+import { toIsoDate } from "@/utils/date";
+import { useAppSelector } from "@/hooks/storeHooks";
 import Button from "@/components/ui/Button";
+import DateInput from "@/components/create/task/DateInput";
 
 const DateModal = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const navigation = useNavigation();
+
+  const startDate = useAppSelector((state) => state.newTask.task.start_date);
+
+  const inputRef = useRef<TextInput>(null);
+  const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
+
+  const today = toIsoDate(new Date());
+  const tomorrow = toIsoDate(addDays(new Date(), 1));
+  const thisWeekend = toIsoDate(nextSaturday(new Date()));
+  const nextWeek = toIsoDate(nextMonday(new Date()));
+
+  useEffect(() => {
+    if (!isDateInputOpen) return;
+    navigation.setOptions({
+      sheetAllowedDetents: [1],
+    });
+  }, [isDateInputOpen, navigation]);
+
+  const handleUpdateStartDate = (date: IsoDate | null) => {
+    dispatch(setStartDate({ start_date: date }));
+    router.back();
+  };
+
+  const handleGoBack = () => {
+    if (isDateInputOpen) {
+      inputRef.current?.blur();
+      navigation.setOptions({
+        sheetAllowedDetents: "fitToContents",
+      });
+      setIsDateInputOpen(false);
+      return;
+    }
+
+    router.back();
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Button
-          iconOnly
-          onPress={() => {
-            router.back();
-          }}
-        >
+        <Button iconOnly onPress={handleGoBack}>
           <SymbolView
             name="xmark"
             weight="medium"
@@ -35,112 +75,121 @@ const DateModal = () => {
           />
         </Button>
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Type a date"
-          placeholderTextColor="rgba(0,0,0,0.35)"
-          returnKeyType="next"
-          blurOnSubmit={false}
-          keyboardType="twitter"
-          style={styles.input}
-        />
-      </View>
-      <View style={styles.shortcutsContainer}>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.ButtonContainer}>
-            <View style={styles.iconContainer}>
-              <SymbolView
-                name="clock"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>Today</Text>
-            </View>
-            <Text style={styles.shortcutDay}>Wed</Text>
-          </View>
-        </Button>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.ButtonContainer}>
-            <View style={styles.iconContainer}>
-              <SymbolView
-                name="sunrise"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>Tomorrow</Text>
-            </View>
-            <Text style={styles.shortcutDay}>Thu</Text>
-          </View>
-        </Button>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.ButtonContainer}>
-            <View style={styles.iconContainer}>
-              <SymbolView
-                name="beach.umbrella"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>This Weekend</Text>
-            </View>
-            <Text style={styles.shortcutDay}>Sat</Text>
-          </View>
-        </Button>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.ButtonContainer}>
-            <View style={styles.iconContainer}>
-              <SymbolView
-                name="chevron.forward.2"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>Next Week</Text>
-            </View>
-            <Text style={styles.shortcutDay}>Mon</Text>
-          </View>
-        </Button>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.ButtonContainer}>
-            <View style={styles.iconContainer}>
-              <SymbolView
-                name="calendar"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>Custom</Text>
-            </View>
-            <SymbolView
-              name="chevron.right"
-              weight="medium"
-              size={15}
-              type="monochrome"
-              tintColor="rgba(0, 0, 0, 0.45)"
-            />
-          </View>
-        </Button>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.ButtonContainer}>
-            <View style={styles.iconContainer}>
-              <SymbolView
-                name="clock"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>Time</Text>
-            </View>
-            <View style={styles.timeContainer}>
-              <Text style={styles.timeText}>None</Text>
+      <DateInput
+        inputRef={inputRef}
+        isOpen={isDateInputOpen}
+        onFocusChange={setIsDateInputOpen}
+        updateDate={handleUpdateStartDate}
+        dateValue={startDate}
+      />
+      {!isDateInputOpen && (
+        <View style={styles.shortcutsContainer}>
+          {startDate !== today && (
+            <Button
+              style={styles.button}
+              onPress={() => handleUpdateStartDate(today)}
+            >
+              <View style={styles.ButtonContainer}>
+                <View style={styles.iconContainer}>
+                  <SymbolView
+                    name="clock"
+                    weight="medium"
+                    size={26}
+                    type="monochrome"
+                    tintColor="rgba(0, 0, 0, 0.45)"
+                  />
+                  <Text style={styles.shortcutLabel}>Today</Text>
+                </View>
+                <Text style={styles.shortcutDay}>
+                  {format(new Date(), "EEE")}
+                </Text>
+              </View>
+            </Button>
+          )}
+          {startDate !== tomorrow && (
+            <Button
+              style={styles.button}
+              onPress={() => {
+                handleUpdateStartDate(tomorrow);
+              }}
+            >
+              <View style={styles.ButtonContainer}>
+                <View style={styles.iconContainer}>
+                  <SymbolView
+                    name="sunrise"
+                    weight="medium"
+                    size={26}
+                    type="monochrome"
+                    tintColor="rgba(0, 0, 0, 0.45)"
+                  />
+                  <Text style={styles.shortcutLabel}>Tomorrow</Text>
+                </View>
+                <Text style={styles.shortcutDay}>
+                  {format(addDays(new Date(), 1), "EEE")}
+                </Text>
+              </View>
+            </Button>
+          )}
+          {startDate !== thisWeekend && (
+            <Button
+              style={styles.button}
+              onPress={() => {
+                handleUpdateStartDate(thisWeekend);
+              }}
+            >
+              <View style={styles.ButtonContainer}>
+                <View style={styles.iconContainer}>
+                  <SymbolView
+                    name="beach.umbrella"
+                    weight="medium"
+                    size={26}
+                    type="monochrome"
+                    tintColor="rgba(0, 0, 0, 0.45)"
+                  />
+                  <Text style={styles.shortcutLabel}>This Weekend</Text>
+                </View>
+                <Text style={styles.shortcutDay}>
+                  {format(nextSaturday(new Date()), "EEE")}
+                </Text>
+              </View>
+            </Button>
+          )}
+          {startDate !== nextWeek && (
+            <Button
+              style={styles.button}
+              onPress={() => {
+                handleUpdateStartDate(nextWeek);
+              }}
+            >
+              <View style={styles.ButtonContainer}>
+                <View style={styles.iconContainer}>
+                  <SymbolView
+                    name="chevron.forward.2"
+                    weight="medium"
+                    size={26}
+                    type="monochrome"
+                    tintColor="rgba(0, 0, 0, 0.45)"
+                  />
+                  <Text style={styles.shortcutLabel}>Next Week</Text>
+                </View>
+                <Text style={styles.shortcutDay}>
+                  {format(nextMonday(new Date()), "EEE")}
+                </Text>
+              </View>
+            </Button>
+          )}
+          <Button style={styles.button} onPress={() => {}}>
+            <View style={styles.ButtonContainer}>
+              <View style={styles.iconContainer}>
+                <SymbolView
+                  name="calendar"
+                  weight="medium"
+                  size={26}
+                  type="monochrome"
+                  tintColor="rgba(0, 0, 0, 0.45)"
+                />
+                <Text style={styles.shortcutLabel}>Custom</Text>
+              </View>
               <SymbolView
                 name="chevron.right"
                 weight="medium"
@@ -149,21 +198,50 @@ const DateModal = () => {
                 tintColor="rgba(0, 0, 0, 0.45)"
               />
             </View>
-          </View>
-        </Button>
-        <Button style={styles.button} onPress={() => {}}>
-          <View style={styles.noDayShortCutsContainer}>
-            <SymbolView
-              name="infinity"
-              weight="medium"
-              size={26}
-              type="monochrome"
-              tintColor="rgba(0, 0, 0, 0.45)"
-            />
-            <Text style={styles.shortcutLabel}>No Date</Text>
-          </View>
-        </Button>
-      </View>
+          </Button>
+          <Button style={styles.button} onPress={() => {}}>
+            <View style={styles.ButtonContainer}>
+              <View style={styles.iconContainer}>
+                <SymbolView
+                  name="clock"
+                  weight="medium"
+                  size={26}
+                  type="monochrome"
+                  tintColor="rgba(0, 0, 0, 0.45)"
+                />
+                <Text style={styles.shortcutLabel}>Time</Text>
+              </View>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeText}>None</Text>
+                <SymbolView
+                  name="chevron.right"
+                  weight="medium"
+                  size={15}
+                  type="monochrome"
+                  tintColor="rgba(0, 0, 0, 0.45)"
+                />
+              </View>
+            </View>
+          </Button>
+          <Button
+            style={styles.button}
+            onPress={() => {
+              handleUpdateStartDate(null);
+            }}
+          >
+            <View style={styles.noDayShortCutsContainer}>
+              <SymbolView
+                name="infinity"
+                weight="medium"
+                size={26}
+                type="monochrome"
+                tintColor="rgba(0, 0, 0, 0.45)"
+              />
+              <Text style={styles.shortcutLabel}>No Date</Text>
+            </View>
+          </Button>
+        </View>
+      )}
     </View>
   );
 };
@@ -184,17 +262,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  inputContainer: {
-    borderBottomColor: "rgba(0,0,0,0.06)",
-    borderBottomWidth: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-  },
-  input: {
-    backgroundColor: "rgb(240, 240, 240)",
-    borderRadius: 10,
-    padding: 12,
-  },
   shortcutsContainer: {
     flexDirection: "column",
   },
@@ -212,7 +279,7 @@ const styles = StyleSheet.create({
   },
   shortcutLabel: {
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "700",
     color: "rgba(0, 0, 0, 0.45)",
   },
   shortcutDay: {

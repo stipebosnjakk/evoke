@@ -14,9 +14,10 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
 import { routes } from "@/consts/routes";
+import { setDescription, setTitle } from "@/store/tasks/slices/newTask.slice";
 import DropdownStatus from "@/components/create/task/DropdownStatus";
 import Chip from "@/components/ui/Chip";
-import { setDescription, setTitle } from "@/store/tasks/slices/newTask.slice";
+import { getDateLabel } from "@/utils/date";
 
 const CreateTaskModal = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const CreateTaskModal = () => {
   const description = useAppSelector(
     (state) => state.newTask.inputs.description,
   );
+  const startDate = useAppSelector((state) => state.newTask.task.start_date);
 
   const showErrorToast = (message: string) => {
     Toast.show({
@@ -51,7 +53,7 @@ const CreateTaskModal = () => {
   };
 
   // NEXT TODO: organize this code
-  // TODO: after creation keep modal active so user can create more tasks instantlly
+  // TODO: before creating task check if there is task with same start time
 
   return (
     <View>
@@ -96,7 +98,7 @@ const CreateTaskModal = () => {
               <DropdownStatus />
               <Chip
                 icon="calendar"
-                label="Date"
+                label={startDate ? getDateLabel(startDate) : "Date"}
                 onPress={() => {
                   router.push(routes.date.href);
                 }}

@@ -140,6 +140,7 @@ export const validateTaskStartDate = (
       };
     }
 
+    // TODO: check if this is working
     if (startDate > taskDeadline) {
       return {
         ok: false,

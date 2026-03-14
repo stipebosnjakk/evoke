@@ -13,10 +13,14 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { useDispatch } from "react-redux";
 import { setStatus } from "@/store/tasks/slices/newTask.slice";
 
+// TODO: fix when keyboard is unfocused dropdown stays at the same position.
+
 const DropdownStatus = () => {
   const dispatch = useDispatch();
 
-  const status = useAppSelector((state) => state.newTask.task.status);
+  const statusValue = useAppSelector((state) => state.newTask.task.status);
+
+  const status = TASK_STATUSES.find((s) => s.value === statusValue);
 
   return (
     <DropdownMenu>

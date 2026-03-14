@@ -11,8 +11,8 @@ import {
   validateTaskStatus,
   validateTaskTitle,
 } from "@/utils/validateTask";
-import { getTodayIsoDate } from "@/utils/date";
 import { initialState } from "@/store/tasks/initialStates/newTask.initialState";
+import { toIsoDate } from "@/utils/date";
 
 export const setTitleReducer = (
   state: NewTaskInitialState,
@@ -108,7 +108,7 @@ export const setStartTimeReducer = (
   }
 
   if (res.data !== null && !state.task.start_date) {
-    const today = getTodayIsoDate();
+    const today = toIsoDate(new Date());
     state.task.start_date = today;
   }
 
@@ -149,11 +149,20 @@ export const validateTextInputsReducer = (state: NewTaskInitialState) => {
     return;
   }
 
-  console.log(titleRes.ok);
-  console.log(descriptionRes.ok);
-
   state.task.title = titleRes.data;
   state.task.description = descriptionRes.data;
+  state.error = null;
+};
+
+export const sendErrorMessageReducer = (
+  state: NewTaskInitialState,
+  action: PayloadAction<{ message: string | null }>,
+) => {
+  if (action.payload.message) {
+    state.error = action.payload.message;
+    return;
+  }
+
   state.error = null;
 };
 

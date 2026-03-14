@@ -1,8 +1,8 @@
 import { memo } from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { format } from "date-fns";
 
 import { TaskWithOrderKey } from "@/types/task.types";
-import { createdAtFormat } from "@/utils/date";
 
 export type RenderTaskItem = {
   item: TaskWithOrderKey;
@@ -10,6 +10,7 @@ export type RenderTaskItem = {
 };
 
 const DraggableTask = ({ item, drag }: RenderTaskItem) => {
+  const date = format(new Date(item.created_at), "d MMM");
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -20,9 +21,7 @@ const DraggableTask = ({ item, drag }: RenderTaskItem) => {
       <Text numberOfLines={1} style={styles.inboxTaskTitleText}>
         {item.title}
       </Text>
-      <Text style={styles.inboxTaskCreatedDateText}>
-        {createdAtFormat(item.created_at)}
-      </Text>
+      <Text style={styles.inboxTaskCreatedDateText}>{date}</Text>
     </TouchableOpacity>
   );
 };

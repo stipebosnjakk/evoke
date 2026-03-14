@@ -29,6 +29,7 @@ export const createTaskAction = createAsyncThunk<
 
     const task = await createTaskRepo(newTask.task);
 
+    console.log(JSON.stringify(task, null, 2));
     if (!task || !task.id) {
       return rejectWithValue({
         message: "Task was not created properly",

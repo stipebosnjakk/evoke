@@ -1,34 +1,122 @@
 import * as Localization from "expo-localization";
+import {
+  format,
+  isMatch,
+  isValid,
+  isThisWeek,
+  isToday,
+  isTomorrow,
+  parseISO,
+  parse,
+  addDays,
+  nextDay,
+  startOfDay,
+} from "date-fns";
+import { enUS } from "date-fns/locale";
 
 import { IsoDate } from "@/types/task.types";
+import { weekdays } from "@/consts/date";
+
+// TODO: remove this if you don't need it
+
+// TODO: write params for utils
 
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-export const createdAtFormat = (ms: number) =>
-  new Date(ms).toLocaleDateString(userLocale, {
-    month: "short",
-    day: "numeric",
-  });
+export function isValidIsoDate(value: string) {
+  return isMatch(value, "yyyy-MM-dd") && isValid(parseISO(value));
+}
 
-export const isValidIsoDate = (value: string): boolean => {
-  const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+export const formatIsoDate = (date: IsoDate): string =>
+  format(parseISO(date), "d MMM");
 
-  if (!ISO_DATE_REGEX.test(value)) return false;
-
-  const [year, month, day] = value.split("-").map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-
-  return (
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
-  );
+export const toIsoDate = (date: Date): IsoDate => {
+  return format(date, "yyyy-MM-dd") as IsoDate;
 };
 
-export const getTodayIsoDate = (): IsoDate => {
+export function getDateLabel(value: IsoDate) {
+  const date = parseISO(value);
+
+  if (isToday(date)) return "Today";
+  if (isTomorrow(date)) return "Tomorrow";
+  if (isThisWeek(date, { weekStartsOn: 1 })) return format(date, "EEEE");
+
+  return format(date, "d MMM");
+}
+
+// FIX: check if typed date is before current time like 12.12.2012.
+const parseFromPatterns = (
+  value: string,
+  referenceDate: Date,
+  patterns: readonly { regex: RegExp; format: string; useLocale?: boolean }[],
+): Date | null => {
+  for (const pattern of patterns) {
+    if (!pattern.regex.test(value)) continue;
+    const date = parse(
+      value,
+      pattern.format,
+      referenceDate,
+      pattern.useLocale ? { locale: enUS } : undefined,
+    );
+    if (isValid(date)) return startOfDay(date);
+  }
+  return null;
+};
+
+export const smartDateInput = (raw: string): Date | null => {
   const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}` as IsoDate;
+  const today = startOfDay(now);
+  const normalizedText = raw.trim().replace(/\s+/g, " ");
+  const input = normalizedText.toLowerCase();
+
+  if (!input) return null;
+  if (input === "today") return today;
+  if (input === "tomorrow") return addDays(today, 1);
+
+  const nextMatch = input.match(
+    /^next (sunday|monday|tuesday|wednesday|thursday|friday|saturday)$/,
+  );
+
+  if (nextMatch) {
+    const day = weekdays[nextMatch[1] as keyof typeof weekdays];
+    return startOfDay(nextDay(today, day));
+  }
+
+  if (input in weekdays) {
+    return startOfDay(nextDay(today, weekdays[input as keyof typeof weekdays]));
+  }
+
+  const numericInput = input.replace(/[.-]/g, "/");
+
+  const numericDate = parseFromPatterns(numericInput, today, [
+    { regex: /^\d{4}\/\d{1,2}\/\d{1,2}$/, format: "yyyy/M/d" },
+    { regex: /^\d{1,2}\/\d{1,2}\/\d{4}$/, format: "d/M/yyyy" },
+  ]);
+
+  if (numericDate) return numericDate;
+
+  const textInput = normalizedText.replace(
+    /[a-zA-Z]+/g,
+    (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+  );
+
+  const namedMonthDate = parseFromPatterns(textInput, today, [
+    { regex: /^\d{1,2}\s+[A-Za-z]{3}$/, format: "d MMM", useLocale: true },
+    {
+      regex: /^\d{1,2}\s+[A-Za-z]{3}\s+\d{4}$/,
+      format: "d MMM yyyy",
+      useLocale: true,
+    },
+    { regex: /^\d{1,2}\s+[A-Za-z]+$/, format: "d MMMM", useLocale: true },
+    {
+      regex: /^\d{1,2}\s+[A-Za-z]+\s+\d{4}$/,
+      format: "d MMMM yyyy",
+      useLocale: true,
+    },
+  ]);
+
+  if (namedMonthDate) return namedMonthDate;
+
+  return null;
 };

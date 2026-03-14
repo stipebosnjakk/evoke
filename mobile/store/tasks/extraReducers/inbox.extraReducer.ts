@@ -23,7 +23,6 @@ export const addInboxExtraReducers = (
       }
     })
     .addCase(getInboxTasksAction.rejected, (state, action) => {
-      console.log(action.payload?.message);
       state.lists.inbox.loading = false;
       state.lists.inbox.error =
         action.payload?.message || "Failed to load Inbox tasks";
