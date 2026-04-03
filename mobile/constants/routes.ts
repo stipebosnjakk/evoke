@@ -13,5 +13,4 @@ export const routes = {
   create: { title: "Create Task", href: "/(modals)/create/task/create" },
   date: { title: "Date", href: "/(modals)/create/task/date" },
   deadline: { title: "Deadline", href: "/(modals)/create/task/deadline" },
-  repeat: { title: "Repeat1", href: "/(modals)/create/task/repeat" },
 } as const;

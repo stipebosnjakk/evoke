@@ -1,32 +1,45 @@
-import { useMemo, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
-import { Calendar, toDateId } from "@marceloterreiro/flash-calendar";
+import { Calendar } from "react-native-calendars";
 
-const today = new Date();
-const todayId = toDateId(today);
-const maxDate = new Date(today);
-maxDate.setFullYear(maxDate.getFullYear() + 2);
-const maxDateId = toDateId(maxDate);
+import { toIsoDate } from "@/utils/date";
+import { IsoDate } from "@/types/task.types";
 
-const CalendarView = () => {
-  const { height } = useWindowDimensions();
-  const [selectedDate, setSelectedDate] = useState(todayId);
-  const activeDateRanges = useMemo(
-    () => [{ startId: selectedDate, endId: selectedDate }],
-    [selectedDate]
-  );
+type CalendarViewType = {
+  selected: IsoDate | null;
+  setSelected: (date: IsoDate) => void;
+};
+
+const CalendarView = ({ selected, setSelected }: CalendarViewType) => {
+  const today = toIsoDate(new Date());
 
   return (
-    <View style={{ width: "100%", height: Math.min(height * 0.72, 560) }}>
-      <Calendar.List
-        calendarInstanceId="task-date-picker"
-        calendarInitialMonthId={todayId}
-        calendarMinDateId={todayId}
-        calendarMaxDateId={maxDateId}
-        calendarActiveDateRanges={activeDateRanges}
-        onCalendarDayPress={setSelectedDate}
-      />
-    </View>
+    <Calendar
+      current={selected || today}
+      minDate={today}
+      enableSwipeMonths
+      theme={{
+        arrowColor: "rgb(67, 67, 67)",
+        textSectionTitleColor: "rgba(0,0,0,0.35)",
+        textInactiveColor: "rgba(0,0,0,0.35)",
+        textDisabledColor: "rgba(0,0,0,0.35)",
+        selectedDayBackgroundColor: "rgba(0,0,0,0.06)",
+        selectedDayTextColor: "rgb(67, 67, 67)",
+        todayTextColor: "rgb(67, 67, 67)",
+        dayTextColor: "rgb(67, 67, 67)",
+      }}
+      onDayPress={(day) => {
+        setSelected(day.dateString as IsoDate);
+      }}
+      markedDates={
+        selected
+          ? {
+              [selected]: {
+                selected: true,
+                disableTouchEvent: true,
+              },
+            }
+          : undefined
+      }
+    />
   );
 };
 

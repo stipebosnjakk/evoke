@@ -14,11 +14,12 @@ import {
   startOfToday,
   isYesterday,
   isBefore,
+  isSameYear,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 
 import { IsoDate } from "@/types/task.types";
-import { weekdays } from "@/consts/date";
+import { weekdays } from "@/constants/date";
 
 // TODO: remove this if you don't need it
 
@@ -31,8 +32,12 @@ export const isValidIsoDate = (value: string) => {
   return isMatch(value, "yyyy-MM-dd") && isValid(parseISO(value));
 };
 
-export const formatIsoDate = (date: IsoDate): string =>
-  format(parseISO(date), "d MMM");
+export const formatIsoDate = (date: IsoDate): string => {
+  const parsedDate = parseISO(date);
+  const isCurrentYear = parsedDate.getFullYear() === new Date().getFullYear();
+
+  return format(parsedDate, isCurrentYear ? "d MMM" : "d MMM yyyy");
+};
 
 export const toIsoDate = (date: Date): IsoDate => {
   return format(date, "yyyy-MM-dd") as IsoDate;
@@ -49,6 +54,15 @@ export const getDateLabel = (value: IsoDate) => {
   if (isThisWeek(date, { weekStartsOn: 1 })) return format(date, "EEEE");
 
   return format(date, "d MMM");
+};
+
+export const formatSmartUiDate = (value: Date) => {
+  const date = typeof value === "string" ? parseISO(value) : value;
+
+  return format(
+    date,
+    isSameYear(date, new Date()) ? "EEEE d MMM" : "EEEE d MMM yyyy",
+  );
 };
 
 const parseFromPatterns = (
@@ -99,7 +113,10 @@ export const smartDateInput = (raw: string): Date | null => {
     { regex: /^\d{1,2}\/\d{1,2}\/\d{4}$/, format: "d/M/yyyy" },
   ]);
 
-  if (numericDate) return numericDate;
+  if (numericDate) {
+    if (startOfDay(numericDate) < today) return null;
+    return numericDate;
+  }
 
   const textInput = normalizedText.replace(
     /[a-zA-Z]+/g,
@@ -121,7 +138,10 @@ export const smartDateInput = (raw: string): Date | null => {
     },
   ]);
 
-  if (namedMonthDate) return namedMonthDate;
+  if (namedMonthDate) {
+    if (startOfDay(namedMonthDate) < today) return null;
+    return namedMonthDate;
+  }
 
   return null;
 };

@@ -1,4 +1,4 @@
-import { TASK_STATUSES } from "@/consts/statuses";
+import { TASK_STATUSES } from "@/constants/statuses";
 import type { Task } from "@/db";
 
 export type TaskStatusOptionsArray = {
@@ -40,3 +40,5 @@ export type OrderTaskItem = {
 };
 
 export type IsoDate = `${number}-${number}-${number}`;
+
+export type DateValueType = "start_date" | "deadline";

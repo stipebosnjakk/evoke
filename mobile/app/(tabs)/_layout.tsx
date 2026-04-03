@@ -4,7 +4,7 @@ import { Tabs, useSegments } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
 import Header from "@/components/custom/Header";
-import { TITLE_BY_ROUTE } from "@/consts/routes";
+import { TITLE_BY_ROUTE } from "@/constants/routes";
 
 type TabBarIconProps = {
   color: string;

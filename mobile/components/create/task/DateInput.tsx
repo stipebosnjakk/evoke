@@ -1,16 +1,20 @@
-import { RefObject, useMemo, useState } from "react";
+import { RefObject, useState } from "react";
 import { View, TextInput, StyleSheet, Text, Pressable } from "react-native";
 import { SymbolView } from "expo-symbols";
 
 import { IsoDate } from "@/types/task.types";
-import { formatIsoDate, smartDateInput, toIsoDate } from "@/utils/date";
-import { format } from "date-fns";
+import {
+  formatIsoDate,
+  formatSmartUiDate,
+  smartDateInput,
+  toIsoDate,
+} from "@/utils/date";
 
 type DateInputType = {
   inputRef: RefObject<TextInput | null>;
   isOpen: boolean;
-  onFocusOpen: () => void;
-  updateDate: (date: IsoDate | null) => void;
+  setIsOpen: (isOpen: boolean) => void;
+  handleNewDateSelect: (date: IsoDate | null) => void;
   dateValue?: IsoDate | null;
 };
 
@@ -22,8 +26,8 @@ type AvailableDateType = {
 const DateInput = ({
   inputRef,
   isOpen,
-  onFocusOpen,
-  updateDate,
+  setIsOpen,
+  handleNewDateSelect,
   dateValue,
 }: DateInputType) => {
   const [dateInput, setDateInput] = useState<string>(
@@ -42,7 +46,7 @@ const DateInput = ({
     if (getSmartInputDateDay) {
       setAvailableDate({
         isoDate: toIsoDate(getSmartInputDateDay),
-        uiDate: format(getSmartInputDateDay, "EEEE d MMM"),
+        uiDate: formatSmartUiDate(getSmartInputDateDay),
       });
       return;
     }
@@ -56,18 +60,18 @@ const DateInput = ({
   const handleTypedDateSubmit = () => {
     const getSmartInputDateDay = smartDateInput(dateInput);
     if (!getSmartInputDateDay) return null;
-    updateDate(toIsoDate(getSmartInputDateDay));
+    handleNewDateSelect(toIsoDate(getSmartInputDateDay));
   };
 
   const selectDate = () => {
     if (availableDate.isoDate) {
-      updateDate(availableDate.isoDate);
+      handleNewDateSelect(availableDate.isoDate);
       return;
     }
   };
 
   return (
-    <>
+    <View>
       <View style={styles.inputContainer}>
         <TextInput
           ref={inputRef}
@@ -86,7 +90,7 @@ const DateInput = ({
           autoCapitalize="none"
           style={styles.input}
           onChangeText={(text) => handleOnChangeText(text)}
-          onFocus={onFocusOpen}
+          onFocus={() => setIsOpen(true)}
         />
       </View>
       {isOpen && availableDate.isoDate && (
@@ -106,7 +110,7 @@ const DateInput = ({
           <Text style={styles.text}>Try today, tomorrow, or next Friday</Text>
         </View>
       )}
-    </>
+    </View>
   );
 };
 

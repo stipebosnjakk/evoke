@@ -17,7 +17,7 @@ import {
 import { TaskWithOrderKey } from "@/types/task.types";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
-import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
+import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
 import DraggableTask, { type RenderTaskItem } from "./DraggableTask";
 import ScreenContainer from "@/components/custom/ScreenContainer";
 

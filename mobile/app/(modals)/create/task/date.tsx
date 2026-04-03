@@ -1,70 +1,60 @@
-import { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Text, TextInput } from "react-native";
-import { SymbolView } from "expo-symbols";
-import { useNavigation, useRouter } from "expo-router";
+import { useRef, useState } from "react";
+import { ScrollView, StyleSheet, TextInput, View, Text } from "react-native";
+import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import { format, nextSaturday, nextMonday, addDays } from "date-fns";
+import { addDays, nextSaturday, nextMonday } from "date-fns";
 
+import CalendarView from "@/components/create/task/CalendarView";
+import DateInput from "@/components/create/task/DateInput";
+import Chip from "@/components/ui/Chip";
+import Button from "@/components/ui/Button";
 import { setStartDate } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
-import { toIsoDate } from "@/utils/date";
 import { useAppSelector } from "@/hooks/storeHooks";
-import Button from "@/components/ui/Button";
-import DateInput from "@/components/create/task/DateInput";
-import CalendarView from "@/components/create/task/CalendarView";
+import { toIsoDate } from "@/utils/date";
+import { SymbolView } from "expo-symbols";
 
-type OpenModalType = "input" | "calendar" | "time";
-
-const DateModal = () => {
-  const dispatch = useDispatch();
+const DateFormSheet = () => {
   const router = useRouter();
-  const navigation = useNavigation();
-
-  const startDate = useAppSelector((state) => state.newTask.task.start_date);
-
+  const dispatch = useDispatch();
   const inputRef = useRef<TextInput>(null);
-
-  const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
-  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
-  const [isTimeSelectorOpen, setIsTimeSelectorOpen] = useState<boolean>(false);
 
   const today = toIsoDate(new Date());
   const tomorrow = toIsoDate(addDays(new Date(), 1));
   const thisWeekend = toIsoDate(nextSaturday(new Date()));
   const nextWeek = toIsoDate(nextMonday(new Date()));
 
-  const isSubModalOpen =
-    isDateInputOpen || isCalendarOpen || isTimeSelectorOpen;
+  const startDateValue = useAppSelector(
+    (state) => state.newTask.task.start_date,
+  );
 
-  useEffect(() => {
-    if (!isSubModalOpen) return;
-    navigation.setOptions({
-      sheetAllowedDetents: [1],
-    });
-  }, [isSubModalOpen, navigation]);
+  const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<IsoDate | null>(
+    startDateValue || null,
+  );
 
-  const handleUpdateStartDate = (date: IsoDate | null) => {
+  const handleNewStartDateSelect = (date: IsoDate | null) => {
     dispatch(setStartDate({ start_date: date }));
     router.back();
   };
 
-  const handleGoBack = () => {
+  const handleSubmitDate = () => {
     if (isDateInputOpen) {
       inputRef.current?.blur();
-      navigation.setOptions({
-        sheetAllowedDetents: "fitToContents",
-      });
+      setIsDateInputOpen(false);
+    }
+
+    handleNewStartDateSelect(selected);
+  };
+
+  const handleGoBack = () => {
+    setSelected(null);
+    if (isDateInputOpen) {
+      inputRef.current?.blur();
       setIsDateInputOpen(false);
       return;
     }
-
     router.back();
-  };
-
-  const handleSubOpenModal = (type: OpenModalType) => {
-    setIsDateInputOpen(type === "input");
-    setIsCalendarOpen(type === "calendar");
-    setIsTimeSelectorOpen(type === "time");
   };
 
   return (
@@ -82,11 +72,11 @@ const DateModal = () => {
         <Text style={styles.title}>Date</Text>
         <Button
           style={{
-            opacity: isSubModalOpen ? 0 : 1,
+            opacity: isDateInputOpen ? 0 : selected ? 1 : 0.5,
           }}
-          disabled={isSubModalOpen}
+          disabled={!isDateInputOpen && !selected}
           iconOnly
-          onPress={() => {}}
+          onPress={handleSubmitDate}
         >
           <SymbolView
             name="checkmark"
@@ -100,179 +90,60 @@ const DateModal = () => {
       <DateInput
         inputRef={inputRef}
         isOpen={isDateInputOpen}
-        onFocusOpen={() => {
-          handleSubOpenModal("input");
-        }}
-        updateDate={handleUpdateStartDate}
-        dateValue={startDate}
+        setIsOpen={setIsDateInputOpen}
+        dateValue={selected || startDateValue}
+        handleNewDateSelect={handleNewStartDateSelect}
       />
-      {!isDateInputOpen && isCalendarOpen && <CalendarView />}
-      {!isSubModalOpen && (
-        <View style={styles.shortcutsContainer}>
-          {startDate !== today && (
-            <Button
-              style={styles.button}
-              onPress={() => {
-                handleUpdateStartDate(today);
-              }}
+      {!isDateInputOpen && (
+        <>
+          <View collapsable={false}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
-              <View style={styles.ButtonContainer}>
-                <View style={styles.iconContainer}>
-                  <SymbolView
-                    name="clock"
-                    weight="medium"
-                    size={26}
-                    type="monochrome"
-                    tintColor="rgba(0, 0, 0, 0.45)"
+              <View style={styles.row}>
+                {startDateValue !== today && (
+                  <Chip
+                    icon="clock"
+                    label="Today"
+                    onPress={() => {
+                      handleNewStartDateSelect(today);
+                    }}
                   />
-                  <Text style={styles.shortcutLabel}>Today</Text>
-                </View>
-                <Text style={styles.shortcutDay}>
-                  {format(new Date(), "EEE")}
-                </Text>
-              </View>
-            </Button>
-          )}
-          {startDate !== tomorrow && (
-            <Button
-              style={styles.button}
-              onPress={() => {
-                handleUpdateStartDate(tomorrow);
-              }}
-            >
-              <View style={styles.ButtonContainer}>
-                <View style={styles.iconContainer}>
-                  <SymbolView
-                    name="sunrise"
-                    weight="medium"
-                    size={26}
-                    type="monochrome"
-                    tintColor="rgba(0, 0, 0, 0.45)"
+                )}
+                {startDateValue !== tomorrow && (
+                  <Chip
+                    icon="sunrise"
+                    label="Tomorrow"
+                    onPress={() => {
+                      handleNewStartDateSelect(tomorrow);
+                    }}
                   />
-                  <Text style={styles.shortcutLabel}>Tomorrow</Text>
-                </View>
-                <Text style={styles.shortcutDay}>
-                  {format(addDays(new Date(), 1), "EEE")}
-                </Text>
-              </View>
-            </Button>
-          )}
-          {startDate !== thisWeekend && (
-            <Button
-              style={styles.button}
-              onPress={() => {
-                handleUpdateStartDate(thisWeekend);
-              }}
-            >
-              <View style={styles.ButtonContainer}>
-                <View style={styles.iconContainer}>
-                  <SymbolView
-                    name="beach.umbrella"
-                    weight="medium"
-                    size={26}
-                    type="monochrome"
-                    tintColor="rgba(0, 0, 0, 0.45)"
+                )}
+                {startDateValue !== thisWeekend && (
+                  <Chip
+                    icon="beach.umbrella"
+                    label="This Weekend"
+                    onPress={() => {
+                      handleNewStartDateSelect(thisWeekend);
+                    }}
                   />
-                  <Text style={styles.shortcutLabel}>This Weekend</Text>
-                </View>
-                <Text style={styles.shortcutDay}>
-                  {format(nextSaturday(new Date()), "EEE")}
-                </Text>
-              </View>
-            </Button>
-          )}
-          {startDate !== nextWeek && (
-            <Button
-              style={styles.button}
-              onPress={() => {
-                handleUpdateStartDate(nextWeek);
-              }}
-            >
-              <View style={styles.ButtonContainer}>
-                <View style={styles.iconContainer}>
-                  <SymbolView
-                    name="chevron.forward.2"
-                    weight="medium"
-                    size={26}
-                    type="monochrome"
-                    tintColor="rgba(0, 0, 0, 0.45)"
+                )}
+                {startDateValue !== nextWeek && (
+                  <Chip
+                    icon="chevron.forward.2"
+                    label="Next Week"
+                    onPress={() => {
+                      handleNewStartDateSelect(nextWeek);
+                    }}
                   />
-                  <Text style={styles.shortcutLabel}>Next Week</Text>
-                </View>
-                <Text style={styles.shortcutDay}>
-                  {format(nextMonday(new Date()), "EEE")}
-                </Text>
+                )}
               </View>
-            </Button>
-          )}
-          <Button
-            style={styles.button}
-            onPress={() => {
-              handleSubOpenModal("calendar");
-            }}
-          >
-            <View style={styles.ButtonContainer}>
-              <View style={styles.iconContainer}>
-                <SymbolView
-                  name="calendar"
-                  weight="medium"
-                  size={26}
-                  type="monochrome"
-                  tintColor="rgba(0, 0, 0, 0.45)"
-                />
-                <Text style={styles.shortcutLabel}>Calendar</Text>
-              </View>
-              <SymbolView
-                name="chevron.right"
-                weight="medium"
-                size={15}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-            </View>
-          </Button>
-          <Button style={styles.button} onPress={() => {}}>
-            <View style={styles.ButtonContainer}>
-              <View style={styles.iconContainer}>
-                <SymbolView
-                  name="clock"
-                  weight="medium"
-                  size={26}
-                  type="monochrome"
-                  tintColor="rgba(0, 0, 0, 0.45)"
-                />
-                <Text style={styles.shortcutLabel}>Time</Text>
-              </View>
-              <View style={styles.timeContainer}>
-                <Text style={styles.timeText}>None</Text>
-                <SymbolView
-                  name="chevron.right"
-                  weight="medium"
-                  size={15}
-                  type="monochrome"
-                  tintColor="rgba(0, 0, 0, 0.45)"
-                />
-              </View>
-            </View>
-          </Button>
-          <Button
-            style={styles.button}
-            onPress={() => {
-              handleUpdateStartDate(null);
-            }}
-          >
-            <View style={styles.noDayShortCutsContainer}>
-              <SymbolView
-                name="infinity"
-                weight="medium"
-                size={26}
-                type="monochrome"
-                tintColor="rgba(0, 0, 0, 0.45)"
-              />
-              <Text style={styles.shortcutLabel}>No Date</Text>
-            </View>
-          </Button>
-        </View>
+            </ScrollView>
+          </View>
+          <CalendarView selected={selected} setSelected={setSelected} />
+        </>
       )}
     </View>
   );
@@ -282,10 +153,11 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
   },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
+  row: {
+    flexDirection: "row",
+    gap: 8,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
   },
   headerContainer: {
     paddingHorizontal: 20,
@@ -294,53 +166,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  shortcutsContainer: {
-    flexDirection: "column",
-  },
-  ButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-  },
-  shortcutLabel: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "rgba(0, 0, 0, 0.45)",
-  },
-  shortcutDay: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "rgba(0, 0, 0, 0.45)",
-  },
-  noDayShortCutsContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 12,
-  },
-  button: {
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  timeContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-  },
-  timeText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "rgba(0, 0, 0, 0.45)",
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
   },
 });
 
-export default DateModal;
+export default DateFormSheet;

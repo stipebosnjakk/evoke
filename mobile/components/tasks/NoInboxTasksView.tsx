@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
-import { routes } from "@/consts/routes";
+import { routes } from "@/constants/routes";
 import ScreenContainer from "@/components/custom/ScreenContainer";
 
 export const NoInboxTasksView = () => {

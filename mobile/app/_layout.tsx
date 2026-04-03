@@ -4,15 +4,15 @@ import { Provider } from "react-redux";
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import Toast from "react-native-toast-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import Toast from "react-native-toast-message";
 
 import "@/global.css";
 import { toastConfig } from "@/components/ui/ToastConfig";
 import { store } from "@/store/store";
-import migrations from "@/drizzle/migrations";
 import { db } from "@/db/client";
+import migrations from "@/drizzle/migrations";
 import ScreenContainer from "@/components/custom/ScreenContainer";
 
 const RootLayout = () => {
@@ -64,7 +64,7 @@ const RootLayout = () => {
             options={modalOptions}
           />
           <Stack.Screen
-            name="(modals)/create/task/repeat"
+            name="(modals)/create/task/calendar"
             options={modalOptions}
           />
         </Stack>

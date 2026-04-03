@@ -1,4 +1,4 @@
-import { TASK_STATUSES } from "@/consts/statuses";
+import { TASK_STATUSES } from "@/constants/statuses";
 import { IsoDate, TaskStatusOptionsArray } from "@/types/task.types";
 import { isValidIsoDate } from "@/utils/date";
 

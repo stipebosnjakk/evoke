@@ -8,7 +8,7 @@ import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 
 import Button from "@/components/ui/Button";
-import { routes } from "@/consts/routes";
+import { routes } from "@/constants/routes";
 
 type HeaderProps = { title: string };
 

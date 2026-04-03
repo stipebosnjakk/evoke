@@ -4,7 +4,7 @@ import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { changeContainerId } from "@/store/tasks/slices/tasks.slice";
-import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
+import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
 import { TaskWithOrderKey } from "@/types/task.types";
 import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
 import { NoInboxTasksView } from "@/components/tasks/NoInboxTasksView";

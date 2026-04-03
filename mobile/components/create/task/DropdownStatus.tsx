@@ -1,19 +1,20 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SymbolView } from "expo-symbols";
 
-import Chip from "../../ui/Chip";
+import Chip from "@/components/ui/Chip";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TASK_STATUSES } from "@/consts/statuses";
+import { TASK_STATUSES } from "@/constants/statuses";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { useDispatch } from "react-redux";
 import { setStatus } from "@/store/tasks/slices/newTask.slice";
 
-// TODO: fix when keyboard is unfocused dropdown stays at the same position.
+// TODO: make dropdown up from status chip not below
+// TODO: if user clicks on already selected status, deselect it and set status to null
 
 const DropdownStatus = () => {
   const dispatch = useDispatch();
@@ -24,14 +25,6 @@ const DropdownStatus = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Pressable>
-          <Chip
-            icon={status ? status.icon : "tag"}
-            label={status ? status.label : "Status"}
-          />
-        </Pressable>
-      </DropdownMenuTrigger>
       <DropdownMenuContent style={styles.dropdownContent}>
         {TASK_STATUSES.map((item) => {
           const selected = status?.label === item.label;
@@ -74,12 +67,21 @@ const DropdownStatus = () => {
           );
         })}
       </DropdownMenuContent>
+      <DropdownMenuTrigger asChild>
+        <Pressable>
+          <Chip
+            icon={status ? status.icon : "tag"}
+            label={status ? status.label : "Status"}
+          />
+        </Pressable>
+      </DropdownMenuTrigger>
     </DropdownMenu>
   );
 };
 
 const styles = StyleSheet.create({
   dropdownContent: {
+    marginVertical: 10,
     width: 240,
     backgroundColor: "rgb(240, 240, 240)",
     borderRadius: 18,
@@ -90,7 +92,10 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.35,
     shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
   },
 });
 

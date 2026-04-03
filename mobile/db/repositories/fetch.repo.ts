@@ -2,7 +2,7 @@ import { and, eq, isNull, desc, sql } from "drizzle-orm";
 
 import { DataReturnType } from "@/types/task.types";
 import { db, tasks, list_order } from "@/db";
-import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
+import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
 import { throwDbError } from "@/utils/handleErrorMessage";
 
 export const fetchInboxTasks = async (

@@ -3,8 +3,8 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  TextInput,
   ScrollView,
+  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
@@ -13,13 +13,13 @@ import Toast from "react-native-toast-message";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-import { routes } from "@/consts/routes";
+import { routes } from "@/constants/routes";
 import { setDescription, setTitle } from "@/store/tasks/slices/newTask.slice";
+import { getDateLabel } from "@/utils/date";
 import DropdownStatus from "@/components/create/task/DropdownStatus";
 import Chip from "@/components/ui/Chip";
-import { getDateLabel } from "@/utils/date";
 
-const CreateTaskModal = () => {
+const CreateFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -63,11 +63,11 @@ const CreateTaskModal = () => {
         </Text>
         <View style={styles.fields}>
           <TextInput
+            autoFocus
             value={title || ""}
             onChangeText={(text) => dispatch(setTitle({ title: text }))}
             placeholder="Task title"
             placeholderTextColor="rgba(0,0,0,0.35)"
-            autoFocus
             returnKeyType="next"
             style={styles.titleInput}
             blurOnSubmit={false}
@@ -114,7 +114,7 @@ const CreateTaskModal = () => {
                 icon="repeat"
                 label="Repeat"
                 onPress={() => {
-                  router.push(routes.repeat.href);
+                  console.log("repeat");
                 }}
               />
             </View>
@@ -144,6 +144,21 @@ const CreateTaskModal = () => {
 };
 
 const styles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+  sheetBackground: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  handle: {
+    backgroundColor: "rgba(0,0,0,0.25)",
+  },
+  content: {
+    flex: 1,
+  },
   container: {
     padding: 16,
   },
@@ -193,4 +208,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateTaskModal;
+export default CreateFormSheet;

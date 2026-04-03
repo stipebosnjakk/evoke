@@ -4,7 +4,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { db, list_order, NewTask, tasks } from "@/db";
 import { TaskWithOrderKey } from "@/types/task.types";
 import { throwDbError } from "@/utils/handleErrorMessage";
-import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
+import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
 
 // TODO: for some reason all of my tasks has order key around 5000
 

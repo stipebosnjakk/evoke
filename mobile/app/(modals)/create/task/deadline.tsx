@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { View, Text } from "react-native";
 
-const DeadlineModal = () => {
+const DeadlineFormSheet = () => {
   const [deadline, setDeadline] = useState<number | null>(null);
+
   return (
     <View>
-      <Text>DeadlineModal</Text>
+      <Text>DeadlineFormSheet</Text>
     </View>
   );
 };
 
-export default DeadlineModal;
+export default DeadlineFormSheet;

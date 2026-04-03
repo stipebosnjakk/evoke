@@ -6,7 +6,7 @@ import { tasks } from "@/db/schemas/task.schema";
 import { db } from "@/db/client";
 import { RejectWithValue, TaskWithOrderKey } from "@/types/task.types";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
-import { INBOX_CONTAINER_ID } from "@/consts/containerIds";
+import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
 import { list_order } from "@/db";
 
 export const deleteAllTasksAction = createAsyncThunk<
