@@ -26,15 +26,15 @@ const Shortcuts = ({
   const isStartDateShortcutAvailable = (shortcutDate: IsoDate) => {
     if (selectedStartDate === shortcutDate) return false;
     if (!selectedDeadline) return true;
-    const minimumDeadline = minDate(shortcutDate);
-    if (!minimumDeadline) return true;
-    return selectedDeadline >= minimumDeadline;
+    const maximumStartDate = minDate("start_date", selectedDeadline);
+    if (!maximumStartDate) return true;
+    return shortcutDate <= maximumStartDate;
   };
 
   const isDeadlineShortcutAvailable = (shortcutDate: IsoDate) => {
     if (selectedDeadline === shortcutDate) return false;
     if (!selectedStartDate) return true;
-    const minimumDeadline = minDate(selectedStartDate);
+    const minimumDeadline = minDate("deadline", selectedStartDate);
     if (!minimumDeadline) return true;
     return shortcutDate >= minimumDeadline;
   };

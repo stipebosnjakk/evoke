@@ -23,7 +23,7 @@ const DeadlineFormSheet = () => {
     (state) => state.newTask.task.start_date,
   );
 
-  const minDeadlineDate = minDate(startDateValue ?? null);
+  const minDeadlineDate = minDate("deadline", startDateValue ?? null);
 
   const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<IsoDate | null>(
@@ -100,7 +100,7 @@ const DeadlineFormSheet = () => {
             handleNewDateSelect={handleNewDeadlineSelect}
           />
           <CalendarView
-            minDate={minDeadlineDate as IsoDate}
+            minDate={minDeadlineDate}
             selected={selected}
             setSelected={setSelected}
           />

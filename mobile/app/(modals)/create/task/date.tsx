@@ -11,6 +11,7 @@ import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
 import Shortcuts from "./components/Shortcuts";
+import { minDate } from "@/utils/date";
 
 const DateFormSheet = () => {
   const router = useRouter();
@@ -26,6 +27,8 @@ const DateFormSheet = () => {
   const [selected, setSelected] = useState<IsoDate | null>(
     startDateValue || null,
   );
+
+  const maxDateValue = minDate("start_date", deadlineValue || null);
 
   const handleNewStartDateSelect = (date: IsoDate | null) => {
     dispatch(setStartDate({ start_date: date }));
@@ -96,7 +99,11 @@ const DateFormSheet = () => {
             selectedDeadline={deadlineValue || null}
             handleNewDateSelect={handleNewStartDateSelect}
           />
-          <CalendarView selected={selected} setSelected={setSelected} />
+          <CalendarView
+            maxDate={maxDateValue}
+            selected={selected}
+            setSelected={setSelected}
+          />
         </View>
       )}
     </View>

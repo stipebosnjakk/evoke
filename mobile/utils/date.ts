@@ -28,10 +28,23 @@ import { weekdays } from "@/constants/date";
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-export const minDate = (selectedDate: IsoDate | null) => {
-  return selectedDate
-    ? format(addDays(parseISO(selectedDate), 1), "yyyy-MM-dd")
-    : null;
+export const minDate = (
+  type: "start_date" | "deadline",
+  selectedDate: IsoDate | null,
+) => {
+  if (type === "start_date") {
+    if (!selectedDate) return null;
+    const maximumStartDate = addDays(parseISO(selectedDate), -1);
+    return toIsoDate(maximumStartDate);
+  }
+
+  if (type === "deadline") {
+    if (!selectedDate) return null;
+    const minimumDeadlineDate = addDays(parseISO(selectedDate), 1);
+    return toIsoDate(minimumDeadlineDate);
+  }
+
+  return null;
 };
 
 export const isValidIsoDate = (value: string) => {

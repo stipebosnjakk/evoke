@@ -29,6 +29,7 @@ const CreateFormSheet = () => {
     (state) => state.newTask.inputs.description,
   );
   const startDate = useAppSelector((state) => state.newTask.task.start_date);
+  const deadline = useAppSelector((state) => state.newTask.task.deadline);
 
   const showErrorToast = (message: string) => {
     Toast.show({
@@ -107,7 +108,7 @@ const CreateFormSheet = () => {
               />
               <Chip
                 icon="calendar.badge.clock"
-                label="Deadline"
+                label={deadline ? getDateLabel(deadline) : "Deadline"}
                 onPress={() => {
                   router.push(routes.deadline.href);
                 }}
