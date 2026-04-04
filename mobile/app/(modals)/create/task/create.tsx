@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   View,
   Text,
@@ -14,7 +15,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
 import { routes } from "@/constants/routes";
-import { setDescription, setTitle } from "@/store/tasks/slices/newTask.slice";
+import {
+  clearState,
+  setDescription,
+  setTitle,
+} from "@/store/tasks/slices/newTask.slice";
 import { getDateLabel } from "@/utils/date";
 import DropdownStatus from "./components/DropdownStatus";
 import Chip from "@/components/ui/Chip";
@@ -30,6 +35,12 @@ const CreateFormSheet = () => {
   );
   const startDate = useAppSelector((state) => state.newTask.task.start_date);
   const deadline = useAppSelector((state) => state.newTask.task.deadline);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearState());
+    };
+  }, [dispatch]);
 
   const showErrorToast = (message: string) => {
     Toast.show({
@@ -54,9 +65,6 @@ const CreateFormSheet = () => {
   };
 
   // TODO: on close bottom sheet restore newTask
-
-  // NEXT TODO: organize this code
-  // TODO: before creating task check if there is task with same start time
 
   return (
     <View>
