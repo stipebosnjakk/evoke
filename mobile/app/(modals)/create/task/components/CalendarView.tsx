@@ -4,17 +4,20 @@ import { toIsoDate } from "@/utils/date";
 import { IsoDate } from "@/types/task.types";
 
 type CalendarViewType = {
+  minDate?: IsoDate;
   selected: IsoDate | null;
   setSelected: (date: IsoDate) => void;
 };
 
-const CalendarView = ({ selected, setSelected }: CalendarViewType) => {
+const CalendarView = ({ minDate, selected, setSelected }: CalendarViewType) => {
   const today = toIsoDate(new Date());
+
+  // TODO: today is not unavailable 
 
   return (
     <Calendar
-      current={selected || today}
-      minDate={today}
+      current={selected ? selected : minDate || today}
+      minDate={minDate || today}
       enableSwipeMonths
       theme={{
         arrowColor: "rgb(67, 67, 67)",

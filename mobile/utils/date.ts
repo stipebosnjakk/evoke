@@ -28,6 +28,12 @@ import { weekdays } from "@/constants/date";
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+export const minDate = (selectedDate: IsoDate | null) => {
+  return selectedDate
+    ? format(addDays(parseISO(selectedDate), 1), "yyyy-MM-dd")
+    : null;
+};
+
 export const isValidIsoDate = (value: string) => {
   return isMatch(value, "yyyy-MM-dd") && isValid(parseISO(value));
 };

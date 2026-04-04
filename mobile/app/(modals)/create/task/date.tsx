@@ -1,29 +1,23 @@
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, TextInput, View, Text } from "react-native";
+import { StyleSheet, TextInput, View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import { addDays, nextSaturday, nextMonday } from "date-fns";
 
-import CalendarView from "@/components/create/task/CalendarView";
-import DateInput from "@/components/create/task/DateInput";
-import Chip from "@/components/ui/Chip";
+import CalendarView from "./components/CalendarView";
+import DateInput from "./components/DateInput";
 import Button from "@/components/ui/Button";
 import { setStartDate } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
-import { toIsoDate } from "@/utils/date";
 import { SymbolView } from "expo-symbols";
+import Shortcuts from "./components/Shortcuts";
 
 const DateFormSheet = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const inputRef = useRef<TextInput>(null);
 
-  const today = toIsoDate(new Date());
-  const tomorrow = toIsoDate(addDays(new Date(), 1));
-  const thisWeekend = toIsoDate(nextSaturday(new Date()));
-  const nextWeek = toIsoDate(nextMonday(new Date()));
-
+  const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
   const startDateValue = useAppSelector(
     (state) => state.newTask.task.start_date,
   );
@@ -95,55 +89,15 @@ const DateFormSheet = () => {
         handleNewDateSelect={handleNewStartDateSelect}
       />
       {!isDateInputOpen && (
-        <>
-          <View collapsable={false}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
-              <View style={styles.row}>
-                {startDateValue !== today && (
-                  <Chip
-                    icon="clock"
-                    label="Today"
-                    onPress={() => {
-                      handleNewStartDateSelect(today);
-                    }}
-                  />
-                )}
-                {startDateValue !== tomorrow && (
-                  <Chip
-                    icon="sunrise"
-                    label="Tomorrow"
-                    onPress={() => {
-                      handleNewStartDateSelect(tomorrow);
-                    }}
-                  />
-                )}
-                {startDateValue !== thisWeekend && (
-                  <Chip
-                    icon="beach.umbrella"
-                    label="This Weekend"
-                    onPress={() => {
-                      handleNewStartDateSelect(thisWeekend);
-                    }}
-                  />
-                )}
-                {startDateValue !== nextWeek && (
-                  <Chip
-                    icon="chevron.forward.2"
-                    label="Next Week"
-                    onPress={() => {
-                      handleNewStartDateSelect(nextWeek);
-                    }}
-                  />
-                )}
-              </View>
-            </ScrollView>
-          </View>
+        <View>
+          <Shortcuts
+            type="start_date"
+            selectedStartDate={startDateValue || null}
+            selectedDeadline={deadlineValue || null}
+            handleNewDateSelect={handleNewStartDateSelect}
+          />
           <CalendarView selected={selected} setSelected={setSelected} />
-        </>
+        </View>
       )}
     </View>
   );

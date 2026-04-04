@@ -13,7 +13,7 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { useDispatch } from "react-redux";
 import { setStatus } from "@/store/tasks/slices/newTask.slice";
 
-// TODO: make dropdown up from status chip not below
+// TODO: make custom dropdown
 // TODO: if user clicks on already selected status, deselect it and set status to null
 
 const DropdownStatus = () => {

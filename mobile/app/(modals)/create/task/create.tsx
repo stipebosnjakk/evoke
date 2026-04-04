@@ -16,7 +16,7 @@ import { handleErrorMessage } from "@/utils/handleErrorMessage";
 import { routes } from "@/constants/routes";
 import { setDescription, setTitle } from "@/store/tasks/slices/newTask.slice";
 import { getDateLabel } from "@/utils/date";
-import DropdownStatus from "@/components/create/task/DropdownStatus";
+import DropdownStatus from "./components/DropdownStatus";
 import Chip from "@/components/ui/Chip";
 
 const CreateFormSheet = () => {
@@ -51,6 +51,8 @@ const CreateFormSheet = () => {
       showErrorToast(handleErrorMessage(error, "Something went wrong."));
     }
   };
+
+  // TODO: on close bottom sheet restore newTask
 
   // NEXT TODO: organize this code
   // TODO: before creating task check if there is task with same start time

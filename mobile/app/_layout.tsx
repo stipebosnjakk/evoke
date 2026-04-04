@@ -68,9 +68,9 @@ const RootLayout = () => {
             options={modalOptions}
           />
         </Stack>
-        <Toast config={toastConfig} />
-        <PortalHost />
       </GestureHandlerRootView>
+      <Toast config={toastConfig} />
+      <PortalHost />
     </Provider>
   );
 };
