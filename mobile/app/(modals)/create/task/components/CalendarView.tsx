@@ -24,6 +24,7 @@ const CalendarView = ({
       current={selected ? selected : minDate || today}
       minDate={minDate || today}
       maxDate={maxDate || undefined}
+      firstDay={1}
       enableSwipeMonths
       disableAllTouchEventsForDisabledDays
       theme={{

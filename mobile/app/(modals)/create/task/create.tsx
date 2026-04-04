@@ -64,8 +64,6 @@ const CreateFormSheet = () => {
     }
   };
 
-  // TODO: on close bottom sheet restore newTask
-
   return (
     <View>
       <View style={styles.container}>

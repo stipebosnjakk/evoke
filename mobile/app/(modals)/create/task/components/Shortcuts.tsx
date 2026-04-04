@@ -1,8 +1,15 @@
 import { View, ScrollView, StyleSheet } from "react-native";
-import { nextMonday, addDays, nextSaturday } from "date-fns";
+import {
+  nextMonday,
+  addDays,
+  nextSaturday,
+  isWeekend,
+  addWeeks,
+  startOfWeek,
+} from "date-fns";
 
 import Chip from "@/components/ui/Chip";
-import { minDate, toIsoDate } from "@/utils/date";
+import { getWeekendSaturday, minDate, toIsoDate } from "@/utils/date";
 import { IsoDate } from "@/types/task.types";
 
 type ShortcutsType = {
@@ -20,8 +27,11 @@ const Shortcuts = ({
 }: ShortcutsType) => {
   const today = toIsoDate(new Date());
   const tomorrow = toIsoDate(addDays(new Date(), 1));
-  const thisWeekend = toIsoDate(nextSaturday(new Date()));
   const nextWeek = toIsoDate(nextMonday(new Date()));
+  const nextWeekend = toIsoDate(getWeekendSaturday(today, 1));
+  const thisWeekend = isWeekend(today)
+    ? null
+    : toIsoDate(getWeekendSaturday(today, 0));
 
   const isStartDateShortcutAvailable = (shortcutDate: IsoDate) => {
     if (selectedStartDate === shortcutDate) return false;
@@ -39,7 +49,8 @@ const Shortcuts = ({
     return shortcutDate >= minimumDeadline;
   };
 
-  const isShortcutAvailable = (shortcutDate: IsoDate) => {
+  const isShortcutAvailable = (shortcutDate: IsoDate | null) => {
+    if (!shortcutDate) return false;
     return type === "deadline"
       ? isDeadlineShortcutAvailable(shortcutDate)
       : isStartDateShortcutAvailable(shortcutDate);
@@ -66,6 +77,13 @@ const Shortcuts = ({
       label: "This Weekend",
       date: thisWeekend,
       available: isShortcutAvailable(thisWeekend),
+    },
+    {
+      key: "nextWeekend",
+      icon: "moon.stars",
+      label: "Next Weekend",
+      date: nextWeekend,
+      available: isShortcutAvailable(nextWeekend),
     },
     {
       key: "nextWeek",

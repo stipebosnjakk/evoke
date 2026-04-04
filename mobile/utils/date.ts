@@ -15,6 +15,8 @@ import {
   isYesterday,
   isBefore,
   isSameYear,
+  addWeeks,
+  startOfWeek,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 
@@ -27,6 +29,11 @@ import { weekdays } from "@/constants/date";
 
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+export const getWeekendSaturday = (date: IsoDate, weeksAhead = 0) => {
+  const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+  return addDays(addWeeks(weekStart, weeksAhead), 5);
+};
 
 export const minDate = (
   type: "start_date" | "deadline",
