@@ -59,7 +59,7 @@ const Shortcuts = ({
   const shortcuts = [
     {
       key: "today",
-      icon: "clock",
+      icon: "sun.max",
       label: "Today",
       date: today,
       available: isShortcutAvailable(today),

@@ -6,12 +6,19 @@ import { useDispatch } from "react-redux";
 import CalendarView from "./components/CalendarView";
 import DateInput from "./components/DateInput";
 import Button from "@/components/ui/Button";
+import Shortcuts from "./components/Shortcuts";
 import { setStartDate } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
-import Shortcuts from "./components/Shortcuts";
 import { minDate } from "@/utils/date";
+import { routes } from "@/constants/routes";
+
+// TODO: make a time picker
+// TODO: impement smart text for time
+// TODO: make a custom dropdown for status and repeat
+// TODO: test if conflict is working between start date and deadline, with error warnings for creating task
+// TODO: try to fix toast message showing behind formSheet
 
 const DateFormSheet = () => {
   const router = useRouter();
@@ -54,6 +61,13 @@ const DateFormSheet = () => {
     router.back();
   };
 
+  const handleNoDate = () => {
+    // TODO: also add for time
+    dispatch(setStartDate({ start_date: null }));
+    setSelected(null);
+    router.back();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -92,19 +106,50 @@ const DateFormSheet = () => {
         handleNewDateSelect={handleNewStartDateSelect}
       />
       {!isDateInputOpen && (
-        <View>
-          <Shortcuts
-            type="start_date"
-            selectedStartDate={startDateValue || null}
-            selectedDeadline={deadlineValue || null}
-            handleNewDateSelect={handleNewStartDateSelect}
-          />
-          <CalendarView
-            maxDate={maxDateValue}
-            selected={selected}
-            setSelected={setSelected}
-          />
-        </View>
+        <>
+          <View style={styles.calendarContainer}>
+            <Shortcuts
+              type="start_date"
+              selectedStartDate={startDateValue || null}
+              selectedDeadline={deadlineValue || null}
+              handleNewDateSelect={handleNewStartDateSelect}
+            />
+            <CalendarView
+              maxDate={maxDateValue}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </View>
+          <View style={styles.buttonsContainer}>
+            <Button
+              style={styles.button}
+              onPress={() => {
+                router.push(routes.time.href);
+              }}
+            >
+              <SymbolView
+                name="clock"
+                weight="medium"
+                size={22}
+                type="monochrome"
+                tintColor="rgb(67, 67, 67)"
+              />
+              <Text style={styles.buttonText}>Time</Text>
+            </Button>
+            {startDateValue && (
+              <Button style={styles.button} onPress={handleNoDate}>
+                <SymbolView
+                  name="minus.circle"
+                  weight="medium"
+                  size={22}
+                  type="monochrome"
+                  tintColor="rgb(67, 67, 67)"
+                />
+                <Text style={styles.buttonText}>No Date</Text>
+              </Button>
+            )}
+          </View>
+        </>
       )}
     </View>
   );
@@ -131,6 +176,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#111827",
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 20,
+  },
+  buttonsContainer: {
+    borderTopColor: "rgba(0,0,0,0.06)",
+    borderTopWidth: 1,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "rgb(67, 67, 67)",
+    fontWeight: "500",
+  },
+  calendarContainer: {
+    paddingBottom: 10,
   },
 });
 

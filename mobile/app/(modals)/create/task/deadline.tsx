@@ -13,6 +13,8 @@ import DateInput from "./components/DateInput";
 import { setDeadline } from "@/store/tasks/slices/newTask.slice";
 import Shortcuts from "./components/Shortcuts";
 
+// FIX: date input has bug where user can type date that is before start date
+
 const DeadlineFormSheet = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -54,6 +56,12 @@ const DeadlineFormSheet = () => {
     router.back();
   };
 
+  const handleNoDeadline = () => {
+    dispatch(setDeadline({ deadline: null }));
+    setSelected(null);
+    router.back();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -92,19 +100,35 @@ const DeadlineFormSheet = () => {
         handleNewDateSelect={handleNewDeadlineSelect}
       />
       {!isDateInputOpen && (
-        <View>
-          <Shortcuts
-            type="deadline"
-            selectedStartDate={startDateValue || null}
-            selectedDeadline={deadlineValue || null}
-            handleNewDateSelect={handleNewDeadlineSelect}
-          />
-          <CalendarView
-            minDate={minDeadlineDate}
-            selected={selected}
-            setSelected={setSelected}
-          />
-        </View>
+        <>
+          <View>
+            <Shortcuts
+              type="deadline"
+              selectedStartDate={startDateValue || null}
+              selectedDeadline={deadlineValue || null}
+              handleNewDateSelect={handleNewDeadlineSelect}
+            />
+            <CalendarView
+              minDate={minDeadlineDate}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </View>
+          {deadlineValue && (
+            <View style={styles.buttonsContainer}>
+              <Button style={styles.button} onPress={handleNoDeadline}>
+                <SymbolView
+                  name="minus.circle"
+                  weight="medium"
+                  size={22}
+                  type="monochrome"
+                  tintColor="rgb(67, 67, 67)"
+                />
+                <Text style={styles.buttonText}>No Deadline</Text>
+              </Button>
+            </View>
+          )}
+        </>
       )}
     </View>
   );
@@ -125,6 +149,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#111827",
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 20,
+  },
+  buttonsContainer: {
+    borderTopColor: "rgba(0,0,0,0.06)",
+    borderTopWidth: 1,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "rgb(67, 67, 67)",
+    fontWeight: "500",
   },
 });
 

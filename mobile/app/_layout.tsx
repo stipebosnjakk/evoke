@@ -64,7 +64,7 @@ const RootLayout = () => {
             options={modalOptions}
           />
           <Stack.Screen
-            name="(modals)/create/task/calendar"
+            name="(modals)/create/task/time"
             options={modalOptions}
           />
         </Stack>

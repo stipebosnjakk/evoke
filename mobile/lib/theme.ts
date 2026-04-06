@@ -112,3 +112,39 @@ export const APP_THEME: Record<"light" | "dark", ColorTheme> = {
     difficultyHard: "#F97316",
   },
 };
+
+export const CALENDAR_THEME = {
+  backgroundColor: "#FFFFFF",
+  calendarBackground: "#FFFFFF",
+  textSectionTitleColor: "#A3A3A3",
+  textInactiveColor: "#D0D0D0",
+  textDisabledColor: "#D0D0D0",
+  dayTextColor: "#111111",
+  monthTextColor: "#111111",
+  textDayFontSize: 16,
+  textMonthFontSize: 18,
+  textMonthFontWeight: "600",
+  textDayHeaderFontSize: 12,
+  textDayHeaderFontWeight: "500",
+  "stylesheet.calendar.header": {
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 10,
+      marginBottom: 18,
+    },
+    week: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginBottom: 10,
+    },
+    dayHeader: {
+      width: 40,
+      textAlign: "center",
+      color: "#A3A3A3",
+      fontSize: 12,
+      fontWeight: "500",
+    },
+  },
+} as Record<string, unknown>;
