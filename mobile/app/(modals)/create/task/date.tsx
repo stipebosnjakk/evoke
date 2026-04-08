@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, TextInput, View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
+import { useCalendars, useLocales } from "expo-localization";
 
 import CalendarView from "./components/CalendarView";
 import DateInput from "./components/DateInput";
@@ -11,7 +12,7 @@ import { setStartDate } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
-import { minDate } from "@/utils/date";
+import { formatTimeFromMin, minDate } from "@/utils/date";
 import { routes } from "@/constants/routes";
 
 // TODO: make a time picker
@@ -23,9 +24,28 @@ import { routes } from "@/constants/routes";
 const DateFormSheet = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const locales = useLocales();
+  const calendars = useCalendars();
   const inputRef = useRef<TextInput>(null);
 
+  const startTimeMin = useAppSelector(
+    (state) => state.newTask.task.start_time_min,
+  );
+  const dueTimeMin = useAppSelector((state) => state.newTask.task.due_time_min);
   const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
+
+  const locale = locales[0]?.languageTag ?? "en-US";
+  const is24Hour = calendars[0]?.uses24hourClock ?? false;
+
+  const startTimeLabel = formatTimeFromMin(
+    startTimeMin ?? null,
+    locale,
+    is24Hour,
+  );
+  const dueTimeLabel = formatTimeFromMin(dueTimeMin ?? null, locale, is24Hour);
+  // FIX: due time is not showing
+  // FIX: check if due time is alright after setting duration, is time correct
+
   const startDateValue = useAppSelector(
     (state) => state.newTask.task.start_date,
   );
@@ -122,19 +142,41 @@ const DateFormSheet = () => {
           </View>
           <View style={styles.buttonsContainer}>
             <Button
-              style={styles.button}
+              style={[styles.button, { justifyContent: "space-between" }]}
               onPress={() => {
                 router.push(routes.time.href);
               }}
             >
-              <SymbolView
-                name="clock"
-                weight="medium"
-                size={22}
-                type="monochrome"
-                tintColor="rgb(67, 67, 67)"
-              />
-              <Text style={styles.buttonText}>Time</Text>
+              <View style={styles.buttonContent}>
+                <SymbolView
+                  name="clock"
+                  weight="medium"
+                  size={22}
+                  type="monochrome"
+                  tintColor="rgb(67, 67, 67)"
+                />
+                <Text style={styles.buttonText}>Time</Text>
+              </View>
+              <View style={styles.buttonContent}>
+                {!startTimeLabel && !dueTimeLabel && (
+                  <Text style={styles.sideButtonText}>None</Text>
+                )}
+                {startTimeLabel && !dueTimeLabel && (
+                  <Text style={styles.sideButtonText}>{startTimeLabel}</Text>
+                )}
+                {startTimeLabel && dueTimeLabel && (
+                  <Text style={styles.sideButtonText}>
+                    {startTimeLabel} - {dueTimeLabel}
+                  </Text>
+                )}
+                <SymbolView
+                  name="chevron.right"
+                  weight="light"
+                  size={16}
+                  type="monochrome"
+                  tintColor="rgb(67, 67, 67)"
+                />
+              </View>
             </Button>
             {startDateValue && (
               <Button style={styles.button} onPress={handleNoDate}>
@@ -192,8 +234,18 @@ const styles = StyleSheet.create({
     color: "rgb(67, 67, 67)",
     fontWeight: "500",
   },
+  sideButtonText: {
+    fontSize: 16,
+    color: "rgb(67, 67, 67)",
+    fontWeight: "400",
+  },
   calendarContainer: {
     paddingBottom: 10,
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
 });
 

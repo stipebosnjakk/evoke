@@ -1,12 +1,281 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { useMemo, useState } from "react";
+import { View, Text, StyleSheet, Platform } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
+import { SymbolView } from "expo-symbols";
+import { useRouter } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
+import { useDispatch } from "react-redux";
+import { useCalendars } from "expo-localization";
+
+import Button from "@/components/ui/Button";
+import { setDueTime, setStartTime } from "@/store/tasks/slices/newTask.slice";
+import {
+  getDueTimeMin,
+  getDurationFromStartAndDueTimeMin,
+  getHoursAndMinutesFromMin,
+  getStartTimeMin,
+} from "@/utils/date";
+import { useAppSelector } from "@/hooks/storeHooks";
+
+// TODO: clean the code
 
 const TimeFormSheet = () => {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>TimeFormSheet</Text>
-    </View>
-  )
-}
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const calendars = useCalendars();
+  const is24Hour = calendars[0]?.uses24hourClock ?? false;
+  const timeFormat = is24Hour ? "HH:mm" : "h:mm a";
 
-export default TimeFormSheet
+  const startTimeMin = useAppSelector(
+    (state) => state.newTask.task.start_time_min,
+  );
+  const dueTimeMin = useAppSelector((state) => state.newTask.task.due_time_min);
+
+  const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
+  const duration = getDurationFromStartAndDueTimeMin(
+    startTimeMin ?? null,
+    dueTimeMin ?? null,
+  );
+
+  const [time, setTime] = useState(
+    startTime
+      ? new Date(0, 0, 0, startTime.hours, startTime.minutes)
+      : new Date(),
+  );
+  const [durationHours, setDurationHours] = useState<number>(
+    duration?.hours ?? 0,
+  );
+  const [durationMinutes, setDurationMinutes] = useState<number>(
+    duration?.minutes ?? 0,
+  );
+
+  const durationLabel = useMemo(() => {
+    return `${durationHours}:${String(durationMinutes).padStart(2, "0")}`;
+  }, [durationHours, durationMinutes]);
+
+  const endTime = useMemo(() => {
+    const totalMinutes = durationHours * 60 + durationMinutes;
+    return new Date(time.getTime() + totalMinutes * 60 * 1000);
+  }, [time, durationHours, durationMinutes]);
+
+  const minuteOptions = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => i * 5);
+  }, []);
+
+  const handleTimeChange = (_: unknown, selectedTime?: Date) => {
+    if (!selectedTime) return;
+    setTime(selectedTime);
+  };
+
+  const handleSubmitTime = () => {
+    const start_time_min = getStartTimeMin(time);
+    const due_time_min = getDueTimeMin(time, durationHours, durationMinutes);
+
+    dispatch(setStartTime({ start_time_min: start_time_min }));
+    if (durationHours > 0 || durationMinutes > 0) {
+      dispatch(setDueTime({ due_time_min: due_time_min }));
+    }
+    router.back();
+  };
+
+  const handleGoBack = () => {
+    setTime(new Date());
+    setDurationHours(0);
+    setDurationMinutes(0);
+    router.back();
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Button iconOnly onPress={handleGoBack}>
+          <SymbolView
+            name="xmark"
+            weight="medium"
+            size={20}
+            type="monochrome"
+            tintColor="rgb(67, 67, 67)"
+          />
+        </Button>
+        <Text style={styles.title}>Time</Text>
+        <Button iconOnly onPress={handleSubmitTime}>
+          <SymbolView
+            name="checkmark"
+            weight="medium"
+            size={20}
+            type="monochrome"
+            tintColor="rgb(67, 67, 67)"
+          />
+        </Button>
+      </View>
+      <View
+        style={[styles.row, { paddingVertical: 20, paddingHorizontal: 16 }]}
+      >
+        <Text style={styles.label}>Time</Text>
+        {durationHours > 0 || durationMinutes > 0 ? (
+          <View style={styles.badgeRow}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{format(time, timeFormat)}</Text>
+            </View>
+            <Text>-</Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {format(endTime, timeFormat)}
+              </Text>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{format(time, timeFormat)}</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.cardContainer}>
+        <View style={styles.card}>
+          <View style={[styles.row, { paddingBottom: 8 }]}>
+            <Text style={styles.label}>Time</Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{format(time, timeFormat)}</Text>
+            </View>
+          </View>
+          <View style={styles.pickerWrap}>
+            <DateTimePicker
+              value={time}
+              mode="time"
+              display="spinner"
+              onChange={handleTimeChange}
+              themeVariant="light"
+              textColor="#111111"
+              style={styles.picker}
+            />
+          </View>
+        </View>
+        <View style={styles.card}>
+          <View style={[styles.row, { paddingBottom: 8 }]}>
+            <Text style={styles.label}>Duration</Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{durationLabel}</Text>
+            </View>
+          </View>
+          <View style={styles.durationPickers}>
+            <Picker
+              selectedValue={durationHours}
+              onValueChange={setDurationHours}
+              style={styles.wheel}
+              itemStyle={styles.item}
+            >
+              {Array.from({ length: 24 }, (_, i) => (
+                <Picker.Item
+                  key={i}
+                  label={`${i} h`}
+                  value={i}
+                  color="#111111"
+                />
+              ))}
+            </Picker>
+            <Picker
+              selectedValue={durationMinutes}
+              onValueChange={setDurationMinutes}
+              style={styles.wheel}
+              itemStyle={styles.item}
+            >
+              {minuteOptions.map((minute) => (
+                <Picker.Item
+                  key={minute}
+                  label={`${minute} m`}
+                  value={minute}
+                  color="#111111"
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 20,
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  cardContainer: {
+    padding: 20,
+    gap: 20,
+  },
+  card: {
+    backgroundColor: "#F3F3F3",
+    borderRadius: 24,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 10,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#E3E3E3",
+  },
+  label: {
+    fontSize: 18,
+    color: "#111111",
+    fontWeight: "400",
+  },
+  badgeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  badge: {
+    backgroundColor: "rgba(0,0,0,0.06)",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    fontSize: 17,
+    fontWeight: "500",
+    color: "rgb(67, 67, 67)",
+  },
+  pickerWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 8,
+    height: 160,
+    overflow: "hidden",
+  },
+  picker: {
+    width: Platform.OS === "ios" ? 320 : "100%",
+    height: 160,
+  },
+  durationPickers: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 180,
+  },
+  wheel: {
+    flex: 1,
+  },
+  item: {
+    fontSize: 20,
+  },
+});
+
+export default TimeFormSheet;
