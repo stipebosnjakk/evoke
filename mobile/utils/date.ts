@@ -198,14 +198,23 @@ export const getStartTimeMin = (date: Date) => {
   return date.getHours() * 60 + date.getMinutes();
 };
 
-export const getDueTimeMin = (
-  date: Date,
+export const getDurationMin = (
   durationHours: number,
   durationMinutes: number,
 ) => {
-  const start_time_min = getStartTimeMin(date);
-  const duration_total_min = durationHours * 60 + durationMinutes;
-  return (start_time_min + duration_total_min) % 1440;
+  if (durationHours === 0 && durationMinutes === 0) {
+    return null;
+  }
+
+  return durationHours * 60 + durationMinutes;
+};
+
+export const getEndTime = (start_time_min: number, duration_min: number) => {
+  const total = start_time_min + duration_min;
+  return {
+    endDayOffset: Math.floor(total / 1440),
+    endTimeMin: total % 1440,
+  };
 };
 
 export const getHoursAndMinutesFromMin = (totalMinutes: number | null) => {
@@ -218,7 +227,6 @@ export const getHoursAndMinutesFromMin = (totalMinutes: number | null) => {
   return {
     hours,
     minutes,
-    label: `${hours}:${String(minutes).padStart(2, "0")}`,
   };
 };
 
@@ -239,17 +247,12 @@ export const formatTimeFromMin = (
   }).format(date);
 };
 
-export const getDurationFromStartAndDueTimeMin = (
-  startTimeMin: number | null,
-  dueTimeMin: number | null,
-) => {
-  if (startTimeMin == null || dueTimeMin == null) return null;
-  const start = ((startTimeMin % 1440) + 1440) % 1440;
-  const end = ((dueTimeMin % 1440) + 1440) % 1440;
-  const totalMinutes = (end - start + 1440) % 1440;
+export const getDurationFromDurationMin = (durationMin: number | null) => {
+  if (durationMin === null) return null;
+
   return {
-    totalMinutes,
-    hours: Math.floor(totalMinutes / 60),
-    minutes: totalMinutes % 60,
+    totalMinutes: durationMin,
+    hours: Math.floor(durationMin / 60),
+    minutes: durationMin % 60,
   };
 };

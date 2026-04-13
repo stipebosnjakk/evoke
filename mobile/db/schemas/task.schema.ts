@@ -27,7 +27,7 @@ export const tasks = t.sqliteTable("tasks", {
   area_id: t.text("area_id"),
   start_date: t.text("start_date").$type<IsoDate | null>(),
   start_time_min: t.integer("start_time_min"),
-  due_time_min: t.integer("due_time_min"),
+  duration_min: t.integer("duration_min"),
   deadline: t.text("deadline").$type<IsoDate | null>(),
   repeat: t.text("repeat"),
 });

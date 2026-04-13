@@ -205,19 +205,37 @@ export const validateTaskDeadline = (
   };
 };
 
-export const validateTaskStartTime = (
-  data: number | null,
-  due_time_min?: number | null,
-): ValidationResult<number | null> => {
-  if (data === null) {
+export const validateTaskTime = (
+  start_time_min: number | null,
+  duration_min: number | null,
+): ValidationResult<{
+  start_time_min: number | null;
+  duration_min: number | null;
+} | null> => {
+  const minStart = 0;
+  const maxStart = 1439;
+  const normalizedDuration = duration_min === 0 ? null : duration_min;
+
+  if (start_time_min === null) {
+    if (normalizedDuration !== null) {
+      return {
+        ok: false,
+        data: null,
+        message: "Duration can't be set without a start time",
+      };
+    }
+
     return {
       ok: true,
-      data: null,
-      message: "Start time cleared successfully",
+      data: {
+        start_time_min: null,
+        duration_min: null,
+      },
+      message: "Time cleared successfully",
     };
   }
 
-  if (!Number.isInteger(data)) {
+  if (!Number.isInteger(start_time_min)) {
     return {
       ok: false,
       data: null,
@@ -225,10 +243,7 @@ export const validateTaskStartTime = (
     };
   }
 
-  const min = 0; // 00:00
-  const max = 1439; // 23:59
-
-  if (data < min || data > max) {
+  if (start_time_min < minStart || start_time_min > maxStart) {
     return {
       ok: false,
       data: null,
@@ -236,99 +251,47 @@ export const validateTaskStartTime = (
     };
   }
 
-  if (due_time_min) {
-    if (!Number.isInteger(due_time_min)) {
-      return {
-        ok: false,
-        data: null,
-        message: "Due time must be a whole number",
-      };
-    }
-
-    if (due_time_min < min || due_time_min > max) {
-      return {
-        ok: false,
-        data: null,
-        message: "Due time must be between 00:00 and 23:59",
-      };
-    }
-
-    if (data > due_time_min) {
-      return {
-        ok: false,
-        data: null,
-        message: "Start time can't be after due time",
-      };
-    }
-  }
-
-  return {
-    ok: true,
-    data,
-    message: "Start time saved successfully",
-  };
-};
-
-export const validateTaskDueTime = (
-  data: number | null,
-  start_time_min?: number | null,
-): ValidationResult<number | null> => {
-  if (data === null) {
+  if (normalizedDuration === null) {
     return {
       ok: true,
-      data: null,
-      message: "Due time cleared successfully",
+      data: {
+        start_time_min,
+        duration_min: null,
+      },
+      message: "Start time saved successfully",
     };
   }
 
-  if (!Number.isInteger(data)) {
+  if (!Number.isInteger(normalizedDuration)) {
     return {
       ok: false,
       data: null,
-      message: "Due time must be a whole number",
+      message: "Duration must be a whole number",
     };
   }
 
-  const min = 0; // 00:00
-  const max = 1439; // 23:59
-
-  if (data < min || data > max) {
+  if (normalizedDuration < 0) {
     return {
       ok: false,
       data: null,
-      message: "Due time must be between 00:00 and 23:59",
+      message: "Duration can't be negative",
     };
   }
 
-  if (start_time_min) {
-    if (!Number.isInteger(start_time_min)) {
-      return {
-        ok: false,
-        data: null,
-        message: "Start time must be a whole number",
-      };
-    }
-
-    if (start_time_min < min || start_time_min > max) {
-      return {
-        ok: false,
-        data: null,
-        message: "Start time must be between 00:00 and 23:59",
-      };
-    }
-
-    if (data < start_time_min) {
-      return {
-        ok: false,
-        data: null,
-        message: "Due time can't be before start time",
-      };
-    }
+  if (normalizedDuration > 1439) {
+    return {
+      ok: false,
+      data: null,
+      message: "Duration must be less than 24 hours",
+    };
   }
 
   return {
     ok: true,
-    data,
-    message: "Due time saved successfully",
+    data: {
+      start_time_min,
+      duration_min: normalizedDuration,
+    },
+    message: "Time saved successfully",
   };
 };

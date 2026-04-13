@@ -3,7 +3,6 @@ import {
   OrderTaskItem,
   ContainerIdType,
   TaskStatusOptionsArray,
-  TaskWithOrderKey,
 } from "@/types/task.types";
 
 // TODO: maybe replace this type with IsoType from task types
@@ -58,7 +57,7 @@ export type NewTaskType = {
   status: TaskStatusOptionsArray | null;
   start_date: string | null;
   start_time_min: number | null;
-  due_time_min: number | null;
+  duration_min: number | null;
   deadline: string | null;
   repeat: string | null;
 };

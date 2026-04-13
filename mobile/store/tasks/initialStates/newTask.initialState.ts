@@ -13,7 +13,7 @@ export const initialState: NewTaskInitialState = {
     status: null,
     start_date: null,
     start_time_min: null,
-    due_time_min: null,
+    duration_min: null,
     deadline: null,
     repeat: null,
   },

@@ -5,10 +5,9 @@ import { IsoDate, TaskStatusOption } from "@/types/task.types";
 import {
   validateTaskDeadline,
   validateTaskDescription,
-  validateTaskDueTime,
   validateTaskStartDate,
-  validateTaskStartTime,
   validateTaskStatus,
+  validateTaskTime,
   validateTaskTitle,
 } from "@/utils/validateTask";
 import { initialState } from "@/store/tasks/initialStates/newTask.initialState";
@@ -66,7 +65,7 @@ export const setStartDateReducer = (
   if (res.ok && res.data === null) {
     state.task.start_date = null;
     state.task.start_time_min = null;
-    state.task.due_time_min = null;
+    state.task.duration_min = null;
     state.error = null;
     return;
   }
@@ -93,44 +92,30 @@ export const setDeadlineReducer = (
   state.error = null;
 };
 
-export const setStartTimeReducer = (
+export const setTimeReducer = (
   state: NewTaskInitialState,
-  action: PayloadAction<{ start_time_min: number | null }>,
+  action: PayloadAction<{
+    start_time_min: number | null;
+    duration_min: number | null;
+  }>,
 ) => {
-  const res = validateTaskStartTime(
+  const res = validateTaskTime(
     action.payload.start_time_min,
-    state.task.due_time_min,
+    action.payload.duration_min,
   );
 
-  if (!res.ok) {
+  if (!res.ok || !res.data) {
     state.error = res.message;
     return;
   }
 
-  if (res.data !== null && !state.task.start_date) {
+  if (res.data?.start_time_min !== null && !state.task.start_date) {
     const today = toIsoDate(new Date());
     state.task.start_date = today;
   }
 
-  state.task.start_time_min = res.data;
-  state.error = null;
-};
-
-export const setDueTimeReducer = (
-  state: NewTaskInitialState,
-  action: PayloadAction<{ due_time_min: number | null }>,
-) => {
-  const res = validateTaskDueTime(
-    action.payload.due_time_min,
-    state.task.start_time_min,
-  );
-
-  if (!res.ok) {
-    state.error = res.message;
-    return;
-  }
-
-  state.task.due_time_min = res.data;
+  state.task.start_time_min = res.data.start_time_min;
+  state.task.duration_min = res.data.duration_min;
   state.error = null;
 };
 

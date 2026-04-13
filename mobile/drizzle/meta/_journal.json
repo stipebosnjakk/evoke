@@ -57,6 +57,13 @@
       "when": 1773105366940,
       "tag": "0007_quiet_mother_askani",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1775757149358,
+      "tag": "0008_futuristic_the_fallen",
+      "breakpoints": true
     }
   ]
 }

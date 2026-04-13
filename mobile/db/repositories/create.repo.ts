@@ -19,7 +19,7 @@ export const createTaskRepo = async (task: NewTask): Promise<NewTask> => {
         status,
         start_date,
         start_time_min,
-        due_time_min,
+        duration_min,
         deadline,
         repeat,
       } = task;
@@ -31,7 +31,7 @@ export const createTaskRepo = async (task: NewTask): Promise<NewTask> => {
         status,
         start_date,
         start_time_min,
-        due_time_min,
+        duration_min,
         deadline,
         repeat,
       });

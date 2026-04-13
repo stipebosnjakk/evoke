@@ -19,7 +19,7 @@ export const fetchInboxTasks = async (
       isNull(tasks.status),
       isNull(tasks.start_date),
       isNull(tasks.start_time_min),
-      isNull(tasks.due_time_min),
+      isNull(tasks.duration_min),
       isNull(tasks.deadline),
       isNull(tasks.completed_at),
       isNull(tasks.repeat),

@@ -9,10 +9,10 @@ import { useDispatch } from "react-redux";
 import { useCalendars } from "expo-localization";
 
 import Button from "@/components/ui/Button";
-import { setDueTime, setStartTime } from "@/store/tasks/slices/newTask.slice";
+import { setTime as setTimeSlice } from "@/store/tasks/slices/newTask.slice";
 import {
-  getDueTimeMin,
-  getDurationFromStartAndDueTimeMin,
+  getDurationMin,
+  getDurationFromDurationMin,
   getHoursAndMinutesFromMin,
   getStartTimeMin,
 } from "@/utils/date";
@@ -30,13 +30,12 @@ const TimeFormSheet = () => {
   const startTimeMin = useAppSelector(
     (state) => state.newTask.task.start_time_min,
   );
-  const dueTimeMin = useAppSelector((state) => state.newTask.task.due_time_min);
+  const durationMin = useAppSelector(
+    (state) => state.newTask.task.duration_min,
+  );
 
   const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
-  const duration = getDurationFromStartAndDueTimeMin(
-    startTimeMin ?? null,
-    dueTimeMin ?? null,
-  );
+  const duration = getDurationFromDurationMin(durationMin ?? null);
 
   const [time, setTime] = useState(
     startTime
@@ -70,26 +69,22 @@ const TimeFormSheet = () => {
 
   const handleSubmitTime = () => {
     const start_time_min = getStartTimeMin(time);
-    const due_time_min = getDueTimeMin(time, durationHours, durationMinutes);
+    const duration_min = getDurationMin(durationHours, durationMinutes);
 
-    dispatch(setStartTime({ start_time_min: start_time_min }));
-    if (durationHours > 0 || durationMinutes > 0) {
-      dispatch(setDueTime({ due_time_min: due_time_min }));
-    }
-    router.back();
-  };
+    dispatch(setTimeSlice({ start_time_min, duration_min }));
 
-  const handleGoBack = () => {
-    setTime(new Date());
-    setDurationHours(0);
-    setDurationMinutes(0);
     router.back();
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Button iconOnly onPress={handleGoBack}>
+        <Button
+          iconOnly
+          onPress={() => {
+            router.back();
+          }}
+        >
           <SymbolView
             name="xmark"
             weight="medium"

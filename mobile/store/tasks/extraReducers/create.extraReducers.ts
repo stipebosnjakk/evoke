@@ -26,7 +26,7 @@ export const addCreationExtraReducers = (
 
       const { task } = action.payload;
 
-      if (!task) {
+      if (!task || !task.id) {
         state.error = "Failed to create task";
         return;
       }

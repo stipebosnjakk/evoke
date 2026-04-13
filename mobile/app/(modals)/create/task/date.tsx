@@ -8,7 +8,11 @@ import CalendarView from "./components/CalendarView";
 import DateInput from "./components/DateInput";
 import Button from "@/components/ui/Button";
 import Shortcuts from "./components/Shortcuts";
-import { setStartDate } from "@/store/tasks/slices/newTask.slice";
+import {
+  setDuration,
+  setStartDate,
+  setStartTime,
+} from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
@@ -31,7 +35,9 @@ const DateFormSheet = () => {
   const startTimeMin = useAppSelector(
     (state) => state.newTask.task.start_time_min,
   );
-  const dueTimeMin = useAppSelector((state) => state.newTask.task.due_time_min);
+  const durationMin = useAppSelector(
+    (state) => state.newTask.task.duration_min,
+  );
   const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
 
   const locale = locales[0]?.languageTag ?? "en-US";
@@ -42,9 +48,12 @@ const DateFormSheet = () => {
     locale,
     is24Hour,
   );
-  const dueTimeLabel = formatTimeFromMin(dueTimeMin ?? null, locale, is24Hour);
-  // FIX: due time is not showing
-  // FIX: check if due time is alright after setting duration, is time correct
+  const totalDurationMin = startTimeMin
+    ? durationMin
+      ? startTimeMin + durationMin
+      : null
+    : null;
+  const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
 
   const startDateValue = useAppSelector(
     (state) => state.newTask.task.start_date,
@@ -82,8 +91,9 @@ const DateFormSheet = () => {
   };
 
   const handleNoDate = () => {
-    // TODO: also add for time
     dispatch(setStartDate({ start_date: null }));
+    dispatch(setStartTime({ start_time_min: null }));
+    dispatch(setDuration({ duration_min: null }));
     setSelected(null);
     router.back();
   };
@@ -158,15 +168,15 @@ const DateFormSheet = () => {
                 <Text style={styles.buttonText}>Time</Text>
               </View>
               <View style={styles.buttonContent}>
-                {!startTimeLabel && !dueTimeLabel && (
+                {!startTimeLabel && !durationLabel && (
                   <Text style={styles.sideButtonText}>None</Text>
                 )}
-                {startTimeLabel && !dueTimeLabel && (
+                {startTimeLabel && !durationLabel && (
                   <Text style={styles.sideButtonText}>{startTimeLabel}</Text>
                 )}
-                {startTimeLabel && dueTimeLabel && (
+                {startTimeLabel && durationLabel && (
                   <Text style={styles.sideButtonText}>
-                    {startTimeLabel} - {dueTimeLabel}
+                    {startTimeLabel} - {durationLabel}
                   </Text>
                 )}
                 <SymbolView
