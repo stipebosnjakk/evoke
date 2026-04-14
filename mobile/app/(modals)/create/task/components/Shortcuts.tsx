@@ -1,12 +1,5 @@
 import { View, ScrollView, StyleSheet } from "react-native";
-import {
-  nextMonday,
-  addDays,
-  nextSaturday,
-  isWeekend,
-  addWeeks,
-  startOfWeek,
-} from "date-fns";
+import { nextMonday, addDays, isWeekend } from "date-fns";
 
 import Chip from "@/components/ui/Chip";
 import { getWeekendSaturday, minDate, toIsoDate } from "@/utils/date";

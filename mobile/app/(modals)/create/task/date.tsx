@@ -28,13 +28,10 @@ const DateFormSheet = () => {
   const calendars = useCalendars();
   const inputRef = useRef<TextInput>(null);
 
-  const startTimeMin = useAppSelector(
-    (state) => state.newTask.task.start_time_min,
-  );
-  const durationMin = useAppSelector(
-    (state) => state.newTask.task.duration_min,
-  );
+  const startTimeMin = useAppSelector((state) => state.newTask.task.start_time_min,);
+  const durationMin = useAppSelector((state) => state.newTask.task.duration_min,);
   const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
+  const startDateValue = useAppSelector((state) => state.newTask.task.start_date,);
 
   const locale = locales[0]?.languageTag ?? "en-US";
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
@@ -51,14 +48,8 @@ const DateFormSheet = () => {
       : null;
   const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
 
-  const startDateValue = useAppSelector(
-    (state) => state.newTask.task.start_date,
-  );
-
   const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<IsoDate | null>(
-    startDateValue || null,
-  );
+  const [selected, setSelected] = useState<IsoDate | null>(startDateValue || null,);
 
   const selectedDate = selected ?? startDateValue ?? null;
 
@@ -131,6 +122,7 @@ const DateFormSheet = () => {
         </Button>
       </View>
       <DateInput
+        type="start"
         inputRef={inputRef}
         isOpen={isDateInputOpen}
         setIsOpen={setIsDateInputOpen}

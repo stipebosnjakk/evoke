@@ -1,8 +1,10 @@
 import { RefObject, useState } from "react";
 import { View, TextInput, StyleSheet, Text, Pressable } from "react-native";
 import { SymbolView } from "expo-symbols";
+import { format } from "date-fns";
 
 import { IsoDate } from "@/types/task.types";
+import { useAppSelector } from "@/hooks/storeHooks";
 import {
   formatIsoDate,
   formatSmartUiDate,
@@ -16,6 +18,7 @@ type DateInputType = {
   setIsOpen: (isOpen: boolean) => void;
   handleNewDateSelect: (date: IsoDate | null) => void;
   dateValue?: IsoDate | null;
+  type: "start" | "deadline";
 };
 
 type AvailableDateType = {
@@ -29,7 +32,13 @@ const DateInput = ({
   setIsOpen,
   handleNewDateSelect,
   dateValue,
+  type,
 }: DateInputType) => {
+  const startDateValue = useAppSelector(
+    (state) => state.newTask.task.start_date,
+  );
+  const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
+
   const [dateInput, setDateInput] = useState<string>(
     dateValue ? formatIsoDate(dateValue) : "",
   );
@@ -43,17 +52,35 @@ const DateInput = ({
     setDateInput(text);
     const getSmartInputDateDay = smartDateInput(text);
 
-    if (getSmartInputDateDay) {
+    if (!getSmartInputDateDay) {
       setAvailableDate({
-        isoDate: toIsoDate(getSmartInputDateDay),
-        uiDate: formatSmartUiDate(getSmartInputDateDay),
+        isoDate: null,
+        uiDate: null,
+      });
+      return;
+    }
+
+    const typedIso = format(getSmartInputDateDay, "yyyy-MM-dd");
+
+    if (type === "start" && deadlineValue && typedIso >= deadlineValue) {
+      setAvailableDate({
+        isoDate: null,
+        uiDate: null,
+      });
+      return;
+    }
+
+    if (type === "deadline" && startDateValue && typedIso <= startDateValue) {
+      setAvailableDate({
+        isoDate: null,
+        uiDate: null,
       });
       return;
     }
 
     setAvailableDate({
-      isoDate: null,
-      uiDate: null,
+      isoDate: typedIso as IsoDate,
+      uiDate: formatSmartUiDate(getSmartInputDateDay),
     });
   };
 

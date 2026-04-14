@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import { useDispatch } from "react-redux";
 import { useCalendars } from "expo-localization";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import Button from "@/components/ui/Button";
 import { setTime as setTimeSlice } from "@/store/tasks/slices/newTask.slice";
@@ -18,7 +18,6 @@ import {
 } from "@/utils/date";
 import { useAppSelector } from "@/hooks/storeHooks";
 
-// TODO: clean the code
 const TimeFormSheet = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -26,12 +25,8 @@ const TimeFormSheet = () => {
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
   const timeFormat = is24Hour ? "HH:mm" : "h:mm a";
 
-  const startTimeMin = useAppSelector(
-    (state) => state.newTask.task.start_time_min,
-  );
-  const durationMin = useAppSelector(
-    (state) => state.newTask.task.duration_min,
-  );
+  const startTimeMin = useAppSelector((state) => state.newTask.task.start_time_min,);
+  const durationMin = useAppSelector((state) => state.newTask.task.duration_min,);
 
   const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
   const duration = getDurationFromDurationMin(durationMin ?? null);
@@ -41,12 +36,8 @@ const TimeFormSheet = () => {
       ? new Date(0, 0, 0, startTime.hours, startTime.minutes)
       : new Date(),
   );
-  const [durationHours, setDurationHours] = useState<number>(
-    duration?.hours ?? 0,
-  );
-  const [durationMinutes, setDurationMinutes] = useState<number>(
-    duration?.minutes ?? 0,
-  );
+  const [durationHours, setDurationHours] = useState<number>(duration?.hours ?? 0,);
+  const [durationMinutes, setDurationMinutes] = useState<number>(duration?.minutes ?? 0,);
 
   const durationLabel = useMemo(() => {
     return `${durationHours}:${String(durationMinutes).padStart(2, "0")}`;

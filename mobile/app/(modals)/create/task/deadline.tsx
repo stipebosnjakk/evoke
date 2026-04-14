@@ -93,6 +93,7 @@ const DeadlineFormSheet = () => {
         </Button>
       </View>
       <DateInput
+        type="deadline"
         inputRef={inputRef}
         isOpen={isDateInputOpen}
         setIsOpen={setIsDateInputOpen}
