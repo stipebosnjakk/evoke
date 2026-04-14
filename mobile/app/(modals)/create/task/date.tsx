@@ -8,11 +8,7 @@ import CalendarView from "./components/CalendarView";
 import DateInput from "./components/DateInput";
 import Button from "@/components/ui/Button";
 import Shortcuts from "./components/Shortcuts";
-import {
-  setDuration,
-  setStartDate,
-  setStartTime,
-} from "@/store/tasks/slices/newTask.slice";
+import { setStartDate, setTime } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
@@ -48,11 +44,11 @@ const DateFormSheet = () => {
     locale,
     is24Hour,
   );
-  const totalDurationMin = startTimeMin
-    ? durationMin
+
+  const totalDurationMin =
+    startTimeMin != null && durationMin != null
       ? startTimeMin + durationMin
-      : null
-    : null;
+      : null;
   const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
 
   const startDateValue = useAppSelector(
@@ -63,6 +59,8 @@ const DateFormSheet = () => {
   const [selected, setSelected] = useState<IsoDate | null>(
     startDateValue || null,
   );
+
+  const selectedDate = selected ?? startDateValue ?? null;
 
   const maxDateValue = minDate("start_date", deadlineValue || null);
 
@@ -77,7 +75,12 @@ const DateFormSheet = () => {
       setIsDateInputOpen(false);
     }
 
-    handleNewStartDateSelect(selected);
+    if (selected) {
+      handleNewStartDateSelect(selected);
+      return;
+    }
+
+    router.back();
   };
 
   const handleGoBack = () => {
@@ -92,8 +95,7 @@ const DateFormSheet = () => {
 
   const handleNoDate = () => {
     dispatch(setStartDate({ start_date: null }));
-    dispatch(setStartTime({ start_time_min: null }));
-    dispatch(setDuration({ duration_min: null }));
+    dispatch(setTime({ start_time_min: null, duration_min: null }));
     setSelected(null);
     router.back();
   };
@@ -113,9 +115,9 @@ const DateFormSheet = () => {
         <Text style={styles.title}>Date</Text>
         <Button
           style={{
-            opacity: isDateInputOpen ? 0 : selected ? 1 : 0.5,
+            opacity: isDateInputOpen ? 0 : selectedDate ? 1 : 0.5,
           }}
-          disabled={!isDateInputOpen && !selected}
+          disabled={!isDateInputOpen && !selectedDate}
           iconOnly
           onPress={handleSubmitDate}
         >
@@ -132,7 +134,7 @@ const DateFormSheet = () => {
         inputRef={inputRef}
         isOpen={isDateInputOpen}
         setIsOpen={setIsDateInputOpen}
-        dateValue={selected || startDateValue}
+        dateValue={selectedDate}
         handleNewDateSelect={handleNewStartDateSelect}
       />
       {!isDateInputOpen && (
@@ -146,7 +148,7 @@ const DateFormSheet = () => {
             />
             <CalendarView
               maxDate={maxDateValue}
-              selected={selected}
+              selected={selectedDate}
               setSelected={setSelected}
             />
           </View>
