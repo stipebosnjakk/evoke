@@ -15,11 +15,10 @@ import { SymbolView } from "expo-symbols";
 import { formatTimeFromMin, minDate } from "@/utils/date";
 import { routes } from "@/constants/routes";
 
-// TODO: make a time picker
-// TODO: impement smart text for time
 // TODO: make a custom dropdown for status and repeat
 // TODO: test if conflict is working between start date and deadline, with error warnings for creating task
 // TODO: try to fix toast message showing behind formSheet
+// TODO: impement smart text for time and repeat
 
 const DateFormSheet = () => {
   const router = useRouter();

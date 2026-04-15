@@ -13,8 +13,6 @@ import DateInput from "./components/DateInput";
 import { setDeadline } from "@/store/tasks/slices/newTask.slice";
 import Shortcuts from "./components/Shortcuts";
 
-// FIX: date input has bug where user can type date that is before start date
-
 const DeadlineFormSheet = () => {
   const router = useRouter();
   const dispatch = useDispatch();

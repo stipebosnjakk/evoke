@@ -23,13 +23,10 @@ import { enUS } from "date-fns/locale";
 import { IsoDate } from "@/types/task.types";
 import { weekdays } from "@/constants/date";
 
-// TODO: remove this if you don't need it
-
 // TODO: write params for utils
 
 const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
 const is24h = Localization.getCalendars()?.[0]?.uses24hourClock ?? false;
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export const formatUserTime = (date: IsoDate) => {
   return new Intl.DateTimeFormat(userLocale, {
@@ -137,7 +134,8 @@ export const smartDateInput = (raw: string): Date | null => {
   const normalizedText = raw.trim().replace(/\s+/g, " ");
   const input = normalizedText.toLowerCase();
 
-  if (!input) return null;
+  if (!input) {
+  }
   if (input === "today") return today;
   if (input === "tomorrow") return addDays(today, 1);
 
