@@ -1,4 +1,4 @@
-import { TASK_STATUSES } from "@/constants/statuses";
+import { STATUS_OPTIONS } from "@/constants/status";
 import type { Task } from "@/db";
 
 export type TaskStatusOptionsArray = {
@@ -9,7 +9,7 @@ export type TaskStatusOptionsArray = {
 
 export type TaskStatus = "next" | "waiting" | "someday";
 // TODO: check this type
-export type TaskStatusOption = (typeof TASK_STATUSES)[number];
+export type TaskStatusOption = (typeof STATUS_OPTIONS)[number];
 
 export type ContainerIdType =
   | "container:today"
@@ -42,3 +42,5 @@ export type OrderTaskItem = {
 export type IsoDate = `${number}-${number}-${number}`;
 
 export type DateValueType = "start_date" | "deadline";
+
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;

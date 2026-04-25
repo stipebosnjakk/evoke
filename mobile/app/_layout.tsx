@@ -67,6 +67,10 @@ const RootLayout = () => {
             name="(modals)/create/task/time"
             options={modalOptions}
           />
+          <Stack.Screen
+            name="(modals)/create/task/repeat"
+            options={modalOptions}
+          />
         </Stack>
       </GestureHandlerRootView>
       <Toast config={toastConfig} />

@@ -1,10 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 
 import { NewTaskInitialState } from "@/types/initialState.types";
-import { IsoDate, TaskStatusOption } from "@/types/task.types";
+import { IsoDate, TaskStatusOption, Weekday } from "@/types/task.types";
 import {
   validateTaskDeadline,
   validateTaskDescription,
+  validateTaskRepeat,
   validateTaskStartDate,
   validateTaskStatus,
   validateTaskTime,
@@ -45,6 +46,29 @@ export const setStatusReducer = (
   }
 
   state.task.status = res.data.value;
+  state.error = null;
+};
+
+export const setRepeatReducer = (
+  state: NewTaskInitialState,
+  action: PayloadAction<{ repeat: Weekday[] | null }>,
+) => {
+  const res = validateTaskRepeat(action.payload.repeat);
+
+  if (!res.ok) {
+    state.error = res.message;
+    return;
+  }
+
+  if (!res.data) {
+    state.task.repeat = null;
+    state.error = null;
+    return;
+  }
+
+  const sortedRepeat = [...res.data].sort((a, b) => a - b);
+
+  state.task.repeat = sortedRepeat;
   state.error = null;
 };
 

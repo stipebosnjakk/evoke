@@ -20,7 +20,7 @@ import {
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 
-import { IsoDate } from "@/types/task.types";
+import { IsoDate, Weekday } from "@/types/task.types";
 import { weekdays } from "@/constants/date";
 
 // TODO: write params for utils
@@ -253,4 +253,32 @@ export const getDurationFromDurationMin = (durationMin: number | null) => {
     hours: Math.floor(durationMin / 60),
     minutes: durationMin % 60,
   };
+};
+
+export const getIsoWeekday = (date: Date) => {
+  const weekday = date.getDay();
+  return weekday === 0 ? 7 : weekday;
+};
+
+const repeatWeekStart = new Date(2024, 0, 1);
+
+export const formatRepeatWeekday = (day: Weekday) => {
+  return format(addDays(repeatWeekStart, day), "EEE", { locale: enUS });
+};
+
+export const getRepeatLabel = (repeat: Weekday[] | null | undefined) => {
+  if (!repeat?.length) return "Repeat";
+
+  const days = [...new Set(repeat)].sort((a, b) => a - b);
+  const value = days.join(",");
+
+  if (value === "0,1,2,3,4,5,6") return "Every day";
+  if (value === "0,1,2,3,4") return "Every weekday";
+  if (value === "5,6") return "Every weekend";
+
+  if (days.length === 1) {
+    return `Every ${formatRepeatWeekday(days[0])}`;
+  }
+
+  return days.map(formatRepeatWeekday).join(", ");
 };

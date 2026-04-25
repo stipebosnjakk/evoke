@@ -1,5 +1,5 @@
-import { TASK_STATUSES } from "@/constants/statuses";
-import { IsoDate, TaskStatusOptionsArray } from "@/types/task.types";
+import { STATUS_OPTIONS } from "@/constants/status";
+import { IsoDate, TaskStatusOptionsArray, Weekday } from "@/types/task.types";
 import { isValidIsoDate } from "@/utils/date";
 
 type ValidationResult<T> =
@@ -25,7 +25,7 @@ export const validateTaskStatus = (
     };
   }
 
-  const isStatusValid = TASK_STATUSES.some(
+  const isStatusValid = STATUS_OPTIONS.some(
     (status) => status.value === data.value,
   );
 
@@ -41,6 +41,60 @@ export const validateTaskStatus = (
     ok: true,
     data,
     message: "Status saved successfully",
+  };
+};
+
+export const validateTaskRepeat = (
+  data: unknown,
+): ValidationResult<Weekday[] | null> => {
+  if (data === null || data === undefined) {
+    return {
+      ok: true,
+      data: null,
+      message: "Repeat option cleared successfully",
+    };
+  }
+
+  if (!Array.isArray(data)) {
+    return {
+      ok: false,
+      data: null,
+      message: "Repeat option is not valid",
+    };
+  }
+
+  if (data.length === 0) {
+    return {
+      ok: true,
+      data: null,
+      message: "Repeat option cleared successfully",
+    };
+  }
+
+  const isValidDay = (day: any) => day >= 0 && day <= 6;
+
+  if (!data.every(isValidDay)) {
+    return {
+      ok: false,
+      data: null,
+      message: "Repeat option is not valid",
+    };
+  }
+
+  const noDuplicates = [...new Set(data)];
+
+  if (noDuplicates.length !== data.length) {
+    return {
+      ok: false,
+      data: null,
+      message: "Repeat option contains duplicate days",
+    };
+  }
+
+  return {
+    ok: true,
+    data,
+    message: "Repeat option saved successfully",
   };
 };
 

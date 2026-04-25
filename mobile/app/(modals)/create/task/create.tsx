@@ -20,8 +20,8 @@ import {
   setDescription,
   setTitle,
 } from "@/store/tasks/slices/newTask.slice";
-import { getDateLabel } from "@/utils/date";
-import DropdownStatus from "./components/DropdownStatus";
+import { getDateLabel, getRepeatLabel } from "@/utils/date";
+import StatusMenu from "./components/StatusMenu";
 import Chip from "@/components/ui/Chip";
 
 // TODO: handle error messages for task creation
@@ -37,6 +37,7 @@ const CreateFormSheet = () => {
   );
   const startDate = useAppSelector((state) => state.newTask.task.start_date);
   const deadline = useAppSelector((state) => state.newTask.task.deadline);
+  const repeatValue = useAppSelector((state) => state.newTask.task.repeat);
 
   useEffect(() => {
     return () => {
@@ -104,9 +105,10 @@ const CreateFormSheet = () => {
             horizontal
             showsHorizontalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            style={styles.scrollOverflow}
           >
             <View style={styles.row}>
-              <DropdownStatus />
+              <StatusMenu />
               <Chip
                 icon="calendar"
                 label={startDate ? getDateLabel(startDate) : "Date"}
@@ -123,9 +125,9 @@ const CreateFormSheet = () => {
               />
               <Chip
                 icon="repeat"
-                label="Repeat"
+                label={getRepeatLabel(repeatValue)}
                 onPress={() => {
-                  console.log("repeat");
+                  router.push(routes.repeat.href);
                 }}
               />
             </View>
@@ -216,6 +218,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingBottom: 20,
     paddingHorizontal: 16,
+  },
+  scrollOverflow: {
+    overflow: "visible",
   },
 });
 
