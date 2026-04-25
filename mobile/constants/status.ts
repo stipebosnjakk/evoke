@@ -1,10 +1,10 @@
 import { TaskStatusOptionsArray } from "@/types/task.types";
 
-export const TASK_STATUSES: TaskStatusOptionsArray[] = [
-  { 
-    label: "Next", 
-    value: "next", 
-    icon: "tag" 
+export const STATUS_OPTIONS: TaskStatusOptionsArray[] = [
+  {
+    label: "Next",
+    value: "next",
+    icon: "tag",
   },
   {
     label: "Someday",
