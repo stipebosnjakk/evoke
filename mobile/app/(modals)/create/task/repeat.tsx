@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   optionLabel: {
-    fontSize: 18,
+    fontSize: 16,
     color: "black",
     padding: 14,
   },

@@ -15,4 +15,5 @@ export const routes = {
   deadline: { title: "Deadline", href: "/(modals)/create/task/deadline" },
   time: { title: "Time", href: "/(modals)/create/task/time" },
   repeat: { title: "Repeat", href: "/(modals)/create/task/repeat" },
+  status: { title: "Status", href: "/(modals)/create/task/status" },
 } as const;

@@ -11,18 +11,23 @@ import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
 
+import Chip from "@/components/ui/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
 import { routes } from "@/constants/routes";
 import {
+  getDateLabel,
+  getDurationFromDurationMin,
+  getHoursAndMinutesFromMin,
+  getRepeatLabel,
+} from "@/utils/date";
+import { STATUS_OPTIONS } from "@/constants/status";
+import {
   clearState,
   setDescription,
   setTitle,
 } from "@/store/tasks/slices/newTask.slice";
-import { getDateLabel, getRepeatLabel } from "@/utils/date";
-import StatusMenu from "./components/StatusMenu";
-import Chip from "@/components/ui/Chip";
 
 // TODO: handle error messages for task creation
 
@@ -37,7 +42,20 @@ const CreateFormSheet = () => {
   );
   const startDate = useAppSelector((state) => state.newTask.task.start_date);
   const deadline = useAppSelector((state) => state.newTask.task.deadline);
+  const statusValue = useAppSelector((state) => state.newTask.task.status);
   const repeatValue = useAppSelector((state) => state.newTask.task.repeat);
+  const startTimeMin = useAppSelector(
+    (state) => state.newTask.task.start_time_min,
+  );
+  const durationMin = useAppSelector(
+    (state) => state.newTask.task.duration_min,
+  );
+
+  const status = STATUS_OPTIONS.find((s) => s.value === statusValue);
+  const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
+  const duration = getDurationFromDurationMin(durationMin ?? null);
+  console.log("startTime", startTime);
+  console.log("duration", duration);
 
   useEffect(() => {
     return () => {
@@ -108,7 +126,6 @@ const CreateFormSheet = () => {
             style={styles.scrollOverflow}
           >
             <View style={styles.row}>
-              <StatusMenu />
               <Chip
                 icon="calendar"
                 label={startDate ? getDateLabel(startDate) : "Date"}
@@ -121,6 +138,13 @@ const CreateFormSheet = () => {
                 label={deadline ? getDateLabel(deadline) : "Deadline"}
                 onPress={() => {
                   router.push(routes.deadline.href);
+                }}
+              />
+              <Chip
+                icon={status ? status.icon : "tag"}
+                label={status ? status.label : "Status"}
+                onPress={() => {
+                  router.push(routes.status.href);
                 }}
               />
               <Chip
