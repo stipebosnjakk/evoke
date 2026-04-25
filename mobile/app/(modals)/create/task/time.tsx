@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { format } from "date-fns";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
@@ -25,8 +25,12 @@ const TimeFormSheet = () => {
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
   const timeFormat = is24Hour ? "HH:mm" : "h:mm a";
 
-  const startTimeMin = useAppSelector((state) => state.newTask.task.start_time_min,);
-  const durationMin = useAppSelector((state) => state.newTask.task.duration_min,);
+  const startTimeMin = useAppSelector(
+    (state) => state.newTask.task.start_time_min,
+  );
+  const durationMin = useAppSelector(
+    (state) => state.newTask.task.duration_min,
+  );
 
   const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
   const duration = getDurationFromDurationMin(durationMin ?? null);
@@ -36,8 +40,12 @@ const TimeFormSheet = () => {
       ? new Date(0, 0, 0, startTime.hours, startTime.minutes)
       : new Date(),
   );
-  const [durationHours, setDurationHours] = useState<number>(duration?.hours ?? 0,);
-  const [durationMinutes, setDurationMinutes] = useState<number>(duration?.minutes ?? 0,);
+  const [durationHours, setDurationHours] = useState<number>(
+    duration?.hours ?? 0,
+  );
+  const [durationMinutes, setDurationMinutes] = useState<number>(
+    duration?.minutes ?? 0,
+  );
 
   const durationLabel = useMemo(() => {
     return `${durationHours}:${String(durationMinutes).padStart(2, "0")}`;
@@ -63,6 +71,11 @@ const TimeFormSheet = () => {
 
     dispatch(setTimeSlice({ start_time_min, duration_min }));
 
+    router.back();
+  };
+
+  const handleRemoveTime = () => {
+    dispatch(setTimeSlice({ start_time_min: null, duration_min: null }));
     router.back();
   };
 
@@ -177,6 +190,13 @@ const TimeFormSheet = () => {
           </View>
         </View>
       </View>
+      {startTimeMin && (
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.button} onPress={handleRemoveTime}>
+            <Text style={styles.buttonText}>Remove</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 };
@@ -260,6 +280,27 @@ const styles = StyleSheet.create({
   },
   item: {
     fontSize: 20,
+  },
+  buttonContainer: {
+    paddingHorizontal: 20,
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    backgroundColor: "#F3F3F3",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: 200,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#DC2626",
   },
 });
 

@@ -10,18 +10,14 @@ import {
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
+import { useCalendars, useLocales } from "expo-localization";
 
 import Chip from "@/components/ui/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
 import { routes } from "@/constants/routes";
-import {
-  getDateLabel,
-  getDurationFromDurationMin,
-  getHoursAndMinutesFromMin,
-  getRepeatLabel,
-} from "@/utils/date";
+import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
 import { STATUS_OPTIONS } from "@/constants/status";
 import {
   clearState,
@@ -34,6 +30,8 @@ import {
 const CreateFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const locales = useLocales();
+  const calendars = useCalendars();
 
   const loading = useAppSelector((state) => state.tasks.loading);
   const title = useAppSelector((state) => state.newTask.inputs.title);
@@ -52,10 +50,20 @@ const CreateFormSheet = () => {
   );
 
   const status = STATUS_OPTIONS.find((s) => s.value === statusValue);
-  const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
-  const duration = getDurationFromDurationMin(durationMin ?? null);
-  console.log("startTime", startTime);
-  console.log("duration", duration);
+  const locale = locales[0]?.languageTag ?? "en-US";
+  const is24Hour = calendars[0]?.uses24hourClock ?? false;
+
+  const startTimeLabel = formatTimeFromMin(
+    startTimeMin ?? null,
+    locale,
+    is24Hour,
+  );
+
+  const totalDurationMin =
+    startTimeMin != null && durationMin != null
+      ? startTimeMin + durationMin
+      : null;
+  const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
 
   useEffect(() => {
     return () => {
@@ -128,7 +136,15 @@ const CreateFormSheet = () => {
             <View style={styles.row}>
               <Chip
                 icon="calendar"
-                label={startDate ? getDateLabel(startDate) : "Date"}
+                label={
+                  startDate
+                    ? startTimeLabel
+                      ? durationLabel
+                        ? `${getDateLabel(startDate)} ${startTimeLabel} - ${durationLabel}`
+                        : `${getDateLabel(startDate)} ${startTimeLabel}`
+                      : `${getDateLabel(startDate)}`
+                    : "Date"
+                }
                 onPress={() => {
                   router.push(routes.date.href);
                 }}
