@@ -175,4 +175,8 @@ export const sendErrorMessageReducer = (
   state.error = null;
 };
 
+export const clearCreateTaskErrorReducer = (state: NewTaskInitialState) => {
+  state.error = null;
+};
+
 export const clearStateReducer = () => initialState;

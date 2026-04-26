@@ -22,7 +22,7 @@ export type ContainerIdType =
   | "container:plan:inRange:someday";
 
 export type TaskWithOrderKey = Task & {
-  order_key: number | null;
+  order_key: number;
 };
 
 export type DataReturnType = {

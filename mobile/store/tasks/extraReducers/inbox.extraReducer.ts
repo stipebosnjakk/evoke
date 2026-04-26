@@ -10,7 +10,7 @@ export const addInboxExtraReducers = (
   builder
     .addCase(getInboxTasksAction.pending, (state, action) => {
       state.lists.inbox.loading = true;
-      state.lists.inbox.error = null;
+      state.error = null;
 
       const isRefresh = action.meta.arg.offset === 0;
 
@@ -24,12 +24,11 @@ export const addInboxExtraReducers = (
     })
     .addCase(getInboxTasksAction.rejected, (state, action) => {
       state.lists.inbox.loading = false;
-      state.lists.inbox.error =
-        action.payload?.message || "Failed to load Inbox tasks";
+      state.error = action.payload?.message || "Failed to load Inbox tasks";
     })
     .addCase(getInboxTasksAction.fulfilled, (state, action) => {
       state.lists.inbox.loading = false;
-      state.lists.inbox.error = null;
+      state.error = null;
 
       const { data, total } = action.payload;
       for (const task of data) state.tasks.byId[task.id] = task;

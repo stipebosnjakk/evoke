@@ -3,7 +3,6 @@ import { TasksState } from "@/types/initialState.types";
 const listsInitialState = {
   ids: [],
   loading: false,
-  error: null,
   offset: 0,
   total: 0,
   hasMore: true,

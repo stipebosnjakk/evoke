@@ -21,7 +21,6 @@ type PlanRange = {
 export type PagedIdList = {
   ids: OrderTaskItem[];
   loading: boolean;
-  error: ErrorType;
   limit: number;
   offset: number;
   total: number;

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { changeContainerId } from "@/store/tasks/slices/tasks.slice";
@@ -15,7 +14,6 @@ const InboxScreen = () => {
   const dispatch = useAppDispatch();
 
   const loading = useAppSelector((state) => state.tasks.lists.inbox.loading);
-  const error = useAppSelector((state) => state.tasks.lists.inbox.error);
   const limit = useAppSelector((state) => state.tasks.lists.inbox.limit);
   const ids = useAppSelector((state) => state.tasks.lists.inbox.ids);
   const byId = useAppSelector((state) => state.tasks.tasks.byId);
@@ -42,15 +40,6 @@ const InboxScreen = () => {
     dispatch(getInboxTasksAction({ limit, offset: 0 }));
   }, [dispatch, limit]);
 
-  useEffect(() => {
-    if (!error) return;
-    Toast.show({
-      type: "error",
-      text1: "Something went wrong",
-      text2: error ?? "Try again later",
-    });
-  }, [error]);
-
   if (loading || (ids.length > 0 && data.length === 0)) {
     return (
       <ScreenContainer
@@ -61,7 +50,7 @@ const InboxScreen = () => {
     );
   }
 
-  if (!loading && !error && !data.length) {
+  if (!loading && !data.length) {
     return <NoInboxTasksView />;
   }
 

@@ -14,18 +14,19 @@ import { store } from "@/store/store";
 import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
 import ScreenContainer from "@/components/custom/ScreenContainer";
+import GlobalToastListener from "@/components/custom/GlobalToastListener";
 
 const RootLayout = () => {
-  const { success, error } = useMigrations(db, migrations);
+  const { success, error: migrationError } = useMigrations(db, migrations);
 
   useEffect(() => {
-    if (!error) return;
+    if (!migrationError) return;
     Toast.show({
       type: "error",
       text1: "Database error",
-      text2: error.message || "Try reinstalling the app",
+      text2: migrationError.message || "Try reinstalling the app",
     });
-  }, [error]);
+  }, [migrationError]);
 
   if (!success) {
     return (
@@ -49,6 +50,7 @@ const RootLayout = () => {
   return (
     <Provider store={store}>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <GlobalToastListener />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen

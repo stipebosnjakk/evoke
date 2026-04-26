@@ -12,6 +12,7 @@ import {
   validateTextInputsReducer,
   sendErrorMessageReducer,
   clearStateReducer,
+  clearCreateTaskErrorReducer,
 } from "@/store/tasks/reducers/createTaskReducer";
 
 const newTaskSlice = createSlice({
@@ -28,6 +29,7 @@ const newTaskSlice = createSlice({
     validateTextInputs: validateTextInputsReducer,
     sendErrorMessage: sendErrorMessageReducer,
     clearState: clearStateReducer,
+    clearCreateTaskError: clearCreateTaskErrorReducer,
   },
 });
 
@@ -42,5 +44,6 @@ export const {
   validateTextInputs,
   sendErrorMessage,
   clearState,
+  clearCreateTaskError,
 } = newTaskSlice.actions;
 export default newTaskSlice.reducer;

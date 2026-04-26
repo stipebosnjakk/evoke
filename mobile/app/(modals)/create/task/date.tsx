@@ -15,8 +15,7 @@ import { SymbolView } from "expo-symbols";
 import { formatTimeFromMin, minDate } from "@/utils/date";
 import { routes } from "@/constants/routes";
 
-// TODO: test if conflict is working between start date and deadline, with error warnings for creating task
-// TODO: try to fix toast message showing behind formSheet
+//  TODO: try to fix toast message showing behind formSheet
 // TODO: impement smart text for time and repeat
 
 const DateFormSheet = () => {
@@ -26,10 +25,16 @@ const DateFormSheet = () => {
   const calendars = useCalendars();
   const inputRef = useRef<TextInput>(null);
 
-  const startTimeMin = useAppSelector((state) => state.newTask.task.start_time_min,);
-  const durationMin = useAppSelector((state) => state.newTask.task.duration_min,);
+  const startTimeMin = useAppSelector(
+    (state) => state.newTask.task.start_time_min,
+  );
+  const durationMin = useAppSelector(
+    (state) => state.newTask.task.duration_min,
+  );
   const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
-  const startDateValue = useAppSelector((state) => state.newTask.task.start_date,);
+  const startDateValue = useAppSelector(
+    (state) => state.newTask.task.start_date,
+  );
 
   const locale = locales[0]?.languageTag ?? "en-US";
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
@@ -47,7 +52,9 @@ const DateFormSheet = () => {
   const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
 
   const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<IsoDate | null>(startDateValue || null,);
+  const [selected, setSelected] = useState<IsoDate | null>(
+    startDateValue || null,
+  );
 
   const selectedDate = selected ?? startDateValue ?? null;
 

@@ -22,7 +22,6 @@ const StatusFormSheet = () => {
   );
 
   const handleSubmitStatus = () => {
-    console.log("submit");
     dispatch(setStatus({ status: selected }));
     setSelected(null);
     router.back();
