@@ -8,10 +8,10 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { IsoDate } from "@/types/task.types";
 import { minDate } from "@/utils/date";
 import Button from "@/components/ui/Button";
-import CalendarView from "./components/CalendarView";
-import DateInput from "./components/DateInput";
+import CalendarView from "@/components/features/CalendarView";
+import DateInput from "@/components/features/DateInput";
 import { setDeadline } from "@/store/tasks/slices/newTask.slice";
-import Shortcuts from "./components/Shortcuts";
+import Shortcuts from "@/components/features/Shortcuts";
 
 const DeadlineFormSheet = () => {
   const router = useRouter();
@@ -107,11 +107,7 @@ const DeadlineFormSheet = () => {
               selectedDeadline={deadlineValue || null}
               handleNewDateSelect={handleNewDeadlineSelect}
             />
-            <CalendarView
-              minDate={minDeadlineDate}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            <CalendarView selected={selected} setSelected={setSelected} />
           </View>
           {deadlineValue && (
             <View style={styles.buttonsContainer}>

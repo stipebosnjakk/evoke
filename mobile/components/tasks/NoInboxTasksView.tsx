@@ -8,7 +8,7 @@ export const NoInboxTasksView = () => {
   const router = useRouter();
 
   const navigateToCreateModal = () => {
-    router.push(routes.create.href);
+    router.push(routes.create_task.href);
   };
 
   const navigateToPlan = () => {

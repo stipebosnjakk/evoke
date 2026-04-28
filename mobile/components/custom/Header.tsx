@@ -26,7 +26,7 @@ const Header = ({ title }: HeaderProps) => {
   });
 
   const navigateToCreateModal = () => {
-    router.push(routes.create.href);
+    router.push(routes.create_task.href);
   };
 
   return (

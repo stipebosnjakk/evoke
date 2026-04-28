@@ -27,7 +27,7 @@ import {
 
 // TODO: handle error messages for task creation
 
-const CreateFormSheet = () => {
+const CreateTaskFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const locales = useLocales();
@@ -82,6 +82,7 @@ const CreateFormSheet = () => {
   const onSubmit = async () => {
     if (loading) return;
 
+    // TODO: on create tell user where task belongs and also make a route button to view it
     try {
       await dispatch(createTaskAction()).unwrap();
       Toast.show({
@@ -94,7 +95,7 @@ const CreateFormSheet = () => {
   };
 
   return (
-    <View>
+    <View style={styles.root}>
       <View style={styles.container}>
         <Text style={styles.helper}>
           Try #Project, “tomorrow”, or “every week”.
@@ -146,28 +147,28 @@ const CreateFormSheet = () => {
                     : "Date"
                 }
                 onPress={() => {
-                  router.push(routes.date.href);
+                  router.push(routes.create_task_date.href);
                 }}
               />
               <Chip
                 icon="calendar.badge.clock"
                 label={deadline ? getDateLabel(deadline) : "Deadline"}
                 onPress={() => {
-                  router.push(routes.deadline.href);
+                  router.push(routes.create_task_deadline.href);
                 }}
               />
               <Chip
                 icon={status ? status.icon : "tag"}
                 label={status ? status.label : "Status"}
                 onPress={() => {
-                  router.push(routes.status.href);
+                  router.push(routes.create_task_status.href);
                 }}
               />
               <Chip
                 icon="repeat"
                 label={getRepeatLabel(repeatValue)}
                 onPress={() => {
-                  router.push(routes.repeat.href);
+                  router.push(routes.create_task_repeat.href);
                 }}
               />
             </View>
@@ -197,6 +198,9 @@ const CreateFormSheet = () => {
 };
 
 const styles = StyleSheet.create({
+  root: {
+    position: "relative",
+  },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.35)",
@@ -264,4 +268,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateFormSheet;
+export default CreateTaskFormSheet;

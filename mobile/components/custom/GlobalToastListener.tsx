@@ -11,7 +11,6 @@ export default function GlobalToastListener() {
   const newTaskError = useAppSelector((state) => state.newTask.error);
   const screensError = useAppSelector((state) => state.tasks.error);
   
-
   useEffect(() => {
     if (!newTaskError) return;
     Toast.show({

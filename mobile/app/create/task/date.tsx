@@ -4,10 +4,10 @@ import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { useCalendars, useLocales } from "expo-localization";
 
-import CalendarView from "./components/CalendarView";
-import DateInput from "./components/DateInput";
+import CalendarView from "@/components/features/CalendarView";
+import DateInput from "@/components/features/DateInput";
 import Button from "@/components/ui/Button";
-import Shortcuts from "./components/Shortcuts";
+import Shortcuts from "@/components/features/Shortcuts";
 import { setStartDate, setTime } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
@@ -35,6 +35,7 @@ const DateFormSheet = () => {
   const startDateValue = useAppSelector(
     (state) => state.newTask.task.start_date,
   );
+  const error = useAppSelector((state) => state.newTask.error);
 
   const locale = locales[0]?.languageTag ?? "en-US";
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
@@ -66,6 +67,8 @@ const DateFormSheet = () => {
   };
 
   const handleSubmitDate = () => {
+    if (error) return;
+
     if (isDateInputOpen) {
       inputRef.current?.blur();
       setIsDateInputOpen(false);
@@ -143,17 +146,13 @@ const DateFormSheet = () => {
               selectedDeadline={deadlineValue || null}
               handleNewDateSelect={handleNewStartDateSelect}
             />
-            <CalendarView
-              maxDate={maxDateValue}
-              selected={selectedDate}
-              setSelected={setSelected}
-            />
+            <CalendarView selected={selectedDate} setSelected={setSelected} />
           </View>
           <View style={styles.buttonsContainer}>
             <Button
               style={[styles.button, { justifyContent: "space-between" }]}
               onPress={() => {
-                router.push(routes.time.href);
+                router.push(routes.create_task_time.href);
               }}
             >
               <View style={styles.buttonContent}>

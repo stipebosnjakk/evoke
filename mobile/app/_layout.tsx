@@ -5,7 +5,6 @@ import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
 
 import "@/global.css";
@@ -15,6 +14,15 @@ import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
 import ScreenContainer from "@/components/custom/ScreenContainer";
 import GlobalToastListener from "@/components/custom/GlobalToastListener";
+import { createSheetRoutes } from "@/constants/routes";
+
+const createSheetOptions = {
+  presentation: "formSheet",
+  sheetAllowedDetents: "fitToContents",
+  sheetInitialDetentIndex: 0,
+  sheetGrabberVisible: true,
+  contentStyle: { backgroundColor: "white" },
+} as const;
 
 const RootLayout = () => {
   const { success, error: migrationError } = useMigrations(db, migrations);
@@ -39,13 +47,7 @@ const RootLayout = () => {
     );
   }
 
-  const modalOptions: NativeStackNavigationOptions = {
-    presentation: "formSheet",
-    sheetAllowedDetents: "fitToContents",
-    sheetInitialDetentIndex: 0,
-    sheetGrabberVisible: true,
-    contentStyle: { backgroundColor: "white" },
-  };
+  // TODO: implement new _layout.tsx inside create folder for toast message
 
   return (
     <Provider store={store}>
@@ -53,30 +55,13 @@ const RootLayout = () => {
         <GlobalToastListener />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="(modals)/create/task/create"
-            options={modalOptions}
-          />
-          <Stack.Screen
-            name="(modals)/create/task/date"
-            options={modalOptions}
-          />
-          <Stack.Screen
-            name="(modals)/create/task/deadline"
-            options={modalOptions}
-          />
-          <Stack.Screen
-            name="(modals)/create/task/time"
-            options={modalOptions}
-          />
-          <Stack.Screen
-            name="(modals)/create/task/repeat"
-            options={modalOptions}
-          />
-          <Stack.Screen
-            name="(modals)/create/task/status"
-            options={modalOptions}
-          />
+          {createSheetRoutes.map((item) => (
+            <Stack.Screen
+              key={item.route}
+              name={item.route}
+              options={createSheetOptions}
+            />
+          ))}
         </Stack>
       </GestureHandlerRootView>
       <Toast config={toastConfig} />
