@@ -3,12 +3,15 @@ import { View, Text, StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 
 import Button from "@/components/ui/Button";
 import { STATUS_OPTIONS } from "@/constants/status";
 import { TaskStatusOptionsArray } from "@/types/task.types";
 import { setStatus } from "@/store/tasks/slices/newTask.slice";
 import { useAppSelector } from "@/hooks/storeHooks";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import { validateTaskStatus } from "@/utils/validateTask";
 
 const StatusFormSheet = () => {
   const dispatch = useDispatch();
@@ -22,8 +25,18 @@ const StatusFormSheet = () => {
   );
 
   const handleSubmitStatus = () => {
+    const res = validateTaskStatus(selected);
+    if (!res.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Status",
+        text2: res.message,
+      });
+      setSelected(null);
+      return;
+    }
+
     dispatch(setStatus({ status: selected }));
-    setSelected(null);
     router.back();
   };
 
@@ -41,7 +54,7 @@ const StatusFormSheet = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <FormSheetWrapper>
       <View style={styles.headerContainer}>
         <Button iconOnly onPress={handleGoBack}>
           <SymbolView
@@ -119,14 +132,11 @@ const StatusFormSheet = () => {
           })}
         </View>
       </View>
-    </View>
+    </FormSheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-  },
   headerContainer: {
     paddingHorizontal: 20,
     flexDirection: "row",

@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
+import Toast from "react-native-toast-message";
 
 import { useAppSelector } from "@/hooks/storeHooks";
 import { IsoDate } from "@/types/task.types";
@@ -12,6 +13,8 @@ import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
 import { setDeadline } from "@/store/tasks/slices/newTask.slice";
 import Shortcuts from "@/components/features/Shortcuts";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import { validateTaskDeadline } from "@/utils/validateTask";
 
 const DeadlineFormSheet = () => {
   const router = useRouter();
@@ -30,7 +33,18 @@ const DeadlineFormSheet = () => {
     deadlineValue || null,
   );
 
-  const handleNewDeadlineSelect = (date: IsoDate | null) => {
+  const handleNewDeadlineSelect = async (date: IsoDate | null) => {
+    const res = validateTaskDeadline(date, startDateValue);
+    if (!res.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Deadline",
+        text2: res.message,
+      });
+      setSelected(null);
+      return;
+    }
+
     dispatch(setDeadline({ deadline: date }));
     router.back();
   };
@@ -40,6 +54,8 @@ const DeadlineFormSheet = () => {
       inputRef.current?.blur();
       setIsDateInputOpen(false);
     }
+
+    if (!selected) return;
 
     handleNewDeadlineSelect(selected);
   };
@@ -61,7 +77,7 @@ const DeadlineFormSheet = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <FormSheetWrapper>
       <View style={styles.headerContainer}>
         <Button iconOnly onPress={handleGoBack}>
           <SymbolView
@@ -77,7 +93,7 @@ const DeadlineFormSheet = () => {
           style={{
             opacity: isDateInputOpen ? 0 : selected ? 1 : 0.5,
           }}
-          disabled={!isDateInputOpen && !selected}
+          disabled={isDateInputOpen || !selected}
           iconOnly
           onPress={handleSubmitDeadline}
         >
@@ -107,7 +123,11 @@ const DeadlineFormSheet = () => {
               selectedDeadline={deadlineValue || null}
               handleNewDateSelect={handleNewDeadlineSelect}
             />
-            <CalendarView selected={selected} setSelected={setSelected} />
+            <CalendarView
+              minDate={minDeadlineDate}
+              selected={selected}
+              setSelected={setSelected}
+            />
           </View>
           {deadlineValue && (
             <View style={styles.buttonsContainer}>
@@ -125,14 +145,11 @@ const DeadlineFormSheet = () => {
           )}
         </>
       )}
-    </View>
+    </FormSheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-  },
   headerContainer: {
     paddingHorizontal: 20,
     flexDirection: "row",

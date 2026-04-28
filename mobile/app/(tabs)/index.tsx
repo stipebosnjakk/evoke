@@ -1,6 +1,6 @@
-import ScreenContainer from "@/components/custom/ScreenContainer";
-
 import { ScrollView, Dimensions } from "react-native";
+
+import ScreenContainer from "@/components/custom/ScreenContainer";
 
 const TodayScreen = () => {
   return (

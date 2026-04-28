@@ -13,7 +13,6 @@ import { store } from "@/store/store";
 import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
 import ScreenContainer from "@/components/custom/ScreenContainer";
-import GlobalToastListener from "@/components/custom/GlobalToastListener";
 import { createSheetRoutes } from "@/constants/routes";
 
 const createSheetOptions = {
@@ -52,7 +51,6 @@ const RootLayout = () => {
   return (
     <Provider store={store}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GlobalToastListener />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           {createSheetRoutes.map((item) => (

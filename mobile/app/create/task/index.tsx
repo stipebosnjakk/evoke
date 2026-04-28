@@ -24,6 +24,7 @@ import {
   setDescription,
   setTitle,
 } from "@/store/tasks/slices/newTask.slice";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
 
 // TODO: handle error messages for task creation
 
@@ -83,6 +84,7 @@ const CreateTaskFormSheet = () => {
     if (loading) return;
 
     // TODO: on create tell user where task belongs and also make a route button to view it
+    // TODO: check and learn what .unwrap() does
     try {
       await dispatch(createTaskAction()).unwrap();
       Toast.show({
@@ -95,8 +97,8 @@ const CreateTaskFormSheet = () => {
   };
 
   return (
-    <View style={styles.root}>
-      <View style={styles.container}>
+    <FormSheetWrapper>
+      <View style={styles.headerFormContainer}>
         <Text style={styles.helper}>
           Try #Project, “tomorrow”, or “every week”.
         </Text>
@@ -193,14 +195,11 @@ const CreateTaskFormSheet = () => {
           </Pressable>
         </View>
       </View>
-    </View>
+    </FormSheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  root: {
-    position: "relative",
-  },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.35)",
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  container: {
+  headerFormContainer: {
     padding: 16,
   },
   helper: {

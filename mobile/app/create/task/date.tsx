@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { useCalendars, useLocales } from "expo-localization";
+import Toast from "react-native-toast-message";
 
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
@@ -14,6 +15,8 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
 import { formatTimeFromMin, minDate } from "@/utils/date";
 import { routes } from "@/constants/routes";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import { validateTaskStartDate } from "@/utils/validateTask";
 
 //  TODO: try to fix toast message showing behind formSheet
 // TODO: impement smart text for time and repeat
@@ -35,7 +38,6 @@ const DateFormSheet = () => {
   const startDateValue = useAppSelector(
     (state) => state.newTask.task.start_date,
   );
-  const error = useAppSelector((state) => state.newTask.error);
 
   const locale = locales[0]?.languageTag ?? "en-US";
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
@@ -61,25 +63,36 @@ const DateFormSheet = () => {
 
   const maxDateValue = minDate("start_date", deadlineValue || null);
 
+  useEffect(() => {
+    setSelected(startDateValue ?? null);
+  }, [startDateValue]);
+
   const handleNewStartDateSelect = (date: IsoDate | null) => {
+    const res = validateTaskStartDate(date, deadlineValue);
+    console.log(res);
+    if (!res.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Start Date",
+        text2: res.message,
+      });
+      setSelected(null);
+      return;
+    }
+
     dispatch(setStartDate({ start_date: date }));
     router.back();
   };
 
   const handleSubmitDate = () => {
-    if (error) return;
-
     if (isDateInputOpen) {
       inputRef.current?.blur();
       setIsDateInputOpen(false);
     }
 
-    if (selected) {
-      handleNewStartDateSelect(selected);
-      return;
-    }
+    if (!selected) return;
 
-    router.back();
+    handleNewStartDateSelect(selected);
   };
 
   const handleGoBack = () => {
@@ -100,7 +113,7 @@ const DateFormSheet = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <FormSheetWrapper>
       <View style={styles.headerContainer}>
         <Button iconOnly onPress={handleGoBack}>
           <SymbolView
@@ -146,7 +159,11 @@ const DateFormSheet = () => {
               selectedDeadline={deadlineValue || null}
               handleNewDateSelect={handleNewStartDateSelect}
             />
-            <CalendarView selected={selectedDate} setSelected={setSelected} />
+            <CalendarView
+              maxDate={maxDateValue}
+              selected={selectedDate}
+              setSelected={setSelected}
+            />
           </View>
           <View style={styles.buttonsContainer}>
             <Button
@@ -201,14 +218,11 @@ const DateFormSheet = () => {
           </View>
         </>
       )}
-    </View>
+    </FormSheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-  },
   row: {
     flexDirection: "row",
     gap: 8,

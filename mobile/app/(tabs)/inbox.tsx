@@ -55,12 +55,14 @@ const InboxScreen = () => {
   }
 
   return (
-    <DraggableTaskList
-      data={data}
-      setData={setData}
-      loading={loading}
-      limit={limit}
-    />
+    <ScreenContainer>
+      <DraggableTaskList
+        data={data}
+        setData={setData}
+        loading={loading}
+        limit={limit}
+      />
+    </ScreenContainer>
   );
 };
 

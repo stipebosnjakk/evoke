@@ -7,6 +7,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useDispatch } from "react-redux";
 import { useCalendars } from "expo-localization";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Toast from "react-native-toast-message";
 
 import Button from "@/components/ui/Button";
 import { setTime as setTimeSlice } from "@/store/tasks/slices/newTask.slice";
@@ -17,6 +18,8 @@ import {
   getStartTimeMin,
 } from "@/utils/date";
 import { useAppSelector } from "@/hooks/storeHooks";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import { validateTaskTime } from "@/utils/validateTask";
 
 const TimeFormSheet = () => {
   const router = useRouter();
@@ -69,6 +72,17 @@ const TimeFormSheet = () => {
     const start_time_min = getStartTimeMin(time);
     const duration_min = getDurationMin(durationHours, durationMinutes);
 
+    const res = validateTaskTime(start_time_min, duration_min);
+
+    if (!res.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Time",
+        text2: res.message,
+      });
+      return;
+    }
+
     dispatch(setTimeSlice({ start_time_min, duration_min }));
 
     router.back();
@@ -80,7 +94,7 @@ const TimeFormSheet = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <FormSheetWrapper>
       <View style={styles.headerContainer}>
         <Button
           iconOnly
@@ -197,14 +211,11 @@ const TimeFormSheet = () => {
           </Pressable>
         </View>
       )}
-    </View>
+    </FormSheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-  },
   headerContainer: {
     paddingHorizontal: 20,
     flexDirection: "row",

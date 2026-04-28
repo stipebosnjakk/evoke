@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
 import { routes } from "@/constants/routes";
-import ScreenContainer from "@/components/custom/ScreenContainer";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
 
 export const NoInboxTasksView = () => {
   const router = useRouter();
@@ -16,7 +16,7 @@ export const NoInboxTasksView = () => {
   };
 
   return (
-    <ScreenContainer>
+    <FormSheetWrapper>
       <View style={styles.emptyContainer}>
         <Text style={styles.titleText}>Your inbox is clear</Text>
         <Text style={styles.subtitleText}>
@@ -40,7 +40,7 @@ export const NoInboxTasksView = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </ScreenContainer>
+    </FormSheetWrapper>
   );
 };
 

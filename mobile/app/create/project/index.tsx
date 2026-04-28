@@ -1,11 +1,12 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { Text } from "react-native";
+
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
 
 const CreateProjectFormSheet = () => {
   return (
-    <View>
+    <FormSheetWrapper>
       <Text>Create a project</Text>
-    </View>
+    </FormSheetWrapper>
   );
 };
 

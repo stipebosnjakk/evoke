@@ -3,12 +3,15 @@ import { View, Text, StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 
 import { useAppSelector } from "@/hooks/storeHooks";
 import { REPEAT_OPTIONS } from "@/constants/repeat";
 import Button from "@/components/ui/Button";
 import { Weekday } from "@/types/task.types";
 import { setRepeat } from "@/store/tasks/slices/newTask.slice";
+import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import { validateTaskRepeat } from "@/utils/validateTask";
 
 const RepeatFormSheet = () => {
   const dispatch = useDispatch();
@@ -19,9 +22,19 @@ const RepeatFormSheet = () => {
   const [selected, setSelected] = useState<Weekday[]>(repeatValue ?? []);
 
   const handleSubmitRepeat = () => {
+    const res = validateTaskRepeat(selected);
+    if (!res.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Repeat Option",
+        text2: res.message,
+      });
+      setSelected([]);
+      return;
+    }
+
     dispatch(setRepeat({ repeat: selected }));
     router.back();
-    return;
   };
 
   const handleSelectOption = (optionValue: Weekday) => {
@@ -38,7 +51,7 @@ const RepeatFormSheet = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <FormSheetWrapper>
       <View style={styles.headerContainer}>
         <Button iconOnly onPress={handleGoBack}>
           <SymbolView
@@ -103,14 +116,11 @@ const RepeatFormSheet = () => {
           })}
         </View>
       </View>
-    </View>
+    </FormSheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-  },
   headerContainer: {
     paddingHorizontal: 20,
     flexDirection: "row",
