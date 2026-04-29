@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   buttonsContainer: {
-    borderTopColor: "rgba(0,0,0,0.06)",
+    borderTopColor: "#efefef",
     borderTopWidth: 1,
   },
   buttonText: {

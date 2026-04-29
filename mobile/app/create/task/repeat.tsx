@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottomColor: "#efefef",
     paddingHorizontal: 14,
   },
   optionLabel: {

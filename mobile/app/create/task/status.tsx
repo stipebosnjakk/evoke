@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   borderContainer: {
-    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottomColor: "#efefef",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

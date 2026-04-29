@@ -111,7 +111,7 @@ const DateInput = ({
           }
           onSubmitEditing={handleTypedDateSubmit}
           placeholder="Type a date"
-          placeholderTextColor="rgba(0,0,0,0.35)"
+          placeholderTextColor="#a5a5a5"
           returnKeyType="done"
           autoCorrect={false}
           autoCapitalize="none"
@@ -127,7 +127,7 @@ const DateInput = ({
             weight="medium"
             size={26}
             type="monochrome"
-            tintColor="rgba(0, 0, 0, 0.45)"
+            tintColor="#8c8c8c"
           />
           <Text style={styles.dateText}>{availableDate.uiDate}</Text>
         </Pressable>
@@ -143,7 +143,7 @@ const DateInput = ({
 
 const styles = StyleSheet.create({
   inputContainer: {
-    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottomColor: "#efefef",
     borderBottomWidth: 1,
     paddingVertical: 20,
     paddingHorizontal: 16,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: "rgb(240, 240, 240)",
     borderBottomWidth: 1,
-    borderColor: "rgba(0,0,0,0.06)",
+    borderColor: "#efefef",
   },
   dateText: {
     fontSize: 15,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
-    color: "rgba(0, 0, 0, 0.5)",
+    color: "#7f7f7f",
     fontSize: 14,
   },
 });

@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 999,
-    backgroundColor: "rgba(0,0,0,0.06)",
+    backgroundColor: "#efefef",
   },
   chipDisabled: {
     opacity: 0.45,
