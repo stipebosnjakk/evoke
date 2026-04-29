@@ -5,12 +5,8 @@ import { format } from "date-fns";
 
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
-import {
-  formatIsoDate,
-  formatSmartUiDate,
-  smartDateInput,
-  toIsoDate,
-} from "@/utils/date";
+import { smartDateInput } from "@/utils/smartTextInput";
+import { formatIsoDate, formatSmartUiDate, toIsoDate } from "@/utils/date";
 
 type DateInputType = {
   inputRef: RefObject<TextInput | null>;

@@ -16,7 +16,6 @@ import {
  * @param data Newly fetched tasks containing `id` and `order_key`.
  * @param isRefresh Indicates if this is a refresh action, which should replace the list instead of appending.
  */
-
 export const mergeNewListItems = (
   list: PagedIdList,
   data: TaskWithOrderKey[],

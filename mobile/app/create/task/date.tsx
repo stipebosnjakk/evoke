@@ -18,9 +18,6 @@ import { routes } from "@/constants/routes";
 import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
 import { validateTaskStartDate } from "@/utils/validateTask";
 
-//  TODO: try to fix toast message showing behind formSheet
-// TODO: impement smart text for time and repeat
-
 const DateFormSheet = () => {
   const router = useRouter();
   const dispatch = useDispatch();

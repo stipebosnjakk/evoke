@@ -26,8 +26,6 @@ import {
 } from "@/store/tasks/slices/newTask.slice";
 import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
 
-// TODO: handle error messages for task creation
-
 const CreateTaskFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -72,6 +70,15 @@ const CreateTaskFormSheet = () => {
     };
   }, [dispatch]);
 
+  const onSubmit = async () => {
+    if (loading) return;
+    try {
+      await dispatch(createTaskAction()).unwrap();
+    } catch (error: unknown) {
+      showErrorToast(handleErrorMessage(error, "Something went wrong."));
+    }
+  };
+
   const showErrorToast = (message: string) => {
     Toast.show({
       type: "error",
@@ -80,29 +87,17 @@ const CreateTaskFormSheet = () => {
     });
   };
 
-  const onSubmit = async () => {
-    if (loading) return;
-    // TODO: get info where task belongs, based on that, give destination label, and on press function
-    // TODO: on route change, screen appears as a formSheet
-    // TODO: check and learn what .unwrap() does
-    try {
-      await dispatch(createTaskAction()).unwrap();
-    } catch (error: unknown) {
-      showErrorToast(handleErrorMessage(error, "Something went wrong."));
-    }
-  };
-
   return (
     <FormSheetWrapper>
       <View style={styles.headerFormContainer}>
-        <Text style={styles.helper}>
-          Try #Project, “tomorrow”, or “every week”.
-        </Text>
+        <Text style={styles.helper}>Try #Area/Project/Section</Text>
         <View style={styles.fields}>
           <TextInput
             autoFocus
             value={title || ""}
-            onChangeText={(text) => dispatch(setTitle({ title: text }))}
+            onChangeText={(text) => {
+              dispatch(setTitle({ title: text }));
+            }}
             placeholder="Task title"
             placeholderTextColor="#a5a5a5"
             returnKeyType="next"
