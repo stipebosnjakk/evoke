@@ -5,6 +5,7 @@ import { db, list_order, NewTask, tasks } from "@/db";
 import { TaskWithOrderKey } from "@/types/task.types";
 import { throwDbError } from "@/utils/handleErrorMessage";
 import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
+import { isInboxTask, isPlanTask } from "@/utils/taskPlacement";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
@@ -12,6 +13,14 @@ export const createTaskRepo = async (task: NewTask): Promise<NewTask> => {
   try {
     return await db.transaction(async (tx) => {
       const id = createId();
+      const isInbox = isInboxTask(task);
+      const isPlan = isPlanTask(task);
+
+      if (!isInbox && !isPlan) {
+        throw new Error("Task has no valid placement");
+      }
+
+      // TODO: fix container ID selection
 
       const {
         title,

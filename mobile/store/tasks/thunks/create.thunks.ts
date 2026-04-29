@@ -9,6 +9,12 @@ import {
 } from "@/store/tasks/slices/newTask.slice";
 import { RootState } from "@/store/store";
 import { NewTask } from "@/db";
+import {
+  getTaskPlacement,
+  getTaskScreenHref,
+  getTaskScreenText,
+} from "@/utils/taskPlacement";
+import Toast from "react-native-toast-message";
 
 export const createTaskAction = createAsyncThunk<
   { task: NewTask },
@@ -34,6 +40,17 @@ export const createTaskAction = createAsyncThunk<
         message: "Task was not created properly",
       });
     }
+
+    const placement = getTaskPlacement(task);
+
+    Toast.show({
+      type: "taskSaved",
+      text1: task.title || "Task created",
+      text2: getTaskScreenText(placement),
+      props: {
+        href: getTaskScreenHref(placement),
+      },
+    });
 
     dispatch(clearState());
 

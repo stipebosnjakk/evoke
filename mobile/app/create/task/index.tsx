@@ -82,15 +82,11 @@ const CreateTaskFormSheet = () => {
 
   const onSubmit = async () => {
     if (loading) return;
-
-    // TODO: on create tell user where task belongs and also make a route button to view it
+    // TODO: get info where task belongs, based on that, give destination label, and on press function
+    // TODO: on route change, screen appears as a formSheet
     // TODO: check and learn what .unwrap() does
     try {
       await dispatch(createTaskAction()).unwrap();
-      Toast.show({
-        type: "success",
-        text1: "Task created",
-      });
     } catch (error: unknown) {
       showErrorToast(handleErrorMessage(error, "Something went wrong."));
     }
@@ -108,7 +104,7 @@ const CreateTaskFormSheet = () => {
             value={title || ""}
             onChangeText={(text) => dispatch(setTitle({ title: text }))}
             placeholder="Task title"
-            placeholderTextColor="rgba(0,0,0,0.35)"
+            placeholderTextColor="#a5a5a5"
             returnKeyType="next"
             style={styles.titleInput}
             blurOnSubmit={false}
@@ -120,7 +116,7 @@ const CreateTaskFormSheet = () => {
               dispatch(setDescription({ description: text }))
             }
             placeholder="Description"
-            placeholderTextColor="rgba(0,0,0,0.35)"
+            placeholderTextColor="#a5a5a5"
             multiline
             style={styles.descriptionInput}
             textAlignVertical="top"
@@ -179,10 +175,10 @@ const CreateTaskFormSheet = () => {
         <View style={styles.actions}>
           <Pressable
             onPress={onSubmit}
-            disabled={title?.trim().length === 0 || loading}
+            disabled={!title || loading}
             style={[
               styles.btnPrimary,
-              { opacity: title?.trim().length === 0 || loading ? 0.6 : 1 },
+              { opacity: !title || loading ? 0.6 : 1 },
             ]}
           >
             <SymbolView
@@ -202,7 +198,7 @@ const CreateTaskFormSheet = () => {
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "#a5a5a5",
   },
   sheetBackground: {
     backgroundColor: "white",
@@ -210,7 +206,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
   },
   handle: {
-    backgroundColor: "rgba(0,0,0,0.25)",
+    backgroundColor: "#bfbfbf",
   },
   content: {
     flex: 1,
@@ -252,12 +248,12 @@ const styles = StyleSheet.create({
   btnPrimary: {
     padding: 15,
     borderRadius: 999,
-    backgroundColor: "rgba(0,0,0,0.9)",
+    backgroundColor: "#191919",
   },
   row: {
     flexDirection: "row",
     gap: 8,
-    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottomColor: "#efefef",
     borderBottomWidth: 1,
     paddingBottom: 20,
     paddingHorizontal: 16,
