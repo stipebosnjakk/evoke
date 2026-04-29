@@ -7,10 +7,7 @@ import {
   isToday,
   isTomorrow,
   parseISO,
-  parse,
   addDays,
-  nextDay,
-  startOfDay,
   startOfToday,
   isYesterday,
   isBefore,
@@ -21,39 +18,25 @@ import {
 import { enUS } from "date-fns/locale";
 
 import { IsoDate, Weekday } from "@/types/task.types";
-import { weekdays } from "@/constants/date";
 
-// TODO: write params for utils
-
-const userLocale = Localization.getLocales()?.[0]?.languageTag ?? "en-US";
-const is24h = Localization.getCalendars()?.[0]?.uses24hourClock ?? false;
-
-export const formatUserTime = (date: IsoDate) => {
-  return new Intl.DateTimeFormat(userLocale, {
-    timeStyle: "short",
-    hour12: !is24h,
-  }).format(new Date(date));
-};
-
-export const formatUserDate = (date: IsoDate) => {
-  return new Intl.DateTimeFormat(userLocale, {
-    dateStyle: "medium",
-  }).format(new Date(date));
-};
-
-export const formatUserDateTime = (date: IsoDate) => {
-  return new Intl.DateTimeFormat(userLocale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-    hour12: !is24h,
-  }).format(new Date(date));
-};
-
+/**
+ * Finds the Saturday of the week where date belongs.
+ * @param date The date to find the weekend for
+ * @param weeksAhead Number of weeks ahead to get the weekend for, example: 0 for this weekend, 1 for next weekend, etc
+ * @returns
+ */
 export const getWeekendSaturday = (date: IsoDate, weeksAhead = 0) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   return addDays(addWeeks(weekStart, weeksAhead), 5);
 };
 
+/**
+ * Returns the minimum date for a given type and selected date.
+ * For start_date, it returns one day before the deadline; for deadline, it returns one day after the start date.
+ * @param type The type of date to calculate the minimum for, either "start_date" or "deadline"
+ * @param selectedDate The currently selected date to calculate the minimum against
+ * @returns
+ */
 export const minDate = (
   type: "start_date" | "deadline",
   selectedDate: IsoDate | null,
@@ -73,10 +56,21 @@ export const minDate = (
   return null;
 };
 
+/**
+ * Checks if a string is a valid ISO date.
+ * @param value The string to validate
+ * @returns
+ */
 export const isValidIsoDate = (value: string) => {
   return isMatch(value, "yyyy-MM-dd") && isValid(parseISO(value));
 };
 
+/**
+ * Formats an ISO date into a shorter readable date.
+ * If the date is in the current year, it returns "29 Apr"; otherwise it returns "29 Apr 2027".
+ * @param date
+ * @returns
+ */
 export const formatIsoDate = (date: IsoDate): string => {
   const parsedDate = parseISO(date);
   const isCurrentYear = parsedDate.getFullYear() === new Date().getFullYear();
@@ -84,10 +78,21 @@ export const formatIsoDate = (date: IsoDate): string => {
   return format(parsedDate, isCurrentYear ? "d MMM" : "d MMM yyyy");
 };
 
+/**
+ * Converts a Date object to an ISO date string.
+ * @param date  The Date object to convert
+ * @returns The ISO date string in the format "yyyy-MM-dd"
+ */
 export const toIsoDate = (date: Date): IsoDate => {
   return format(date, "yyyy-MM-dd") as IsoDate;
 };
 
+/**
+ * Turns a date into a friendly label for UI.
+ * It returns "Today", "Tomorrow", "Yesterday", weekday name like "Friday", or date like "29 Apr".
+ * @param value  The ISO date string to format into a label
+ * @returns The formatted date label
+ */
 export const getDateLabel = (value: IsoDate) => {
   const date = parseISO(value);
   const today = startOfToday();
@@ -101,7 +106,13 @@ export const getDateLabel = (value: IsoDate) => {
   return format(date, "d MMM");
 };
 
-export const formatSmartUiDate = (value: Date) => {
+/**
+ * Formats a date for a more detailed UI label.
+ * If the date is this year, it returns "Wednesday 29 Apr"; otherwise "Wednesday 29 Apr 2027".
+ * @param value  The date to format
+ * @returns The formatted date string
+ */
+export const formatSmartUiDate = (value: Date | IsoDate) => {
   const date = typeof value === "string" ? parseISO(value) : value;
 
   return format(
@@ -110,92 +121,23 @@ export const formatSmartUiDate = (value: Date) => {
   );
 };
 
-const parseFromPatterns = (
-  value: string,
-  referenceDate: Date,
-  patterns: readonly { regex: RegExp; format: string; useLocale?: boolean }[],
-): Date | null => {
-  for (const pattern of patterns) {
-    if (!pattern.regex.test(value)) continue;
-    const date = parse(
-      value,
-      pattern.format,
-      referenceDate,
-      pattern.useLocale ? { locale: enUS } : undefined,
-    );
-    if (isValid(date)) return startOfDay(date);
-  }
-  return null;
-};
-
-export const smartDateInput = (raw: string): Date | null => {
-  const now = new Date();
-  const today = startOfDay(now);
-  const normalizedText = raw.trim().replace(/\s+/g, " ");
-  const input = normalizedText.toLowerCase();
-
-  if (!input) {
-  }
-  if (input === "today") return today;
-  if (input === "tomorrow") return addDays(today, 1);
-
-  const nextMatch = input.match(
-    /^next (sunday|monday|tuesday|wednesday|thursday|friday|saturday)$/,
-  );
-
-  if (nextMatch) {
-    const day = weekdays[nextMatch[1] as keyof typeof weekdays];
-    return startOfDay(nextDay(today, day));
-  }
-
-  if (input in weekdays) {
-    return startOfDay(nextDay(today, weekdays[input as keyof typeof weekdays]));
-  }
-
-  const numericInput = input.replace(/[.-]/g, "/");
-
-  const numericDate = parseFromPatterns(numericInput, today, [
-    { regex: /^\d{4}\/\d{1,2}\/\d{1,2}$/, format: "yyyy/M/d" },
-    { regex: /^\d{1,2}\/\d{1,2}\/\d{4}$/, format: "d/M/yyyy" },
-  ]);
-
-  if (numericDate) {
-    if (startOfDay(numericDate) < today) return null;
-    return numericDate;
-  }
-
-  const textInput = normalizedText.replace(
-    /[a-zA-Z]+/g,
-    (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-  );
-
-  const namedMonthDate = parseFromPatterns(textInput, today, [
-    { regex: /^\d{1,2}\s+[A-Za-z]{3}$/, format: "d MMM", useLocale: true },
-    {
-      regex: /^\d{1,2}\s+[A-Za-z]{3}\s+\d{4}$/,
-      format: "d MMM yyyy",
-      useLocale: true,
-    },
-    { regex: /^\d{1,2}\s+[A-Za-z]+$/, format: "d MMMM", useLocale: true },
-    {
-      regex: /^\d{1,2}\s+[A-Za-z]+\s+\d{4}$/,
-      format: "d MMMM yyyy",
-      useLocale: true,
-    },
-  ]);
-
-  if (namedMonthDate) {
-    if (startOfDay(namedMonthDate) < today) return null;
-    return namedMonthDate;
-  }
-
-  return null;
-};
-
+/**
+ * Converts the time part of a Date into total minutes from midnight.
+ * Example: 14:30 becomes 870 because 14 * 60 + 30 = 870.
+ * @param date
+ * @returns
+ */
 export const getStartTimeMin = (date: Date) => {
   return date.getHours() * 60 + date.getMinutes();
 };
 
+/**
+ * Converts hours and minutes into total minutes.
+ * Example: 1 hour 30 minutes = 90.
+ * @param durationHours
+ * @param durationMinutes
+ * @returns
+ */
 export const getDurationMin = (
   durationHours: number,
   durationMinutes: number,
@@ -207,14 +149,12 @@ export const getDurationMin = (
   return durationHours * 60 + durationMinutes;
 };
 
-export const getEndTime = (start_time_min: number, duration_min: number) => {
-  const total = start_time_min + duration_min;
-  return {
-    endDayOffset: Math.floor(total / 1440),
-    endTimeMin: total % 1440,
-  };
-};
-
+/**
+ * Converts total minutes back into { hours, minutes }.
+ * Example: 870 becomes { hours: 14, minutes: 30 }.
+ * @param totalMinutes
+ * @returns
+ */
 export const getHoursAndMinutesFromMin = (totalMinutes: number | null) => {
   if (totalMinutes === null) return null;
 
@@ -228,6 +168,14 @@ export const getHoursAndMinutesFromMin = (totalMinutes: number | null) => {
   };
 };
 
+/**
+ * Formats total minutes into a time string.
+ * Example: 870 becomes "2:30 PM" with 12-hour format, or "14:30" in 24-hour format.
+ * @param totalMinutes Number of minutes from midnight
+ * @param locale The locale string
+ * @param is24Hour Whether to use 24-hour format or not
+ * @returns
+ */
 export const formatTimeFromMin = (
   totalMinutes: number | null,
   locale: string,
@@ -245,6 +193,11 @@ export const formatTimeFromMin = (
   }).format(date);
 };
 
+/**
+ * Converts duration minutes into an object with total, hours, and minutes.
+ * @param durationMin
+ * @returns
+ */
 export const getDurationFromDurationMin = (durationMin: number | null) => {
   if (durationMin === null) return null;
 
@@ -255,17 +208,23 @@ export const getDurationFromDurationMin = (durationMin: number | null) => {
   };
 };
 
-export const getIsoWeekday = (date: Date) => {
-  const weekday = date.getDay();
-  return weekday === 0 ? 7 : weekday;
-};
-
-const repeatWeekStart = new Date(2024, 0, 1);
-
-export const formatRepeatWeekday = (day: Weekday) => {
+/**
+ * Converts a weekday number into a short English weekday name.
+ * Example: 0 becomes "Mon", 1 becomes "Tue", assuming your app’s repeat system starts Monday at 0.
+ * @param day The weekday number, where 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+ * @returns
+ */
+const formatRepeatWeekday = (day: Weekday) => {
+  const repeatWeekStart = new Date(2024, 0, 1);
   return format(addDays(repeatWeekStart, day), "EEE", { locale: enUS });
 };
 
+/**
+ * Turns selected repeat days into readable UI text.
+ * Example: [0,1,2,3,4] becomes "Every weekday"
+ * @param repeat The array of selected repeat days
+ * @returns
+ */
 export const getRepeatLabel = (repeat: Weekday[] | null | undefined) => {
   if (!repeat?.length) return "Repeat";
 
