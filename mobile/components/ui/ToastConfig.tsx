@@ -78,7 +78,7 @@ const TaskSavedToastCard = ({
     <Pressable
       style={styles.taskSavedContainer}
       onPress={() => {
-        if (href) router.push(href);
+        if (href) router.dismissTo(href);
       }}
     >
       <View>

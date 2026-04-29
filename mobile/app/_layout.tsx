@@ -46,8 +46,6 @@ const RootLayout = () => {
     );
   }
 
-  // TODO: implement new _layout.tsx inside create folder for toast message
-
   return (
     <Provider store={store}>
       <GestureHandlerRootView style={{ flex: 1 }}>

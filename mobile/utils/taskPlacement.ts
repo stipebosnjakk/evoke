@@ -68,8 +68,8 @@ export const getTaskScreenHref = (screen: TaskScreen): string => {
     case "plan":
       return routes.plan.href;
     case "none":
-      return routes.create_task.href;
+      return routes.inbox.href;
     default:
-      return routes.create_task.href;
+      return routes.inbox.href;
   }
 };
