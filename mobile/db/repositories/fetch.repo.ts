@@ -1,54 +1,55 @@
-import { and, eq, isNull, desc, sql } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
-import { DataReturnType } from "@/types/task.types";
-import { db, tasks, list_order } from "@/db";
-import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
+import { db, list_order, tasks } from "@/db";
 import { throwDbError } from "@/utils/handleErrorMessage";
+import { ScopeType, TasksObjectType } from "@/types/initialState.types";
 
-export const fetchInboxTasks = async (
-  limit: number,
-  offset: number,
-): Promise<DataReturnType> => {
+export const fetchActiveTasks = async (): Promise<TasksObjectType> => {
   try {
-    const where = and(
-      eq(list_order.container_id, INBOX_CONTAINER_ID),
-      eq(tasks.is_deleted, false),
-      isNull(tasks.project_id),
-      isNull(tasks.area_id),
-      isNull(tasks.section_id),
-      isNull(tasks.status),
-      isNull(tasks.start_date),
-      isNull(tasks.start_time_min),
-      isNull(tasks.duration_min),
-      isNull(tasks.deadline),
-      isNull(tasks.completed_at),
-      isNull(tasks.repeat),
-    );
+    const rows = await db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.is_deleted, false), eq(tasks.is_completed, false)));
 
-    const [rows, totalResult] = await Promise.all([
-      db
-        .select({ task: tasks, order_key: list_order.order_key })
-        .from(list_order)
-        .innerJoin(tasks, eq(list_order.task_id, tasks.id))
-        .where(where)
-        .limit(limit)
-        .offset(offset)
-        .orderBy(desc(list_order.order_key)),
-      db
-        .select({ total: sql<number>`count(*)` })
-        .from(list_order)
-        .innerJoin(tasks, eq(list_order.task_id, tasks.id))
-        .where(where),
-    ]);
-
-    return {
-      data: rows.map((r) => ({
-        ...r.task,
-        order_key: r.order_key,
-      })),
-      total: Number(totalResult[0]?.total ?? 0),
+    const data: TasksObjectType = {
+      ids: [],
+      byId: {},
     };
-  } catch (error: unknown) {
-    return throwDbError(error, "Failed to fetch Inbox tasks");
+
+    for (const row of rows) {
+      data.ids.push(row.id);
+      data.byId[row.id] = row;
+    }
+
+    return data;
+  } catch (error) {
+    return throwDbError(error, "Failed get tasks");
+  }
+};
+
+export const fetchScopeOrder = async (scopeId: string): Promise<ScopeType> => {
+  try {
+    if (!scopeId) {
+      throw Error("Scope ID is required");
+    }
+
+    const rows = await db
+      .select({
+        task_id: list_order.task_id,
+        order_key: list_order.order_key,
+      })
+      .from(list_order)
+      .where(eq(list_order.scope_id, scopeId))
+      .orderBy(desc(list_order.order_key));
+
+    const data: ScopeType = {};
+
+    for (const row of rows) {
+      data[row.task_id] = row.order_key;
+    }
+
+    return data;
+  } catch (error) {
+    return throwDbError(error, "Failed get order keys");
   }
 };

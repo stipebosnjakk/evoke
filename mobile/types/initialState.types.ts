@@ -1,64 +1,21 @@
-import type { NewTask, Task } from "@/db";
-import {
-  OrderTaskItem,
-  ContainerIdType,
-  TaskStatusOptionsArray,
-} from "@/types/task.types";
+import type { Task, NewTask } from "@/db";
 
-// TODO: maybe replace this type with IsoType from task types
-type ErrorType = string | null;
-type ISODate = string;
+export type Status = "idle" | "loading" | "succeeded" | "failed";
 
-type PlanPreset = "next7" | "next30" | "week" | "month" | "custom";
-type PlanStatusKey = "next" | "waiting" | "someday";
+export type ScopeType = Record<string, number>;
 
-type PlanRange = {
-  preset: PlanPreset;
-  startDate: ISODate | null;
-  endDate: ISODate | null;
-};
-
-export type PagedIdList = {
-  ids: OrderTaskItem[];
-  loading: boolean;
-  limit: number;
-  offset: number;
-  total: number;
-  hasMore: boolean;
-};
-
-type PlanState = {
-  range: PlanRange;
-  overdue: PagedIdList;
-  inRange: Record<PlanStatusKey, PagedIdList>;
+export type TasksObjectType = {
+  ids: string[];
+  byId: Record<string, Task>;
 };
 
 export type TasksState = {
-  loading: boolean;
-  error: ErrorType;
-  containerId: ContainerIdType | null;
-  ui: {
-    searchQuery: string;
+  status: Status;
+  error: string | null;
+  tasks: TasksObjectType;
+  taskOrder: {
+    inbox: ScopeType;
   };
-  tasks: {
-    byId: Record<string, Task>;
-  };
-  lists: {
-    today: PagedIdList;
-    inbox: PagedIdList;
-    plan: PlanState;
-  };
-};
-
-export type NewTaskType = {
-  title: string | null;
-  description: string | null;
-  status: TaskStatusOptionsArray | null;
-  start_date: string | null;
-  start_time_min: number | null;
-  duration_min: number | null;
-  deadline: string | null;
-  repeat: string | null;
 };
 
 export type NewTaskInitialState = {

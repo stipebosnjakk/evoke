@@ -1,23 +1,36 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import { fetchInboxTasks } from "@/db/repositories/fetch.repo";
-import { DataReturnType, RejectWithValue } from "@/types/task.types";
+import { RejectWithValue } from "@/types/task.types";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
+import {
+  fetchActiveTasks,
+  fetchScopeOrder,
+} from "@/db/repositories/fetch.repo";
+import { ScopeType, TasksObjectType } from "@/types/initialState.types";
+import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
-export const getInboxTasksAction = createAsyncThunk<
-  DataReturnType,
-  { limit: number; offset: number },
+type ActiveTasksType = {
+  tasks: TasksObjectType;
+  inboxOrder: ScopeType;
+};
+
+export const getActiveTasksAction = createAsyncThunk<
+  ActiveTasksType,
+  { refresh?: boolean },
   { rejectValue: RejectWithValue }
->("tasks/fetchInbox", async ({ limit, offset }, { rejectWithValue }) => {
+>("tasks/fetchActiveTasks", async (_, { rejectWithValue }) => {
   try {
-    const { data, total } = await fetchInboxTasks(limit, offset);
-    return {
-      data,
-      total,
-    };
+    const [tasks, inboxOrder] = await Promise.all([
+      fetchActiveTasks(),
+      fetchScopeOrder(INBOX_SCOPE_ID),
+    ]);
+
+    console.log("TASKS: ", JSON.stringify(tasks, null ,2))
+    console.log("ORDER: ", JSON.stringify(inboxOrder, null ,2))
+    return { tasks, inboxOrder };
   } catch (error: unknown) {
     return rejectWithValue({
-      message: handleErrorMessage(error, "Failed to get Inbox tasks"),
+      message: handleErrorMessage(error, "Failed to get active tasks"),
     });
   }
 });

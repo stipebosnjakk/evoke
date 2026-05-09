@@ -3,24 +3,24 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   updateTaskOrderKey,
   rebalanceOrderKeys,
-} from "@/db/repositories/reorder.repo";
+} from "@/db/repositories/update.repo";
 import {
   OrderTaskItem,
   RejectWithValue,
-  ContainerIdType,
+  ScopeIdType,
 } from "@/types/task.types";
 import { handleErrorMessage } from "@/utils/handleErrorMessage";
 
 export const updateTaskOrderKeyAction = createAsyncThunk<
-  OrderTaskItem,
-  { taskId: string; containerId: ContainerIdType; newOrderKey: number },
+  { newOrder: OrderTaskItem; scopeId: ScopeIdType },
+  { newOrder: OrderTaskItem; scopeId: ScopeIdType },
   { rejectValue: RejectWithValue }
 >(
   "tasks/updateTaskOrderKey",
-  async ({ taskId, containerId, newOrderKey }, { rejectWithValue }) => {
+  async ({ newOrder, scopeId }, { rejectWithValue }) => {
     try {
-      await updateTaskOrderKey(taskId, containerId, newOrderKey);
-      return { id: taskId, order_key: newOrderKey };
+      await updateTaskOrderKey(newOrder, scopeId);
+      return { newOrder, scopeId };
     } catch (error) {
       return rejectWithValue({
         message: handleErrorMessage(error, "Failed to update task order key"),
@@ -30,18 +30,18 @@ export const updateTaskOrderKeyAction = createAsyncThunk<
 );
 
 export const rebalanceOrderKeysAction = createAsyncThunk<
-  { orderArray: OrderTaskItem[]; containerId: ContainerIdType },
+  { orderArray: OrderTaskItem[]; scopeId: ScopeIdType },
   {
     orderArray: OrderTaskItem[];
-    containerId: ContainerIdType;
+    scopeId: ScopeIdType;
   },
   { rejectValue: RejectWithValue }
 >(
   "tasks/rebalanceOrderKeys",
-  async ({ orderArray, containerId }, { rejectWithValue }) => {
+  async ({ orderArray, scopeId }, { rejectWithValue }) => {
     try {
-      await rebalanceOrderKeys(orderArray, containerId);
-      return { orderArray, containerId };
+      await rebalanceOrderKeys(orderArray, scopeId);
+      return { orderArray, scopeId };
     } catch (error) {
       return rejectWithValue({
         message: handleErrorMessage(error, "Failed to rebalance order keys"),

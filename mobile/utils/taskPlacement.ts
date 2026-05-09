@@ -10,7 +10,7 @@ type TaskScreen = "inbox" | "today" | "plan" | "none";
  * @returns
  */
 const isActiveTask = (task: NewTask): boolean =>
-  task.completed_at == null && !task.is_deleted;
+  !task.is_completed && !task.is_deleted;
 
 /**
  * Checks if a task has a destination (section, project, or area).
@@ -44,7 +44,7 @@ export const isInboxTask = (task: NewTask): boolean =>
   !task.status;
 
 /**
- * Checks if a task is ready for today (active, not in inbox, status is "next" or null, and start date is today or earlier).
+ * Checks if a task is ready for today (active, not in inbox, start date is today and status is "next" or null).
  * @param task
  * @returns
  */
@@ -54,8 +54,8 @@ export const isTodayTask = (task: NewTask): boolean => {
   return (
     isActiveTask(task) &&
     !isInboxTask(task) &&
-    (task.status === "next" || task.status === null) &&
-    (!task.start_date || task.start_date <= today)
+    task.start_date === today &&
+    (task.status === null || task.status === "next")
   );
 };
 

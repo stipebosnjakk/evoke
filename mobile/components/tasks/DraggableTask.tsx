@@ -4,14 +4,16 @@ import { format } from "date-fns";
 
 import { TaskWithOrderKey } from "@/types/task.types";
 
-export type RenderTaskItem = {
+export type RenderDraggableTask = {
   item: TaskWithOrderKey;
   drag: () => void;
 };
 
-const DraggableTask = ({ item, drag }: RenderTaskItem) => {
-  const date = format(new Date(item.created_at), "d MMM");
-  return (
+const DraggableTask = ({ item, drag }: RenderDraggableTask) => {
+  const { task } = item;
+  const date = format(new Date(task.created_at), "d MMM");
+
+  const InboxTask = (
     <TouchableOpacity
       activeOpacity={0.7}
       delayLongPress={100}
@@ -19,11 +21,13 @@ const DraggableTask = ({ item, drag }: RenderTaskItem) => {
       onLongPress={drag}
     >
       <Text numberOfLines={1} style={styles.inboxTaskTitleText}>
-        {item.title}
+        {task.title}
       </Text>
       <Text style={styles.inboxTaskCreatedDateText}>{date}</Text>
     </TouchableOpacity>
   );
+
+  return InboxTask;
 };
 
 const styles = StyleSheet.create({

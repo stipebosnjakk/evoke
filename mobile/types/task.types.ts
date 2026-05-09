@@ -11,25 +11,12 @@ export type TaskStatus = "next" | "waiting" | "someday";
 // TODO: check this type
 export type TaskStatusOption = (typeof STATUS_OPTIONS)[number];
 
-export type ContainerIdType =
-  | "container:today"
-  | "container:inbox"
-  | "container:plan"
-  | "container:projects"
-  | "container:plan:overdue"
-  | "container:plan:inRange:next"
-  | "container:plan:inRange:waiting"
-  | "container:plan:inRange:someday";
+export type ScopeIdType = "scope:inbox" | "scope:projects";
 
-export type TaskWithOrderKey = Task & {
-  order_key: number;
+export type TaskWithOrderKey = {
+  task: Task;
+  order_key: number | null;
 };
-
-export type DataReturnType = {
-  data: TaskWithOrderKey[];
-  total: number;
-};
-
 export type RejectWithValue = {
   message: string | null;
 };

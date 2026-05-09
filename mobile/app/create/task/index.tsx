@@ -32,7 +32,7 @@ const CreateTaskFormSheet = () => {
   const locales = useLocales();
   const calendars = useCalendars();
 
-  const loading = useAppSelector((state) => state.tasks.loading);
+  const loading = useAppSelector((state) => state.newTask.loading);
   const title = useAppSelector((state) => state.newTask.inputs.title);
   const description = useAppSelector(
     (state) => state.newTask.inputs.description,

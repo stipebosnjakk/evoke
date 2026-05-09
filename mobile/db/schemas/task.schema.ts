@@ -1,7 +1,6 @@
 import * as t from "drizzle-orm/sqlite-core";
 import { createId } from "@paralleldrive/cuid2";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
-
 import { TaskStatus, IsoDate, Weekday } from "@/types/task.types";
 
 export const tasks = t.sqliteTable("tasks", {
@@ -16,11 +15,16 @@ export const tasks = t.sqliteTable("tasks", {
     .notNull()
     .$defaultFn(() => Date.now()),
   updated_at: t.integer("updated_at"),
-  completed_at: t.integer("completed_at"),
+  is_completed: t
+    .integer("is_completed", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  completed_at_utc: t.integer("completed_at_utc"),
   is_deleted: t
     .integer("is_deleted", { mode: "boolean" })
     .notNull()
     .default(false),
+  deleted_at_utc: t.integer("deleted_at_utc"),
   status: t.text("status").$type<TaskStatus>(),
   project_id: t.text("project_id"),
   section_id: t.text("section_id"),

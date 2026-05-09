@@ -6,11 +6,11 @@ import { throwDbError } from "@/utils/handleErrorMessage";
 
 export const rebalanceOrderKeys = async (
   orderArray: OrderTaskItem[],
-  containerId: string,
+  scopeId: string,
 ) => {
   try {
-    if (!containerId) {
-      throw new Error("Container ID cannot be empty");
+    if (!scopeId) {
+      throw new Error("Scope ID cannot be empty");
     }
 
     if (orderArray.length === 0) {
@@ -25,7 +25,7 @@ export const rebalanceOrderKeys = async (
           .where(
             and(
               eq(list_order.task_id, item.id),
-              eq(list_order.container_id, containerId),
+              eq(list_order.scope_id, scopeId),
             ),
           );
       }
@@ -36,32 +36,34 @@ export const rebalanceOrderKeys = async (
 };
 
 export const updateTaskOrderKey = async (
-  taskId: string,
-  containerId: string,
-  newOrderKey: number,
+  newOrder: OrderTaskItem,
+  scopeId: string,
 ) => {
   try {
-    if (!taskId) {
+    const { id, order_key } = newOrder;
+
+    if (!id) {
       throw new Error("Task ID cannot be empty");
     }
 
-    if (!containerId) {
-      throw new Error("Container ID cannot be empty");
+    if (!scopeId) {
+      throw new Error("Scope ID cannot be empty");
     }
 
-    if (!Number.isFinite(newOrderKey)) {
-      throw new Error("New order key must be a valid number");
+    if (!Number.isFinite(order_key)) {
+      throw new Error(`New order key:${order_key} must be a valid number`);
     }
 
-    await db
+    const result = await db
       .update(list_order)
-      .set({ order_key: newOrderKey })
-      .where(
-        and(
-          eq(list_order.task_id, taskId),
-          eq(list_order.container_id, containerId),
-        ),
+      .set({ order_key })
+      .where(and(eq(list_order.task_id, id), eq(list_order.scope_id, scopeId)));
+
+    if (!result) {
+      throw new Error(
+        `Failed to update order key for task "${id}" in scope "${scopeId}"`,
       );
+    }
   } catch (error: unknown) {
     return throwDbError(error, "Failed to update task order key");
   }

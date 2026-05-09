@@ -8,109 +8,92 @@ import DraggableFlatList, {
 import {
   rebalanceOrderKeysAction,
   updateTaskOrderKeyAction,
-} from "@/store/tasks/thunks/reorder.thunks";
+} from "@/store/tasks/thunks/update.thunks";
 import {
   calculateNewOrderKey,
   checkForRebalance,
   handleRebalance,
 } from "@/utils/rebalance";
 import { TaskWithOrderKey } from "@/types/task.types";
-import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { getInboxTasksAction } from "@/store/tasks/thunks/fetch.thunks";
-import { INBOX_CONTAINER_ID } from "@/constants/containerIds";
-import DraggableTask, { type RenderTaskItem } from "./DraggableTask";
+import { useAppDispatch } from "@/hooks/storeHooks";
+import DraggableTask, { type RenderDraggableTask } from "./DraggableTask";
+import { Status } from "@/types/initialState.types";
+import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
 type DraggableTaskListProps = {
   data: TaskWithOrderKey[];
-  setData: (next: TaskWithOrderKey[]) => void;
-  loading: boolean;
-  limit: number;
+  status: Status;
 };
 
 const ORDER_KEY_GAP = 1000;
 
-const DraggableTaskList = ({
-  data,
-  setData,
-  loading,
-  limit,
-}: DraggableTaskListProps) => {
+const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
   const dispatch = useAppDispatch();
 
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
   const headerFadeExtra = 12;
 
-  // TODO: make univerzal for all lists
-  const hasMore = useAppSelector((state) => state.tasks.lists.inbox.hasMore);
-  const offset = useAppSelector((state) => state.tasks.lists.inbox.offset);
-
-  const renderItem = useCallback(({ item, drag }: RenderTaskItem) => {
+  const renderItem = useCallback(({ item, drag }: RenderDraggableTask) => {
     return <DraggableTask item={item} drag={drag} />;
   }, []);
 
-  const loadMore = () => {
-    if (loading || !hasMore) return;
-    dispatch(getInboxTasksAction({ limit, offset }));
-  };
-
   const ListFooterComponent = (
     <View style={{ height: 16 + insets.bottom }}>
-      {loading ? <ActivityIndicator size="small" /> : null}
+      {status === "loading" ? <ActivityIndicator size="small" /> : null}
     </View>
   );
 
   const handleOnDragEnd = ({
-    data: newData,
+    data,
     from,
     to,
   }: DragEndParams<TaskWithOrderKey>) => {
     if (from === to) return;
 
-    const moved = newData[to];
-    const top = newData[to - 1] || null;
-    const bottom = newData[to + 1] || null;
+    const moved = data[to];
+    const top = data[to - 1] || null;
+    const bottom = data[to + 1] || null;
+
+    console.log("MOVED: ", moved)
+    console.log("TOP: ", top)
+    console.log("BOTTOM: ", bottom)
 
     if (!moved) return;
 
     if (checkForRebalance(top, bottom)) {
       const { newTopOrderKey, newBottomOrderKey } = handleRebalance(
-        newData,
+        data,
         to,
         ORDER_KEY_GAP,
       );
 
       const movedKey = (newTopOrderKey + newBottomOrderKey) / 2;
 
-      newData[to - 1].order_key = newTopOrderKey;
-      newData[to].order_key = movedKey;
-      newData[to + 1].order_key = newBottomOrderKey;
-
-      setData([...newData]);
-
       dispatch(
         rebalanceOrderKeysAction({
           orderArray: [
-            { id: top.id, order_key: newTopOrderKey },
-            { id: moved.id, order_key: movedKey },
-            { id: bottom.id, order_key: newBottomOrderKey },
+            { id: top.task.id, order_key: newTopOrderKey },
+            { id: moved.task.id, order_key: movedKey },
+            { id: bottom.task.id, order_key: newBottomOrderKey },
           ],
-          containerId: INBOX_CONTAINER_ID,
+          scopeId: INBOX_SCOPE_ID,
         }),
       );
 
       return;
     }
 
-    setData([...newData]);
-
     const newOrderKey = calculateNewOrderKey(top, bottom, moved, ORDER_KEY_GAP);
+    const newOrder = {
+      id: moved.task.id,
+      order_key: newOrderKey,
+    };
 
     dispatch(
       updateTaskOrderKeyAction({
-        taskId: moved.id,
-        containerId: INBOX_CONTAINER_ID,
-        newOrderKey,
+        newOrder,
+        scopeId: INBOX_SCOPE_ID,
       }),
     );
   };
@@ -118,13 +101,12 @@ const DraggableTaskList = ({
   return (
     <DraggableFlatList
       data={data}
-      keyExtractor={(task) => task.id}
+      keyExtractor={({ task }) => task.id}
       activationDistance={12}
       contentContainerStyle={[
         styles.inboxTaskListContentContainer,
         { paddingTop: headerH + headerFadeExtra },
       ]}
-      onEndReached={loadMore}
       onEndReachedThreshold={0.2}
       showsVerticalScrollIndicator={false}
       ListFooterComponent={ListFooterComponent}

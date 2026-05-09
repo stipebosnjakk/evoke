@@ -2,56 +2,38 @@ import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 import { TasksState } from "@/types/initialState.types";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
-import { isInboxTask, isTodayTask, isPlanTask } from "@/utils/taskPlacement";
 
 export const addCreationExtraReducers = (
   builder: ActionReducerMapBuilder<TasksState>,
 ) => {
   builder
     .addCase(createTaskAction.pending, (state, _) => {
-      state.loading = true;
+      state.status = "loading";
       state.error = null;
     })
     .addCase(createTaskAction.rejected, (state, action) => {
-      state.loading = false;
+      state.status = "failed";
       state.error = action.payload?.message || "Failed to create task";
     })
     .addCase(createTaskAction.fulfilled, (state, action) => {
-      state.loading = false;
+      state.status = "succeeded";
       state.error = null;
 
-      const { task } = action.payload;
+      const { task, order_key } = action.payload;
 
-      if (!task || !task.id) {
+      if (!task) {
         state.error = "Failed to create task";
         return;
       }
 
+      if (!state.tasks.ids.includes(task.id)) {
+        state.tasks.ids.push(task.id);
+      }
+
+      if (order_key !== null) {
+        state.taskOrder.inbox[task.id] = order_key;
+      }
+
       state.tasks.byId[task.id] = task;
-
-      if (isInboxTask(task)) {
-        const exists = state.lists.inbox.ids.some((x) => x.id === task.id);
-        if (!exists) {
-          state.lists.inbox.ids.unshift({
-            id: task.id,
-            order_key: task.order_key,
-          });
-        }
-      }
-
-      if (isTodayTask(task)) {
-        const exists = state.lists.today.ids.some((x) => x.id === task.id);
-        if (!exists) {
-          state.lists.today.ids.unshift({
-            id: task.id,
-            order_key: task.order_key,
-          });
-        }
-      }
-
-      if (isPlanTask(task)) {
-        // TODO: Check functionality for in range and overdue tasks
-        // I think we should have maybe each range ids (next, week, month,.. - ids)
-      }
     });
 };

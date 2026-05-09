@@ -6,7 +6,6 @@ import { PortalHost } from "@rn-primitives/portal";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
-
 import "@/global.css";
 import { toastConfig } from "@/components/ui/ToastConfig";
 import { store } from "@/store/store";
@@ -14,6 +13,7 @@ import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
 import ScreenContainer from "@/components/custom/ScreenContainer";
 import { createSheetRoutes } from "@/constants/routes";
+import { useLoadInitialTasks } from "@/hooks/useLoadInitialTasks";
 
 const createSheetOptions = {
   presentation: "formSheet",
@@ -23,7 +23,7 @@ const createSheetOptions = {
   contentStyle: { backgroundColor: "white" },
 } as const;
 
-const RootLayout = () => {
+const RootLayoutContent = () => {
   const { success, error: migrationError } = useMigrations(db, migrations);
 
   useEffect(() => {
@@ -46,22 +46,34 @@ const RootLayout = () => {
     );
   }
 
+  return <AppNavigator />;
+};
+
+const AppNavigator = () => {
+  useLoadInitialTasks();
+
   return (
-    <Provider store={store}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          {createSheetRoutes.map((item) => (
-            <Stack.Screen
-              key={item.route}
-              name={item.route}
-              options={createSheetOptions}
-            />
-          ))}
-        </Stack>
-      </GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        {createSheetRoutes.map((item) => (
+          <Stack.Screen
+            key={item.route}
+            name={item.route}
+            options={createSheetOptions}
+          />
+        ))}
+      </Stack>
       <Toast config={toastConfig} />
       <PortalHost />
+    </GestureHandlerRootView>
+  );
+};
+
+const RootLayout = () => {
+  return (
+    <Provider store={store}>
+      <RootLayoutContent />
     </Provider>
   );
 };
