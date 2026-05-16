@@ -42,7 +42,7 @@ const TabLayout = () => {
             }}
           />
           <Tabs.Screen
-            name={routes.plan.route}
+            name={routes.upcoming.route}
             options={{
               tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView

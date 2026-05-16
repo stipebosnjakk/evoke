@@ -11,7 +11,7 @@ import { useRouter, useSegments } from "expo-router";
 import { routes, TITLE_BY_ROUTE } from "@/constants/routes";
 import {
   INBOX_SCOPE_ID,
-  PLAN_SCOPE_ID,
+  UPCOMING_SCOPE_ID,
   PROJECTS_SCOPE_ID,
   TODAY_SCOPE_ID,
 } from "@/constants/scopeIds";
@@ -51,7 +51,7 @@ const Header = () => {
 
   const getScopeBySegments = (): ScopeScreenId => {
     if (active === "index") return TODAY_SCOPE_ID;
-    if (active === "plan") return PLAN_SCOPE_ID;
+    if (active === "upcoming") return UPCOMING_SCOPE_ID;
     if (active === "inbox") return INBOX_SCOPE_ID;
     if (active === "project") return PROJECTS_SCOPE_ID;
     return TODAY_SCOPE_ID;

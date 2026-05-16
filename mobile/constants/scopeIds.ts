@@ -6,6 +6,6 @@ export const TODAY_SCOPE_DUE_TODAY_ID = "scope:today:due_today";
 export const TODAY_SCOPE_READY_ID = "scope:today:ready";
 export const TODAY_SCOPE_COMPLETED_ID = "scope:today:completed";
 
-export const PLAN_SCOPE_ID = "scope:plan";
+export const UPCOMING_SCOPE_ID = "scope:upcoming";
 
 export const PROJECTS_SCOPE_ID = "scope:projects";

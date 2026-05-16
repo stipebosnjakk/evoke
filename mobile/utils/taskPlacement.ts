@@ -3,7 +3,7 @@ import { NewTask, Task } from "@/db";
 import { getRepeatWeekdayIndex, toIsoDate } from "@/utils/date";
 import { addDays, getUnixTime, startOfToday } from "date-fns";
 
-type TaskScreen = "inbox" | "today" | "plan" | "none";
+type TaskScreen = "inbox" | "today" | "upcoming" | "none";
 
 /**
  * Checks if a task is active (not completed and not deleted).
@@ -14,35 +14,20 @@ const isActiveTask = (task: NewTask | Task): boolean =>
   !task.is_completed && !task.is_deleted;
 
 /**
- * Checks if a task has a destination (section, project, or area).
- * @param task
- * @returns
- */
-const hasDestination = (task: NewTask | Task): boolean =>
-  Boolean(task.section_id || task.project_id || task.area_id);
-
-/**
- * Checks if a task is planned (has a destination or scheduling information).
+ * Checks if a task is planned.
  * @param task
  * @returns
  */
 const isPlanned = (task: NewTask | Task): boolean =>
-  hasDestination(task) ||
-  Boolean(task.status) ||
-  Boolean(task.start_date) ||
-  Boolean(task.deadline);
+  Boolean(task.status) || Boolean(task.start_date) || Boolean(task.deadline);
 
 /**
- * Checks if a task is in the inbox (active, has no destination, and no scheduling information).
+ * Checks if a task is in the inbox (active, and no scheduling information).
  * @param task
  * @returns
  */
 export const isInboxTask = (task: NewTask | Task): boolean =>
-  isActiveTask(task) &&
-  !hasDestination(task) &&
-  !task.start_date &&
-  !task.deadline &&
-  !task.status;
+  isActiveTask(task) && !task.start_date && !task.deadline && !task.status;
 
 /**
  * Checks if a task is ready for today.
@@ -68,11 +53,11 @@ export const isTodayTask = (
 };
 
 /**
- * Checks if a task is in the plan (active, not in inbox, and planned).
+ * Checks if a task is in the Upcoming (active, not in inbox, and planned).
  * @param task
  * @returns
  */
-export const isPlanTask = (task: NewTask | Task): boolean =>
+export const isUpcomingTask = (task: NewTask | Task): boolean =>
   isActiveTask(task) && !isInboxTask(task) && isPlanned(task);
 
 /**
@@ -83,7 +68,7 @@ export const isPlanTask = (task: NewTask | Task): boolean =>
 export const getTaskPlacement = (task: NewTask): TaskScreen => {
   if (isInboxTask(task)) return "inbox";
   if (isTodayTask(task)) return "today";
-  if (isPlanTask(task)) return "plan";
+  if (isUpcomingTask(task)) return "upcoming";
   return "none";
 };
 
@@ -119,8 +104,8 @@ export const getTaskScreenText = (screen: TaskScreen): string => {
       return "Captured in Inbox";
     case "today":
       return "Ready for Today";
-    case "plan":
-      return "Added to Plan";
+    case "upcoming":
+      return "Added to Upcoming";
     case "none":
       return "Task created";
     default:
@@ -139,8 +124,8 @@ export const getTaskScreenHref = (screen: TaskScreen): string => {
       return routes.inbox.href;
     case "today":
       return routes.today.href;
-    case "plan":
-      return routes.plan.href;
+    case "upcoming":
+      return routes.upcoming.href;
     case "none":
       return routes.inbox.href;
     default:

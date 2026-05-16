@@ -1,6 +1,6 @@
 export const TITLE_BY_ROUTE: Record<string, string> = {
   index: "Today",
-  plan: "Plan",
+  upcoming: "Upcoming",
   inbox: "Inbox",
   projects: "Projects",
 };
@@ -11,10 +11,10 @@ export const routes = {
     href: "/",
     route: "index",
   },
-  plan: {
-    title: "Plan",
-    href: "/plan",
-    route: "plan",
+  upcoming: {
+    title: "Upcoming",
+    href: "/upcoming",
+    route: "upcoming",
   },
   inbox: {
     title: "Inbox",

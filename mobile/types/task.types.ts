@@ -32,7 +32,7 @@ export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ScopeScreenId =
   | "scope:today"
-  | "scope:plan"
+  | "scope:upcoming"
   | "scope:projects"
   | "scope:inbox";
 

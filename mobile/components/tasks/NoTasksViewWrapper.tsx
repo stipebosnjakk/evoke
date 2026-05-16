@@ -16,8 +16,8 @@ const NoTasksViewWrapper = ({ title, subtitle }: NoTasksViewWrapperType) => {
     router.push(routes.create_task.href);
   };
 
-  const navigateToPlan = () => {
-    router.push(routes.plan.href);
+  const navigateToUpcoming = () => {
+    router.push(routes.upcoming.href);
   };
 
   return (
@@ -35,10 +35,10 @@ const NoTasksViewWrapper = ({ title, subtitle }: NoTasksViewWrapperType) => {
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.85}
-            onPress={navigateToPlan}
+            onPress={navigateToUpcoming}
             style={styles.secondaryButton}
           >
-            <Text style={styles.secondaryButtonText}>Go to Plan</Text>
+            <Text style={styles.secondaryButtonText}>Go to Upcoming</Text>
           </TouchableOpacity>
         </View>
       </View>

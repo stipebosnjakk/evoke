@@ -1,6 +1,6 @@
 import {
   INBOX_SCOPE_ID,
-  PLAN_SCOPE_ID,
+  UPCOMING_SCOPE_ID,
   PROJECTS_SCOPE_ID,
   TODAY_SCOPE_ID,
   TODAY_SCOPE_COMPLETED_ID,
@@ -40,7 +40,7 @@ export const defaultUserConfig: UserConfig = {
         },
       ],
     },
-    [PLAN_SCOPE_ID]: {
+    [UPCOMING_SCOPE_ID]: {
       view: "group",
       group_order: [],
     },

@@ -2,12 +2,12 @@ import { Text } from "react-native";
 
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 
-const PlanScreen = () => {
+const UpcomingScreen = () => {
   return (
     <ScreenWrapper>
-      <Text>Plan</Text>
+      <Text>Upcoming</Text>
     </ScreenWrapper>
   );
 };
 
-export default PlanScreen;
+export default UpcomingScreen;
