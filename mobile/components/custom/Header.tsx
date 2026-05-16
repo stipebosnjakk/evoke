@@ -64,7 +64,7 @@ const Header = () => {
   const toggleView = () => {
     if (!view) return;
     const nextView = view === "group" ? "list" : "group";
-    dispatch(updateScreenViewAction({ screenId: scope, view: nextView }));
+    dispatch(updateScreenViewAction({ scopeId: scope, view: nextView }));
   };
 
   return (

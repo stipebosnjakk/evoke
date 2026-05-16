@@ -64,7 +64,7 @@ const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
       order_key: data.length - index,
     }));
 
-    dispatch(updateGroupOrderAction({ screenId: scopeId, groupConfig }));
+    dispatch(updateGroupOrderAction({ scopeId, groupConfig }));
   };
 
   const handleOnDragStart = useCallback((drag: () => void) => {
@@ -78,7 +78,7 @@ const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
     ({ item, drag }: RenderDraggableGroup) => {
       return (
         <GroupView
-          screenId={scopeId}
+          scopeId={scopeId}
           group={item}
           onDragStart={() => handleOnDragStart(drag)}
           isDraggingGroup={isDraggingGroup}

@@ -19,8 +19,8 @@ export const updateGroupOrderAction =
   (payload: UpdateGroupOrderPayload) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
     try {
-      const { screenId, groupConfig } = payload;
-      dispatch(updateGroupOrder({ screenId, groupConfig }));
+      const { scopeId, groupConfig } = payload;
+      dispatch(updateGroupOrder({ scopeId, groupConfig }));
 
       const config = getState().user.config;
       await storeData(USER_CONFIG, JSON.stringify(config));
@@ -34,8 +34,8 @@ export const updateIsOpenGroupAction =
   (payload: UpdateIsOpenGroupType) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
     try {
-      const { screenId, groupId, isOpen } = payload;
-      dispatch(updateIsOpenGroup({ screenId, groupId, isOpen }));
+      const { scopeId, groupId, isOpen } = payload;
+      dispatch(updateIsOpenGroup({ scopeId, groupId, isOpen }));
 
       const config = getState().user.config;
       await storeData(USER_CONFIG, JSON.stringify(config));
@@ -49,8 +49,8 @@ export const updateScreenViewAction =
   (payload: UpdateScreenViewType) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
     try {
-      const { screenId, view } = payload;
-      dispatch(updateScreenView({ screenId, view }));
+      const { scopeId, view } = payload;
+      dispatch(updateScreenView({ scopeId, view }));
 
       const config = getState().user.config;
       await storeData(USER_CONFIG, JSON.stringify(config));

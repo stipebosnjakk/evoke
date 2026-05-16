@@ -15,6 +15,7 @@ import {
   formatTimeFromMin,
   getDateLabel,
   getDurationFromDurationMin,
+  toIsoDate,
 } from "@/utils/date";
 import Toast from "react-native-toast-message";
 
@@ -200,18 +201,34 @@ const Task = ({ task }: TaskGroupType) => {
       </View>
       {showMeta && (
         <View style={styles.taskMeta}>
-          {meta.map((item) => (
-            <View key={item.id} style={styles.taskMetaItem}>
-              <SymbolView
-                name={item.icon as any}
-                size={12}
-                tintColor="#77776F"
-              />
-              {item.label && (
-                <Text style={styles.taskMetaText}>{item.label}</Text>
-              )}
-            </View>
-          ))}
+          {meta.map((item) => {
+            const isOverdue =
+              task.deadline && task.deadline < toIsoDate(startOfToday());
+            const color =
+              isOverdue && item.id === "deadline" ? "#B42318" : "#77776F";
+
+            return (
+              <View key={item.id} style={styles.taskMetaItem}>
+                <SymbolView
+                  name={item.icon as any}
+                  size={12}
+                  tintColor={color}
+                />
+                {item.label && (
+                  <Text
+                    style={[
+                      styles.taskMetaText,
+                      {
+                        color,
+                      },
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                )}
+              </View>
+            );
+          })}
         </View>
       )}
     </View>
@@ -287,7 +304,7 @@ const styles = StyleSheet.create({
   taskMetaText: {
     fontSize: 12,
     lineHeight: 16,
-    color: "#77776F",
+    color: "#B42318",
     fontWeight: "500",
   },
 });

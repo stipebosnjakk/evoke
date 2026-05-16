@@ -34,7 +34,7 @@ export const clearUserConfigErrorReducer = (state: UserState) => {
 };
 
 export type UpdateGroupOrderPayload = {
-  screenId: ScopeScreenId;
+  scopeId: ScopeScreenId;
   groupConfig: GroupConfig[];
 };
 
@@ -42,17 +42,17 @@ export const updateGroupOrderReducer = (
   state: UserState,
   action: PayloadAction<UpdateGroupOrderPayload>,
 ) => {
-  const { screenId, groupConfig } = action.payload;
-  if (!screenId || !groupConfig) return;
+  const { scopeId, groupConfig } = action.payload;
+  if (!scopeId || !groupConfig) return;
 
-  const screen = state.config?.screens[screenId];
+  const screen = state.config?.screens[scopeId];
   if (!screen) return;
 
   screen.group_order = groupConfig;
 };
 
 export type UpdateIsOpenGroupType = {
-  screenId: ScopeScreenId;
+  scopeId: ScopeScreenId;
   groupId: ScopeGroupId;
   isOpen: boolean;
 };
@@ -61,11 +61,11 @@ export const updateIsOpenGroupReducer = (
   state: UserState,
   action: PayloadAction<UpdateIsOpenGroupType>,
 ) => {
-  const { screenId, groupId, isOpen } = action.payload;
+  const { scopeId, groupId, isOpen } = action.payload;
 
-  if (!screenId || !groupId || isOpen === undefined) return;
+  if (!scopeId || !groupId || isOpen === undefined) return;
 
-  const screen = state.config?.screens[screenId];
+  const screen = state.config?.screens[scopeId];
   if (!screen) return;
 
   const group = screen.group_order.find((group) => group.id === groupId);
@@ -75,7 +75,7 @@ export const updateIsOpenGroupReducer = (
 };
 
 export type UpdateScreenViewType = {
-  screenId: ScopeScreenId;
+  scopeId: ScopeScreenId;
   view: ViewType;
 };
 
@@ -83,11 +83,11 @@ export const updateScreenViewReducer = (
   state: UserState,
   action: PayloadAction<UpdateScreenViewType>,
 ) => {
-  const { screenId, view } = action.payload;
+  const { scopeId, view } = action.payload;
 
-  if (!screenId || !view) return;
+  if (!scopeId || !view) return;
 
-  const screen = state.config?.screens[screenId];
+  const screen = state.config?.screens[scopeId];
 
   if (!screen) return;
 

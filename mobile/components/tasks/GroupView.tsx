@@ -33,7 +33,7 @@ export type GroupType = {
 };
 
 type GroupViewType = {
-  screenId: ScopeScreenId;
+  scopeId: ScopeScreenId;
   group: GroupType;
   isDraggingGroup: boolean;
   onDragStart: () => void;
@@ -45,7 +45,7 @@ const exiting = FadeOut.duration(90);
 const layout = LinearTransition.duration(240).easing(Easing.out(Easing.cubic));
 
 const GroupView = ({
-  screenId,
+  scopeId,
   group,
   onDragStart,
   isDraggingGroup,
@@ -61,7 +61,7 @@ const GroupView = ({
   const toggleIsOpen = () => {
     dispatch(
       updateIsOpenGroupAction({
-        screenId,
+        scopeId,
         groupId: group.id,
         isOpen: !group.isOpen,
       }),
@@ -71,7 +71,7 @@ const GroupView = ({
   const navigateToGroupView = () => {
     router.push({
       pathname: "/tasks/group/[groupId]",
-      params: { scopeId: screenId, groupId: group.id },
+      params: { scopeId, groupId: group.id },
     });
   };
 
