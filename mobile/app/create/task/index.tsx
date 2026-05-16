@@ -129,6 +129,13 @@ const CreateTaskFormSheet = () => {
           >
             <View style={styles.row}>
               <Chip
+                icon={status ? status.icon : "tag"}
+                label={status ? status.label : "Status"}
+                onPress={() => {
+                  router.push(routes.create_task_status.href);
+                }}
+              />
+              <Chip
                 icon="calendar"
                 label={
                   startDate
@@ -148,13 +155,6 @@ const CreateTaskFormSheet = () => {
                 label={deadline ? getDateLabel(deadline) : "Deadline"}
                 onPress={() => {
                   router.push(routes.create_task_deadline.href);
-                }}
-              />
-              <Chip
-                icon={status ? status.icon : "tag"}
-                label={status ? status.label : "Status"}
-                onPress={() => {
-                  router.push(routes.create_task_status.href);
                 }}
               />
               <Chip
