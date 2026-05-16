@@ -11,6 +11,7 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskStatus } from "@/utils/validateTask";
 import SheetHeader from "@/components/custom/SheetHeader";
+import Info from "@/components/ui/Info";
 
 const StatusFormSheet = () => {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const StatusFormSheet = () => {
     <SheetWrapper>
       <SheetHeader title="Status" onClose={() => router.back()} />
       <View style={styles.wrapper}>
-        <View style={styles.card}>
+        <View>
           {STATUS_OPTIONS.map((item, index) => {
             const isSelected = statusValue === item.value;
             const isLast = index === STATUS_OPTIONS.length - 1;
@@ -91,6 +92,7 @@ const StatusFormSheet = () => {
             );
           })}
         </View>
+        <Info text="A task must have Next status to appear in Today." />
       </View>
     </SheetWrapper>
   );
@@ -99,11 +101,6 @@ const StatusFormSheet = () => {
 const styles = StyleSheet.create({
   wrapper: {
     padding: 20,
-  },
-  card: {
-    backgroundColor: "rgb(240, 240, 240)",
-    borderRadius: 20,
-    overflow: "hidden",
   },
   optionsButton: {
     flexDirection: "row",
