@@ -2,9 +2,14 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
 import { routes } from "@/constants/routes";
-import ScreenContainer from "@/components/custom/ScreenContainer";
+import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 
-export const NoInboxTasksView = () => {
+type NoTasksViewWrapperType = {
+  title: string;
+  subtitle?: string;
+};
+
+const NoTasksViewWrapper = ({ title, subtitle }: NoTasksViewWrapperType) => {
   const router = useRouter();
 
   const navigateToCreateModal = () => {
@@ -16,13 +21,10 @@ export const NoInboxTasksView = () => {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenWrapper>
       <View style={styles.emptyContainer}>
-        <Text style={styles.titleText}>Your inbox is clear</Text>
-        <Text style={styles.subtitleText}>
-          Inbox holds unprocessed tasks.{"\n"}Capture tasks here and organize
-          {"\n"}them later.
-        </Text>
+        <Text style={styles.titleText}>{title}</Text>
+        <Text style={styles.subtitleText}>{subtitle}</Text>
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             activeOpacity={0.85}
@@ -40,7 +42,7 @@ export const NoInboxTasksView = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </ScreenContainer>
+    </ScreenWrapper>
   );
 };
 
@@ -98,3 +100,5 @@ const styles = StyleSheet.create({
     color: "#0F172A",
   },
 });
+
+export default NoTasksViewWrapper;

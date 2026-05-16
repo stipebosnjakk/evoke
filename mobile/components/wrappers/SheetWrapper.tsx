@@ -1,17 +1,17 @@
 import { StyleProp, ViewStyle, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
-import ScreenContainer from "./ScreenContainer";
+import ScreenWrapper from "./ScreenWrapper";
 import { toastConfig } from "@/components/ui/ToastConfig";
 
-type FormSheetWrapperProps = {
+type SheetWrapperProps = {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
-const FormSheetWrapper = ({ children, style }: FormSheetWrapperProps) => {
+const SheetWrapper = ({ children, style }: SheetWrapperProps) => {
   return (
-    <ScreenContainer style={[styles.container, style]}>
+    <ScreenWrapper style={[styles.container, style]}>
       {children}
       <Toast
         position="bottom"
@@ -20,15 +20,16 @@ const FormSheetWrapper = ({ children, style }: FormSheetWrapperProps) => {
         avoidKeyboard={false}
         config={toastConfig}
       />
-    </ScreenContainer>
+    </ScreenWrapper>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 0,
+    padding: 0,
     paddingTop: 20,
   },
 });
 
-export default FormSheetWrapper;
+export default SheetWrapper;

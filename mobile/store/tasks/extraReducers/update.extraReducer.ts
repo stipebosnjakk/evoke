@@ -2,7 +2,9 @@ import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 import { TasksState } from "@/types/initialState.types";
 import {
+  completeTaskAction,
   rebalanceOrderKeysAction,
+  restoreCompletedTaskAction,
   updateTaskOrderKeyAction,
 } from "@/store/tasks/thunks/update.thunks";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
@@ -40,5 +42,35 @@ export const addReorderExtraReducers = (
     })
     .addCase(rebalanceOrderKeysAction.fulfilled, (state, action) => {
       state.error = null;
+    })
+    .addCase(completeTaskAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to complete task";
+    })
+    .addCase(completeTaskAction.fulfilled, (state, action) => {
+      const task = action.payload.task;
+
+      state.status = "succeeded";
+      state.error = null;
+      state.tasks.byId[task.id] = task;
+
+      if (!state.tasks.ids.includes(task.id)) {
+        state.tasks.ids.push(task.id);
+      }
+    })
+    .addCase(restoreCompletedTaskAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to restore task";
+    })
+    .addCase(restoreCompletedTaskAction.fulfilled, (state, action) => {
+      const task = action.payload.task;
+
+      state.status = "succeeded";
+      state.error = null;
+      state.tasks.byId[task.id] = task;
+
+      if (!state.tasks.ids.includes(task.id)) {
+        state.tasks.ids.push(task.id);
+      }
     });
 };

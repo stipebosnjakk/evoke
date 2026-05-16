@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { useDispatch } from "react-redux";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
@@ -8,13 +8,13 @@ import Toast from "react-native-toast-message";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { IsoDate } from "@/types/task.types";
 import { minDate } from "@/utils/date";
-import Button from "@/components/ui/Button";
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
 import { setDeadline } from "@/store/tasks/slices/newTask.slice";
 import Shortcuts from "@/components/features/Shortcuts";
-import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskDeadline } from "@/utils/validateTask";
+import SheetHeader from "@/components/custom/SheetHeader";
 
 const DeadlineFormSheet = () => {
   const router = useRouter();
@@ -77,35 +77,14 @@ const DeadlineFormSheet = () => {
   };
 
   return (
-    <FormSheetWrapper>
-      <View style={styles.headerContainer}>
-        <Button iconOnly onPress={handleGoBack}>
-          <SymbolView
-            name="xmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-        <Text style={styles.title}>Deadline</Text>
-        <Button
-          style={{
-            opacity: isDateInputOpen ? 0 : selected ? 1 : 0.5,
-          }}
-          disabled={isDateInputOpen || !selected}
-          iconOnly
-          onPress={handleSubmitDeadline}
-        >
-          <SymbolView
-            name="checkmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-      </View>
+    <SheetWrapper>
+      <SheetHeader
+        title="Deadline"
+        onSubmit={handleSubmitDeadline}
+        onClose={handleGoBack}
+        submitButtonVisible={true}
+        submitDisabled={isDateInputOpen || !selected}
+      />
       <DateInput
         type="deadline"
         inputRef={inputRef}
@@ -131,7 +110,7 @@ const DeadlineFormSheet = () => {
           </View>
           {deadlineValue && (
             <View style={styles.buttonsContainer}>
-              <Button style={styles.button} onPress={handleNoDeadline}>
+              <TouchableOpacity style={styles.button} onPress={handleNoDeadline}>
                 <SymbolView
                   name="minus.circle"
                   weight="medium"
@@ -140,28 +119,16 @@ const DeadlineFormSheet = () => {
                   tintColor="rgb(67, 67, 67)"
                 />
                 <Text style={styles.buttonText}>No Deadline</Text>
-              </Button>
+              </TouchableOpacity>
             </View>
           )}
         </>
       )}
-    </FormSheetWrapper>
+    </SheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-  },
   button: {
     flexDirection: "row",
     alignItems: "center",

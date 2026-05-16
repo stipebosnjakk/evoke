@@ -1,8 +1,65 @@
 import { eq, and } from "drizzle-orm";
 
-import { db, list_order } from "@/db";
+import { db, list_order, tasks } from "@/db";
 import { OrderTaskItem } from "@/types/task.types";
-import { throwDbError } from "@/utils/handleErrorMessage";
+import { throwDbError } from "@/utils/error";
+import { getUnixTime } from "date-fns";
+
+export const restoreCompletedTask = async (taskId: string) => {
+  try {
+    const now = getUnixTime(new Date());
+
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    const [task] = await db
+      .update(tasks)
+      .set({
+        is_completed: false,
+        completed_at_utc: null,
+        updated_at: now,
+      })
+      .where(eq(tasks.id, taskId))
+      .returning();
+
+    if (!task) {
+      throw new Error(`Failed to restore task "${taskId}""`);
+    }
+
+    return task;
+  } catch (error) {
+    return throwDbError(error, "Failed to restore task");
+  }
+};
+
+export const completeTask = async (taskId: string) => {
+  try {
+    const now = getUnixTime(new Date());
+
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    const [task] = await db
+      .update(tasks)
+      .set({
+        is_completed: true,
+        completed_at_utc: now,
+        updated_at: now,
+      })
+      .where(eq(tasks.id, taskId))
+      .returning();
+
+    if (!task) {
+      throw new Error(`Failed to complete task "${taskId}""`);
+    }
+
+    return task;
+  } catch (error) {
+    return throwDbError(error, "Failed to complete task");
+  }
+};
 
 export const rebalanceOrderKeys = async (
   orderArray: OrderTaskItem[],
@@ -43,11 +100,11 @@ export const updateTaskOrderKey = async (
     const { id, order_key } = newOrder;
 
     if (!id) {
-      throw new Error("Task ID cannot be empty");
+      throw new Error("Task ID is required");
     }
 
     if (!scopeId) {
-      throw new Error("Scope ID cannot be empty");
+      throw new Error("Scope ID is required");
     }
 
     if (!Number.isFinite(order_key)) {

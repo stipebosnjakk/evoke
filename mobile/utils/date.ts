@@ -13,6 +13,7 @@ import {
   isSameYear,
   addWeeks,
   startOfWeek,
+  getISODay,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 
@@ -197,7 +198,13 @@ export const formatTimeFromMin = (
  * @param durationMin
  * @returns
  */
-export const getDurationFromDurationMin = (durationMin: number | null) => {
+export const getDurationFromDurationMin = (
+  durationMin: number | null,
+): {
+  totalMinutes: number;
+  hours: number;
+  minutes: number;
+} | null => {
   if (durationMin === null) return null;
 
   return {
@@ -239,4 +246,8 @@ export const getRepeatLabel = (repeat: Weekday[] | null | undefined) => {
   }
 
   return days.map(formatRepeatWeekday).join(", ");
+};
+
+export const getRepeatWeekdayIndex = (date: Date): Weekday => {
+  return ((getISODay(date) + 6) % 7) as Weekday;
 };

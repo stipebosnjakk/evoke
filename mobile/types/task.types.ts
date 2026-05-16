@@ -11,8 +11,6 @@ export type TaskStatus = "next" | "waiting" | "someday";
 // TODO: check this type
 export type TaskStatusOption = (typeof STATUS_OPTIONS)[number];
 
-export type ScopeIdType = "scope:inbox" | "scope:projects";
-
 export type TaskWithOrderKey = {
   task: Task;
   order_key: number | null;
@@ -31,3 +29,17 @@ export type IsoDate = `${number}-${number}-${number}`;
 export type DateValueType = "start_date" | "deadline";
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export type ScopeScreenId =
+  | "scope:today"
+  | "scope:plan"
+  | "scope:projects"
+  | "scope:inbox";
+
+export type ScopeGroupId =
+  | "scope:today:overdue"
+  | "scope:today:due_today"
+  | "scope:today:ready"
+  | "scope:today:completed";
+
+  

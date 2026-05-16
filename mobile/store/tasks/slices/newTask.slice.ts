@@ -13,7 +13,7 @@ import {
   sendErrorMessageReducer,
   clearStateReducer,
   clearCreateTaskErrorReducer,
-} from "@/store/tasks/reducers/createTaskReducer";
+} from "@/store/tasks/reducers/createTask.reducer";
 
 const newTaskSlice = createSlice({
   name: "newTask",
@@ -46,4 +46,5 @@ export const {
   clearState,
   clearCreateTaskError,
 } = newTaskSlice.actions;
+
 export default newTaskSlice.reducer;

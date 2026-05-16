@@ -15,16 +15,16 @@ import { useCalendars, useLocales } from "expo-localization";
 import Chip from "@/components/ui/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
-import { handleErrorMessage } from "@/utils/handleErrorMessage";
+import { getErrorMessage } from "@/utils/error";
 import { routes } from "@/constants/routes";
 import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
 import { STATUS_OPTIONS } from "@/constants/status";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import {
   clearState,
   setDescription,
   setTitle,
 } from "@/store/tasks/slices/newTask.slice";
-import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
 
 const CreateTaskFormSheet = () => {
   const router = useRouter();
@@ -75,7 +75,7 @@ const CreateTaskFormSheet = () => {
     try {
       await dispatch(createTaskAction()).unwrap();
     } catch (error: unknown) {
-      showErrorToast(handleErrorMessage(error, "Something went wrong."));
+      showErrorToast(getErrorMessage(error, "Something went wrong."));
     }
   };
 
@@ -88,7 +88,7 @@ const CreateTaskFormSheet = () => {
   };
 
   return (
-    <FormSheetWrapper>
+    <SheetWrapper>
       <View style={styles.headerFormContainer}>
         <Text style={styles.helper}>Try #Area/Project/Section</Text>
         <View style={styles.fields}>
@@ -186,7 +186,7 @@ const CreateTaskFormSheet = () => {
           </Pressable>
         </View>
       </View>
-    </FormSheetWrapper>
+    </SheetWrapper>
   );
 };
 

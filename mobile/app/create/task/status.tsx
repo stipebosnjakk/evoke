@@ -1,98 +1,58 @@
-import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useDispatch } from "react-redux";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
-import Button from "@/components/ui/Button";
 import { STATUS_OPTIONS } from "@/constants/status";
-import { TaskStatusOptionsArray } from "@/types/task.types";
+import { TaskStatusOption } from "@/types/task.types";
 import { setStatus } from "@/store/tasks/slices/newTask.slice";
 import { useAppSelector } from "@/hooks/storeHooks";
-import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskStatus } from "@/utils/validateTask";
+import SheetHeader from "@/components/custom/SheetHeader";
 
 const StatusFormSheet = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
   const statusValue = useAppSelector((state) => state.newTask.task.status);
-  const status = STATUS_OPTIONS.find((s) => s.value === statusValue);
 
-  const [selected, setSelected] = useState<TaskStatusOptionsArray | null>(
-    status ?? null,
-  );
+  const handleSubmitStatus = (optionValue: TaskStatusOption) => {
+    if (statusValue === optionValue.value) {
+      dispatch(setStatus({ status: null }));
+      router.back();
+      return;
+    }
 
-  const handleSubmitStatus = () => {
-    const res = validateTaskStatus(selected);
+    const res = validateTaskStatus(optionValue);
+
     if (!res.ok) {
       Toast.show({
         type: "error",
         text1: "Invalid Status",
         text2: res.message,
       });
-      setSelected(null);
       return;
     }
 
-    dispatch(setStatus({ status: selected }));
-    router.back();
-  };
-
-  const handleSelectOption = (optionValue: TaskStatusOptionsArray) => {
-    if (selected?.value === optionValue.value) {
-      setSelected(null);
-      return;
-    }
-    setSelected(optionValue);
-  };
-
-  const handleGoBack = () => {
-    setSelected(null);
+    dispatch(setStatus({ status: optionValue }));
     router.back();
   };
 
   return (
-    <FormSheetWrapper>
-      <View style={styles.headerContainer}>
-        <Button iconOnly onPress={handleGoBack}>
-          <SymbolView
-            name="xmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-        <Text style={styles.title}>Status</Text>
-        <Button
-          style={{
-            opacity: !selected && !status ? 0.5 : 1,
-          }}
-          disabled={!selected && !status}
-          iconOnly
-          onPress={handleSubmitStatus}
-        >
-          <SymbolView
-            name="checkmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-      </View>
+    <SheetWrapper>
+      <SheetHeader title="Status" onClose={() => router.back()} />
       <View style={styles.wrapper}>
         <View style={styles.card}>
           {STATUS_OPTIONS.map((item, index) => {
-            const isSelected = selected?.value === item.value;
+            const isSelected = statusValue === item.value;
             const isLast = index === STATUS_OPTIONS.length - 1;
 
             return (
-              <Button
+              <TouchableOpacity
                 key={index}
-                onPress={() => handleSelectOption(item)}
+                onPress={() => handleSubmitStatus(item)}
                 style={styles.optionsButton}
               >
                 <View
@@ -127,28 +87,16 @@ const StatusFormSheet = () => {
                     )}
                   </View>
                 </View>
-              </Button>
+              </TouchableOpacity>
             );
           })}
         </View>
       </View>
-    </FormSheetWrapper>
+    </SheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-  },
   wrapper: {
     padding: 20,
   },

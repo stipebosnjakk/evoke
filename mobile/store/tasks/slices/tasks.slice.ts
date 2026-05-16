@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { initialState } from "@/store/tasks/initialStates/tasks.initialState";
 import { addReorderExtraReducers } from "@/store/tasks/extraReducers/update.extraReducer";
 import { addCreationExtraReducers } from "@/store/tasks/extraReducers/create.extraReducers";
-import { clearTaskScreenErrorReducer } from "@/store/tasks/reducers/clearTaskScreenErrorReducer";
+import { clearTaskScreenErrorReducer } from "@/store/tasks/reducers/clearTaskScreenError.reducer";
 import { addActiveTasksExtraReducers } from "../extraReducers/fetch.extraReducer";
 
 const tasksSlice = createSlice({

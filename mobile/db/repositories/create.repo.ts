@@ -2,7 +2,7 @@ import { eq, desc } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 
 import { db, list_order, NewTask, tasks } from "@/db";
-import { throwDbError } from "@/utils/handleErrorMessage";
+import { throwDbError } from "@/utils/error";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 import { isInboxTask } from "@/utils/taskPlacement";
 import { TaskWithOrderKey } from "@/types/task.types";
@@ -47,6 +47,10 @@ export const createTaskRepo = async (
         repeat,
       } = task;
 
+      if (!title) {
+        throw new Error("Title is required");
+      }
+
       await tx.insert(tasks).values({
         id,
         title,
@@ -57,7 +61,6 @@ export const createTaskRepo = async (
         duration_min,
         deadline,
         repeat,
-        is_inbox: isInbox,
       });
 
       const [createdTask] = await tx

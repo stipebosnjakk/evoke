@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { format } from "date-fns";
-import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import { useDispatch } from "react-redux";
@@ -9,7 +8,6 @@ import { useCalendars } from "expo-localization";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Toast from "react-native-toast-message";
 
-import Button from "@/components/ui/Button";
 import { setTime as setTimeSlice } from "@/store/tasks/slices/newTask.slice";
 import {
   getDurationMin,
@@ -18,8 +16,9 @@ import {
   getStartTimeMin,
 } from "@/utils/date";
 import { useAppSelector } from "@/hooks/storeHooks";
-import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskTime } from "@/utils/validateTask";
+import SheetHeader from "@/components/custom/SheetHeader";
 
 const TimeFormSheet = () => {
   const router = useRouter();
@@ -94,33 +93,13 @@ const TimeFormSheet = () => {
   };
 
   return (
-    <FormSheetWrapper>
-      <View style={styles.headerContainer}>
-        <Button
-          iconOnly
-          onPress={() => {
-            router.back();
-          }}
-        >
-          <SymbolView
-            name="xmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-        <Text style={styles.title}>Time</Text>
-        <Button iconOnly onPress={handleSubmitTime}>
-          <SymbolView
-            name="checkmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-      </View>
+    <SheetWrapper>
+      <SheetHeader
+        title="Time"
+        onSubmit={handleSubmitTime}
+        submitButtonVisible={true}
+        submitDisabled={false}
+      />
       <View
         style={[styles.row, { paddingVertical: 20, paddingHorizontal: 16 }]}
       >
@@ -211,23 +190,11 @@ const TimeFormSheet = () => {
           </Pressable>
         </View>
       )}
-    </FormSheetWrapper>
+    </SheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-  },
   cardContainer: {
     padding: 20,
     gap: 20,

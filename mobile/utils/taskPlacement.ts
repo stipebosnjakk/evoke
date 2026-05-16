@@ -1,6 +1,7 @@
 import { routes } from "@/constants/routes";
-import { NewTask } from "@/db";
-import { toIsoDate } from "@/utils/date";
+import { NewTask, Task } from "@/db";
+import { getRepeatWeekdayIndex, toIsoDate } from "@/utils/date";
+import { addDays, getUnixTime, startOfToday } from "date-fns";
 
 type TaskScreen = "inbox" | "today" | "plan" | "none";
 
@@ -9,7 +10,7 @@ type TaskScreen = "inbox" | "today" | "plan" | "none";
  * @param task
  * @returns
  */
-const isActiveTask = (task: NewTask): boolean =>
+const isActiveTask = (task: NewTask | Task): boolean =>
   !task.is_completed && !task.is_deleted;
 
 /**
@@ -17,7 +18,7 @@ const isActiveTask = (task: NewTask): boolean =>
  * @param task
  * @returns
  */
-const hasDestination = (task: NewTask): boolean =>
+const hasDestination = (task: NewTask | Task): boolean =>
   Boolean(task.section_id || task.project_id || task.area_id);
 
 /**
@@ -25,7 +26,7 @@ const hasDestination = (task: NewTask): boolean =>
  * @param task
  * @returns
  */
-const isPlanned = (task: NewTask): boolean =>
+const isPlanned = (task: NewTask | Task): boolean =>
   hasDestination(task) ||
   Boolean(task.status) ||
   Boolean(task.start_date) ||
@@ -36,7 +37,7 @@ const isPlanned = (task: NewTask): boolean =>
  * @param task
  * @returns
  */
-export const isInboxTask = (task: NewTask): boolean =>
+export const isInboxTask = (task: NewTask | Task): boolean =>
   isActiveTask(task) &&
   !hasDestination(task) &&
   !task.start_date &&
@@ -44,18 +45,25 @@ export const isInboxTask = (task: NewTask): boolean =>
   !task.status;
 
 /**
- * Checks if a task is ready for today (active, not in inbox, start date is today and status is "next" or null).
+ * Checks if a task is ready for today.
  * @param task
  * @returns
  */
-export const isTodayTask = (task: NewTask): boolean => {
-  const today = toIsoDate(new Date());
-
+export const isTodayTask = (
+  task: NewTask | Task,
+  todayDate = new Date(),
+): boolean => {
+  const today = toIsoDate(todayDate);
+  const todayRepeatIndex = getRepeatWeekdayIndex(todayDate);
+  const repeat = task.repeat ?? [];
+  const repeatMatchesToday =
+    repeat.length === 0 || repeat.includes(todayRepeatIndex);
   return (
     isActiveTask(task) &&
     !isInboxTask(task) &&
-    task.start_date === today &&
-    (task.status === null || task.status === "next")
+    task.status === "next" &&
+    (!task.start_date || task.start_date <= today) &&
+    repeatMatchesToday
   );
 };
 
@@ -64,7 +72,7 @@ export const isTodayTask = (task: NewTask): boolean => {
  * @param task
  * @returns
  */
-export const isPlanTask = (task: NewTask): boolean =>
+export const isPlanTask = (task: NewTask | Task): boolean =>
   isActiveTask(task) && !isInboxTask(task) && isPlanned(task);
 
 /**
@@ -77,6 +85,27 @@ export const getTaskPlacement = (task: NewTask): TaskScreen => {
   if (isTodayTask(task)) return "today";
   if (isPlanTask(task)) return "plan";
   return "none";
+};
+
+/**
+ * Checks if a task was completed today.
+ * @param task
+ * @returns
+ */
+export const isCompletedTodayTask = (task: NewTask | Task): boolean => {
+  const completedAt = task.completed_at_utc;
+
+  if (typeof completedAt !== "number") return false;
+
+  const todayStart = getUnixTime(startOfToday());
+  const tomorrowStart = getUnixTime(addDays(startOfToday(), 1));
+
+  return (
+    task.is_deleted !== true &&
+    task.is_completed === true &&
+    completedAt >= todayStart &&
+    completedAt < tomorrowStart
+  );
 };
 
 /**

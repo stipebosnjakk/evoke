@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useDispatch } from "react-redux";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
@@ -7,11 +7,11 @@ import Toast from "react-native-toast-message";
 
 import { useAppSelector } from "@/hooks/storeHooks";
 import { REPEAT_OPTIONS } from "@/constants/repeat";
-import Button from "@/components/ui/Button";
 import { Weekday } from "@/types/task.types";
 import { setRepeat } from "@/store/tasks/slices/newTask.slice";
-import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskRepeat } from "@/utils/validateTask";
+import SheetHeader from "@/components/custom/SheetHeader";
 
 const RepeatFormSheet = () => {
   const dispatch = useDispatch();
@@ -50,42 +50,18 @@ const RepeatFormSheet = () => {
     router.back();
   };
 
+  const repeatValueLength = repeatValue?.length ?? 0;
+  const submitDisabled = selected.length === 0 && repeatValueLength === 0;
+
   return (
-    <FormSheetWrapper>
-      <View style={styles.headerContainer}>
-        <Button iconOnly onPress={handleGoBack}>
-          <SymbolView
-            name="xmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-        <Text style={styles.title}>Repeat</Text>
-        <Button
-          style={{
-            opacity: repeatValue
-              ? repeatValue.length > 0
-                ? 1
-                : 0.5
-              : selected.length > 0
-                ? 1
-                : 0.5,
-          }}
-          disabled={selected.length === 0 && repeatValue?.length === 0}
-          iconOnly
-          onPress={handleSubmitRepeat}
-        >
-          <SymbolView
-            name="checkmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-      </View>
+    <SheetWrapper>
+      <SheetHeader
+        title="Repeat"
+        onClose={handleGoBack}
+        onSubmit={handleSubmitRepeat}
+        submitButtonVisible={true}
+        submitDisabled={submitDisabled}
+      />
       <View style={styles.wrapper}>
         <View style={styles.card}>
           {REPEAT_OPTIONS.map((option, index) => {
@@ -93,7 +69,7 @@ const RepeatFormSheet = () => {
             const isLast = index === REPEAT_OPTIONS.length - 1;
 
             return (
-              <Button
+              <TouchableOpacity
                 key={option.id}
                 style={[
                   styles.optionContainer,
@@ -111,28 +87,16 @@ const RepeatFormSheet = () => {
                     tintColor="rgb(67, 67, 67)"
                   />
                 )}
-              </Button>
+              </TouchableOpacity>
             );
           })}
         </View>
       </View>
-    </FormSheetWrapper>
+    </SheetWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-  },
   wrapper: {
     padding: 20,
   },

@@ -1,9 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import { createTaskRepo } from "@/db/repositories/create.repo";
 import { RejectWithValue, TaskWithOrderKey } from "@/types/task.types";
-import { handleErrorMessage } from "@/utils/handleErrorMessage";
+import { getErrorMessage } from "@/utils/error";
 import {
   clearState,
   validateTextInputs,
@@ -32,6 +33,14 @@ export const createTaskAction = createAsyncThunk<
       });
     }
 
+    const title = newTask.task.title?.trim();
+
+    if (!title) {
+      return rejectWithValue({
+        message: "Title is required",
+      });
+    }
+
     const res = await createTaskRepo(newTask.task);
 
     if (!res.task) {
@@ -42,12 +51,17 @@ export const createTaskAction = createAsyncThunk<
 
     const placement = getTaskPlacement(res.task);
 
+    const handleNavigation = () => {
+      router.dismissTo(getTaskScreenHref(placement) as any);
+    };
+
     Toast.show({
-      type: "taskSaved",
+      type: "info",
       text1: res.task.title || "Task created",
       text2: getTaskScreenText(placement),
       props: {
-        href: getTaskScreenHref(placement),
+        onPress: handleNavigation,
+        icon: "chevron.right",
       },
     });
 
@@ -56,7 +70,7 @@ export const createTaskAction = createAsyncThunk<
     return res;
   } catch (error: unknown) {
     return rejectWithValue({
-      message: handleErrorMessage(error, "Failed to create task"),
+      message: getErrorMessage(error, "Failed to create task"),
     });
   }
 });

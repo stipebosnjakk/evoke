@@ -3,19 +3,21 @@ import type { StyleProp, ViewStyle } from "react-native";
 
 import { useColorTheme } from "@/hooks/useColorTheme";
 
-type ScreenContainerProps = {
+type ScreenWrapperProps = {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
-const ScreenContainer = ({ children, style }: ScreenContainerProps) => {
+const ScreenWrapper = ({ children, style }: ScreenWrapperProps) => {
   const { colors } = useColorTheme();
+
   return (
     <View
       style={[
         {
           flex: 1,
           backgroundColor: colors.background,
+          padding: 16,
         },
         style,
       ]}
@@ -25,4 +27,4 @@ const ScreenContainer = ({ children, style }: ScreenContainerProps) => {
   );
 };
 
-export default ScreenContainer;
+export default ScreenWrapper;

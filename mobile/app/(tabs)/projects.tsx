@@ -1,12 +1,12 @@
 import { Text } from "react-native";
 
-import ScreenContainer from "@/components/custom/ScreenContainer";
+import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 
 const ProjectsScreen = () => {
   return (
-    <ScreenContainer>
+    <ScreenWrapper>
       <Text>projects</Text>
-    </ScreenContainer>
+    </ScreenWrapper>
   );
 };
 

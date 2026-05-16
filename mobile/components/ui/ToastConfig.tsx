@@ -9,12 +9,11 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { SymbolView } from "expo-symbols";
-import { useRouter, type Href } from "expo-router";
 
 type ToastRenderProps = {
   text1?: string;
   text2?: string;
-  props?: Record<string, any>;
+  props: Record<string, any>;
 };
 
 type ToastCardProps = {
@@ -62,44 +61,44 @@ const ToastCard = ({
   );
 };
 
-type TaskCreatedToastCardProps = {
+type TaskInfoToastCardProps = {
   text1?: string;
   text2?: string;
-  href: Href;
+  buttonText?: string;
+  onPress?: () => void;
+  icon?: string;
 };
 
-const TaskSavedToastCard = ({
+const TaskInfoToastCard = ({
   text1,
-  text2 = "Task saved",
-  href,
-}: TaskCreatedToastCardProps) => {
-  const router = useRouter();
-  return (
-    <Pressable
-      style={styles.taskSavedContainer}
-      onPress={() => {
-        if (href) router.dismissTo(href);
+  text2,
+  onPress,
+  icon,
+}: TaskInfoToastCardProps) => (
+  <Pressable style={styles.toastInfoContainer} onPress={onPress}>
+    <View
+      style={{
+        justifyContent: "center",
+        alignItems: "flex-start",
       }}
     >
-      <View>
-        <Text style={styles.toastMetadataText} numberOfLines={1}>
-          {text2}
-        </Text>
-        <Text style={styles.toastTitleText} numberOfLines={1}>
-          {text1}
-        </Text>
-      </View>
-      <SymbolView
-        name="chevron.right"
-        size={14}
-        type="monochrome"
-        tintColor="#111827"
-      />
-    </Pressable>
-  );
-};
+      <Text style={styles.toastMetadataText} numberOfLines={1}>
+        {text2}
+      </Text>
+      <Text style={styles.toastTitleText} numberOfLines={1}>
+        {text1}
+      </Text>
+    </View>
+    <SymbolView
+      name={icon as any}
+      size={14}
+      type="monochrome"
+      tintColor="#111827"
+    />
+  </Pressable>
+);
 
-export type ToastType = "success" | "error" | "info" | "taskSaved";
+export type ToastType = "error" | "info";
 
 export type ToastConfig = Record<
   ToastType,
@@ -107,14 +106,6 @@ export type ToastConfig = Record<
 >;
 
 export const toastConfig: ToastConfig = {
-  success: ({ text1, text2 }) => (
-    <ToastCard
-      text1={text1}
-      text2={text2}
-      icon="checkmark.circle.fill"
-      tint="#16A34A"
-    />
-  ),
   error: ({ text1, text2 }) => (
     <ToastCard
       text1={text1}
@@ -123,16 +114,14 @@ export const toastConfig: ToastConfig = {
       tint="#DC2626"
     />
   ),
-  info: ({ text1, text2 }) => (
-    <ToastCard
+  info: ({ text1, text2, props }) => (
+    <TaskInfoToastCard
       text1={text1}
       text2={text2}
-      icon="info.circle.fill"
-      tint="#2563EB"
+      buttonText={props.buttonText}
+      onPress={props.onPress}
+      icon={props.icon}
     />
-  ),
-  taskSaved: ({ text1, text2, props }) => (
-    <TaskSavedToastCard text1={text1} text2={text2} href={props?.href} />
   ),
 };
 const styles = StyleSheet.create({
@@ -181,13 +170,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#70747d",
   },
-  taskSavedWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  taskSavedContainer: {
+  toastInfoContainer: {
     minWidth: 200,
     height: 50,
     paddingHorizontal: 20,
@@ -195,6 +178,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 20,
     backgroundColor: "#efefef",
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -208,18 +192,5 @@ const styles = StyleSheet.create({
   toastMetadataText: {
     fontSize: 12,
     color: "#70747d",
-  },
-  routeButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    backgroundColor: "#efefef",
-  },
-  routeButtonText: {
-    fontSize: 10,
-    fontWeight: "700",
   },
 });

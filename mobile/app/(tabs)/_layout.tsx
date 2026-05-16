@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Tabs, useSegments } from "expo-router";
+import { Tabs } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
 import Header from "@/components/custom/Header";
-import { TITLE_BY_ROUTE } from "@/constants/routes";
+import { routes } from "@/constants/routes";
 
 type TabBarIconProps = {
   color: string;
@@ -12,21 +11,9 @@ type TabBarIconProps = {
 };
 
 const TabLayout = () => {
-  const segments = useSegments();
-  const activeRaw = segments[segments.length - 1];
-  const active = activeRaw === "(tabs)" ? "index" : activeRaw;
-
-  const [title, setTitle] = useState(
-    TITLE_BY_ROUTE[active] || TITLE_BY_ROUTE.index,
-  );
-
-  useEffect(() => {
-    setTitle((prev) => TITLE_BY_ROUTE[active] ?? prev);
-  }, [active]);
-
   return (
     <View style={styles.root}>
-      <Header title={title} />
+      <Header />
       <View style={styles.tabsWrap}>
         <Tabs
           screenOptions={{
@@ -42,7 +29,7 @@ const TabLayout = () => {
           }}
         >
           <Tabs.Screen
-            name="index"
+            name={routes.today.route}
             options={{
               tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
@@ -55,7 +42,7 @@ const TabLayout = () => {
             }}
           />
           <Tabs.Screen
-            name="plan"
+            name={routes.plan.route}
             options={{
               tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
@@ -70,7 +57,7 @@ const TabLayout = () => {
             }}
           />
           <Tabs.Screen
-            name="inbox"
+            name={routes.inbox.route}
             options={{
               tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView
@@ -83,7 +70,7 @@ const TabLayout = () => {
             }}
           />
           <Tabs.Screen
-            name="projects"
+            name={routes.projects.route}
             options={{
               tabBarIcon: ({ color, focused }: TabBarIconProps) => (
                 <SymbolView

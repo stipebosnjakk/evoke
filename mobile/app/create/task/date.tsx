@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, View, Text } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { useCalendars, useLocales } from "expo-localization";
@@ -7,7 +13,6 @@ import Toast from "react-native-toast-message";
 
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
-import Button from "@/components/ui/Button";
 import Shortcuts from "@/components/features/Shortcuts";
 import { setStartDate, setTime } from "@/store/tasks/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
@@ -15,8 +20,9 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
 import { formatTimeFromMin, minDate } from "@/utils/date";
 import { routes } from "@/constants/routes";
-import FormSheetWrapper from "@/components/custom/FormSheetWrapper";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskStartDate } from "@/utils/validateTask";
+import SheetHeader from "@/components/custom/SheetHeader";
 
 const DateFormSheet = () => {
   const router = useRouter();
@@ -109,35 +115,14 @@ const DateFormSheet = () => {
   };
 
   return (
-    <FormSheetWrapper>
-      <View style={styles.headerContainer}>
-        <Button iconOnly onPress={handleGoBack}>
-          <SymbolView
-            name="xmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-        <Text style={styles.title}>Date</Text>
-        <Button
-          style={{
-            opacity: isDateInputOpen ? 0 : selectedDate ? 1 : 0.5,
-          }}
-          disabled={!isDateInputOpen && !selectedDate}
-          iconOnly
-          onPress={handleSubmitDate}
-        >
-          <SymbolView
-            name="checkmark"
-            weight="medium"
-            size={20}
-            type="monochrome"
-            tintColor="rgb(67, 67, 67)"
-          />
-        </Button>
-      </View>
+    <SheetWrapper>
+      <SheetHeader
+        title="Date"
+        onClose={handleGoBack}
+        onSubmit={handleSubmitDate}
+        submitButtonVisible={true}
+        submitDisabled={!isDateInputOpen && !selectedDate}
+      />
       <DateInput
         type="start"
         inputRef={inputRef}
@@ -162,7 +147,7 @@ const DateFormSheet = () => {
             />
           </View>
           <View style={styles.buttonsContainer}>
-            <Button
+            <TouchableOpacity
               style={[styles.button, { justifyContent: "space-between" }]}
               onPress={() => {
                 router.push(routes.create_task_time.href);
@@ -198,9 +183,9 @@ const DateFormSheet = () => {
                   tintColor="rgb(67, 67, 67)"
                 />
               </View>
-            </Button>
+            </TouchableOpacity>
             {startDateValue && (
-              <Button style={styles.button} onPress={handleNoDate}>
+              <TouchableOpacity style={styles.button} onPress={handleNoDate}>
                 <SymbolView
                   name="minus.circle"
                   weight="medium"
@@ -209,12 +194,12 @@ const DateFormSheet = () => {
                   tintColor="rgb(67, 67, 67)"
                 />
                 <Text style={styles.buttonText}>No Date</Text>
-              </Button>
+              </TouchableOpacity>
             )}
           </View>
         </>
       )}
-    </FormSheetWrapper>
+    </SheetWrapper>
   );
 };
 
@@ -224,18 +209,6 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 20,
     paddingHorizontal: 16,
-  },
-  headerContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
   },
   button: {
     flexDirection: "row",

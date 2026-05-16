@@ -21,6 +21,11 @@ export const routes = {
     href: "/inbox",
     route: "inbox",
   },
+  projects: {
+    title: "Projects",
+    href: "/project",
+    route: "projects",
+  },
   create_project: {
     title: "Create Project",
     href: "/create/project",
@@ -55,6 +60,11 @@ export const routes = {
     title: "Status",
     href: "/create/task/status",
     route: "create/task/status",
+  },
+  task_single_group: {
+    title: "Group",
+    href: "/tasks/group/[groupId]",
+    route: "tasks/group/[groupId]",
   },
 } as const;
 

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, {
   DragEndParams,
@@ -19,6 +19,8 @@ import { useAppDispatch } from "@/hooks/storeHooks";
 import DraggableTask, { type RenderDraggableTask } from "./DraggableTask";
 import { Status } from "@/types/initialState.types";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
+
+// TODO: try to make a draggable wrapper
 
 type DraggableTaskListProps = {
   data: TaskWithOrderKey[];
@@ -54,10 +56,6 @@ const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
     const moved = data[to];
     const top = data[to - 1] || null;
     const bottom = data[to + 1] || null;
-
-    console.log("MOVED: ", moved)
-    console.log("TOP: ", top)
-    console.log("BOTTOM: ", bottom)
 
     if (!moved) return;
 
@@ -103,23 +101,14 @@ const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
       data={data}
       keyExtractor={({ task }) => task.id}
       activationDistance={12}
-      contentContainerStyle={[
-        styles.inboxTaskListContentContainer,
-        { paddingTop: headerH + headerFadeExtra },
-      ]}
       onEndReachedThreshold={0.2}
       showsVerticalScrollIndicator={false}
       ListFooterComponent={ListFooterComponent}
       onDragEnd={handleOnDragEnd}
       renderItem={renderItem}
+      contentContainerStyle={{ paddingTop: headerH + headerFadeExtra }}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  inboxTaskListContentContainer: {
-    padding: 16,
-  },
-});
 
 export default DraggableTaskList;

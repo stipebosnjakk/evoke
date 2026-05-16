@@ -1,7 +1,7 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 import { TasksState } from "@/types/initialState.types";
-import { getActiveTasksAction } from "../thunks/fetch.thunks";
+import { getActiveTasksAction } from "@/store/tasks/thunks/fetch.thunks";
 
 export const addActiveTasksExtraReducers = (
   builder: ActionReducerMapBuilder<TasksState>,
@@ -13,7 +13,7 @@ export const addActiveTasksExtraReducers = (
     })
     .addCase(getActiveTasksAction.rejected, (state, action) => {
       state.status = "failed";
-      state.error = action.payload?.message || "Failed to load tasks";
+      state.error = action.payload?.message || "Failed to load active tasks";
     })
     .addCase(getActiveTasksAction.fulfilled, (state, action) => {
       state.status = "succeeded";

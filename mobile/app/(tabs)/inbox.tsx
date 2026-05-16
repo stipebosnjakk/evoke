@@ -1,10 +1,10 @@
 import { ActivityIndicator } from "react-native";
 
 import { useAppSelector } from "@/hooks/storeHooks";
-import { NoInboxTasksView } from "@/components/tasks/NoInboxTasksView";
-import ScreenContainer from "@/components/custom/ScreenContainer";
+import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
+import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/tasks/DraggableTaskList";
-import { selectInboxTasks } from "@/store/tasks/selectors/inbox.selector";
+import { selectInboxTasks } from "@/store/tasks/selectors/task.selector";
 
 const InboxScreen = () => {
   const status = useAppSelector((state) => state.tasks.status);
@@ -12,25 +12,30 @@ const InboxScreen = () => {
 
   if (status === "loading") {
     return (
-      <ScreenContainer
-        style={{ justifyContent: "center", alignItems: "center" }}
-      >
+      <ScreenWrapper style={{ justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
-      </ScreenContainer>
+      </ScreenWrapper>
     );
   }
 
   if (status === "succeeded" && !data.length) {
-    return <NoInboxTasksView />;
+    return (
+      <NoTasksViewWrapper
+        title="Your inbox is clear"
+        subtitle={`Inbox holds unprocessed tasks.\nCapture tasks here and organize\nthem later.`}
+      />
+    );
   }
 
   if (status === "succeeded") {
     return (
-      <ScreenContainer>
+      <ScreenWrapper>
         <DraggableTaskList data={data} status={status} />
-      </ScreenContainer>
+      </ScreenWrapper>
     );
   }
+
+  return null;
 };
 
 export default InboxScreen;

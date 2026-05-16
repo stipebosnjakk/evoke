@@ -1,7 +1,7 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 import { db, list_order, tasks } from "@/db";
-import { throwDbError } from "@/utils/handleErrorMessage";
+import { throwDbError } from "@/utils/error";
 import { ScopeType, TasksObjectType } from "@/types/initialState.types";
 
 export const fetchActiveTasks = async (): Promise<TasksObjectType> => {
@@ -9,7 +9,7 @@ export const fetchActiveTasks = async (): Promise<TasksObjectType> => {
     const rows = await db
       .select()
       .from(tasks)
-      .where(and(eq(tasks.is_deleted, false), eq(tasks.is_completed, false)));
+      .where(eq(tasks.is_deleted, false));
 
     const data: TasksObjectType = {
       ids: [],

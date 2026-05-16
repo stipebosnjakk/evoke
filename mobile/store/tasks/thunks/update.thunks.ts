@@ -3,17 +3,50 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   updateTaskOrderKey,
   rebalanceOrderKeys,
+  completeTask,
+  restoreCompletedTask,
 } from "@/db/repositories/update.repo";
 import {
   OrderTaskItem,
   RejectWithValue,
-  ScopeIdType,
+  ScopeScreenId,
 } from "@/types/task.types";
-import { handleErrorMessage } from "@/utils/handleErrorMessage";
+import { getErrorMessage } from "@/utils/error";
+import { Task } from "@/db";
+
+export const restoreCompletedTaskAction = createAsyncThunk<
+  { task: Task },
+  { taskId: string },
+  { rejectValue: RejectWithValue }
+>("tasks/restoreCompletedTask", async ({ taskId }, { rejectWithValue }) => {
+  try {
+    const task = await restoreCompletedTask(taskId);
+    return { task };
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to restore task"),
+    });
+  }
+});
+
+export const completeTaskAction = createAsyncThunk<
+  { task: Task },
+  { taskId: string },
+  { rejectValue: RejectWithValue }
+>("tasks/completeTask", async ({ taskId }, { rejectWithValue }) => {
+  try {
+    const task = await completeTask(taskId);
+    return { task };
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to complete task"),
+    });
+  }
+});
 
 export const updateTaskOrderKeyAction = createAsyncThunk<
-  { newOrder: OrderTaskItem; scopeId: ScopeIdType },
-  { newOrder: OrderTaskItem; scopeId: ScopeIdType },
+  { newOrder: OrderTaskItem; scopeId: ScopeScreenId },
+  { newOrder: OrderTaskItem; scopeId: ScopeScreenId },
   { rejectValue: RejectWithValue }
 >(
   "tasks/updateTaskOrderKey",
@@ -23,17 +56,17 @@ export const updateTaskOrderKeyAction = createAsyncThunk<
       return { newOrder, scopeId };
     } catch (error) {
       return rejectWithValue({
-        message: handleErrorMessage(error, "Failed to update task order key"),
+        message: getErrorMessage(error, "Failed to update task order key"),
       });
     }
   },
 );
 
 export const rebalanceOrderKeysAction = createAsyncThunk<
-  { orderArray: OrderTaskItem[]; scopeId: ScopeIdType },
+  { orderArray: OrderTaskItem[]; scopeId: ScopeScreenId },
   {
     orderArray: OrderTaskItem[];
-    scopeId: ScopeIdType;
+    scopeId: ScopeScreenId;
   },
   { rejectValue: RejectWithValue }
 >(
@@ -44,7 +77,7 @@ export const rebalanceOrderKeysAction = createAsyncThunk<
       return { orderArray, scopeId };
     } catch (error) {
       return rejectWithValue({
-        message: handleErrorMessage(error, "Failed to rebalance order keys"),
+        message: getErrorMessage(error, "Failed to rebalance order keys"),
       });
     }
   },

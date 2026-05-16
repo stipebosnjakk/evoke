@@ -1,0 +1,38 @@
+import { useEffect } from "react";
+import { FlatList } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
+import SheetHeader from "@/components/custom/SheetHeader";
+import Task from "@/components/tasks/Task";
+import { useAppSelector } from "@/hooks/storeHooks";
+import { selectTodayGroupById } from "@/store/tasks/selectors/task.selector";
+
+const GroupTasksScreen = () => {
+  const router = useRouter();
+
+  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+
+  const { title, tasks } = useAppSelector((state) =>
+    selectTodayGroupById(state, groupId),
+  );
+
+  useEffect(() => {
+    if (tasks.length === 0) router.back();
+  }, [tasks, router]);
+
+  return (
+    <SheetWrapper style={{ flex: 1 }}>
+      <SheetHeader title={title} />
+      <FlatList
+        data={tasks}
+        keyExtractor={(task) => task.id}
+        renderItem={({ item }) => <Task task={item} />}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ padding: 20 }}
+      />
+    </SheetWrapper>
+  );
+};
+
+export default GroupTasksScreen;

@@ -120,6 +120,13 @@
       "when": 1778252570518,
       "tag": "0016_lowly_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1778294060406,
+      "tag": "0017_ancient_shatterstar",
+      "breakpoints": true
     }
   ]
 }
