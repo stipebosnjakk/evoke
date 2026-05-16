@@ -5,7 +5,7 @@ import { db, list_order, NewTask, tasks } from "@/db";
 import { throwDbError } from "@/utils/error";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 import { isInboxTask } from "@/utils/taskPlacement";
-import { TaskWithOrderKey } from "@/types/task.types";
+import { TaskStatus, TaskWithOrderKey } from "@/types/task.types";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
@@ -14,8 +14,23 @@ export const createTaskRepo = async (
 ): Promise<TaskWithOrderKey> => {
   try {
     return await db.transaction(async (tx) => {
+      if (!task.title) {
+        throw new Error("Title is required");
+      }
+
+      const taskStatus: TaskStatus | null = !task.status
+        ? task.start_date || task.deadline
+          ? "next"
+          : null
+        : task.status;
+
+      const normalizedTask = {
+        ...task,
+        status: taskStatus,
+      };
+
       const id = createId();
-      const isInbox = isInboxTask(task);
+      const isInbox = isInboxTask(normalizedTask);
       let newOrderKey: number | null = null;
 
       if (isInbox) {
@@ -36,31 +51,9 @@ export const createTaskRepo = async (
         });
       }
 
-      const {
-        title,
-        description,
-        status,
-        start_date,
-        start_time_min,
-        duration_min,
-        deadline,
-        repeat,
-      } = task;
-
-      if (!title) {
-        throw new Error("Title is required");
-      }
-
       await tx.insert(tasks).values({
+        ...normalizedTask,
         id,
-        title,
-        description,
-        status,
-        start_date,
-        start_time_min,
-        duration_min,
-        deadline,
-        repeat,
       });
 
       const [createdTask] = await tx

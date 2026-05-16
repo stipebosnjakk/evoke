@@ -7,9 +7,14 @@ import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 type NoTasksViewWrapperType = {
   title: string;
   subtitle?: string;
+  isUpcoming?: boolean;
 };
 
-const NoTasksViewWrapper = ({ title, subtitle }: NoTasksViewWrapperType) => {
+const NoTasksViewWrapper = ({
+  title,
+  subtitle,
+  isUpcoming = false,
+}: NoTasksViewWrapperType) => {
   const router = useRouter();
 
   const navigateToCreateModal = () => {
@@ -18,6 +23,10 @@ const NoTasksViewWrapper = ({ title, subtitle }: NoTasksViewWrapperType) => {
 
   const navigateToUpcoming = () => {
     router.push(routes.upcoming.href);
+  };
+
+  const navigateToInbox = () => {
+    router.push(routes.inbox.href);
   };
 
   return (
@@ -33,13 +42,23 @@ const NoTasksViewWrapper = ({ title, subtitle }: NoTasksViewWrapperType) => {
           >
             <Text style={styles.primaryButtonText}>Create Task</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={navigateToUpcoming}
-            style={styles.secondaryButton}
-          >
-            <Text style={styles.secondaryButtonText}>Go to Upcoming</Text>
-          </TouchableOpacity>
+          {isUpcoming ? (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={navigateToInbox}
+              style={styles.secondaryButton}
+            >
+              <Text style={styles.secondaryButtonText}>Go to Inbox</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={navigateToUpcoming}
+              style={styles.secondaryButton}
+            >
+              <Text style={styles.secondaryButtonText}>Go to Upcoming</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </ScreenWrapper>

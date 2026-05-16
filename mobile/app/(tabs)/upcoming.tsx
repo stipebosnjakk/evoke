@@ -34,8 +34,9 @@ const UpcomingScreen = () => {
   if (status === "succeeded" && !total) {
     return (
       <NoTasksViewWrapper
-        title="Today is clear"
-        subtitle={`Today shows tasks that are ready now.\nOnly tasks marked as Next appear here.`}
+        isUpcoming={true}
+        title="Upcoming is clear"
+        subtitle={`Upcoming shows tasks planned for later.\nWaiting and Someday tasks also appear here.`}
       />
     );
   }
