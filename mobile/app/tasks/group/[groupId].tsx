@@ -6,7 +6,7 @@ import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
 import Task from "@/components/tasks/Task";
 import { useAppSelector } from "@/hooks/storeHooks";
-import { selectTodayGroupById } from "@/store/tasks/selectors/task.selector";
+import { selectTasksGroupById } from "@/store/tasks/selectors/task.selector";
 import { ScopeGroupId, ScopeScreenId } from "@/types/task.types";
 
 type LocalSearchParamsType = {
@@ -20,7 +20,7 @@ const GroupTasksScreen = () => {
   const { groupId } = useLocalSearchParams<LocalSearchParamsType>();
 
   const { title, tasks } = useAppSelector((state) =>
-    selectTodayGroupById(state, groupId),
+    selectTasksGroupById(state, groupId),
   );
 
   useEffect(() => {

@@ -1,5 +1,10 @@
 import type { Task, NewTask } from "@/db";
-import { ScopeGroupId, ScopeScreenId } from "./task.types";
+import {
+  ScopeGroupId,
+  ScopeScreenId,
+  TodayGroupId,
+  UpcomingGroupId,
+} from "./task.types";
 
 export type Status = "idle" | "loading" | "succeeded" | "failed";
 
@@ -31,8 +36,17 @@ export type NewTaskInitialState = {
 
 export type UserTheme = "light" | "dark" | "system";
 
+export type GroupData = {
+  title: string;
+  tasks: Task[];
+};
+
+export type TodayGroupsById = Record<TodayGroupId, GroupData>;
+
+export type UpcomingGroupsById = Record<UpcomingGroupId, GroupData>;
+
 export type GroupByIdType = Partial<
-  Record<ScopeGroupId, { title: string; tasks: Task[] }>
+  Record<TodayGroupId | UpcomingGroupId, GroupData>
 >;
 
 export type GroupConfig = {

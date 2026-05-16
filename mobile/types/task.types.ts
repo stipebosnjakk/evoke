@@ -36,11 +36,15 @@ export type ScopeScreenId =
   | "scope:projects"
   | "scope:inbox";
 
-export type ScopeGroupId =
+export type TodayGroupId =
   | "scope:today:overdue"
   | "scope:today:due_today"
   | "scope:today:ready"
-  | "scope:today:completed"
+  | "scope:today:completed";
+
+export type UpcomingGroupId =
   | "scope:upcoming:upcoming"
   | "scope:upcoming:waiting"
   | "scope:upcoming:someday";
+
+export type ScopeGroupId = TodayGroupId | UpcomingGroupId;
