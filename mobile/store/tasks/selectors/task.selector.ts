@@ -87,7 +87,6 @@ export const selectTodayTasks = createSelector(
       ...groupsById[TODAY_SCOPE_OVERDUE_ID].tasks,
       ...groupsById[TODAY_SCOPE_DUE_TODAY_ID].tasks,
       ...groupsById[TODAY_SCOPE_READY_ID].tasks,
-      ...groupsById[TODAY_SCOPE_COMPLETED_ID].tasks,
     ];
 
     return {
