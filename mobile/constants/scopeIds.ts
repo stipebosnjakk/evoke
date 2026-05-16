@@ -7,5 +7,8 @@ export const TODAY_SCOPE_READY_ID = "scope:today:ready";
 export const TODAY_SCOPE_COMPLETED_ID = "scope:today:completed";
 
 export const UPCOMING_SCOPE_ID = "scope:upcoming";
+export const UPCOMING_SCOPE_UPCOMING_ID = "scope:upcoming:upcoming";
+export const UPCOMING_SCOPE_WAITING_ID = "scope:upcoming:waiting";
+export const UPCOMING_SCOPE_SOMEDAY_ID = "scope:upcoming:someday";
 
 export const PROJECTS_SCOPE_ID = "scope:projects";

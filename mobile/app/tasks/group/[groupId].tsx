@@ -7,11 +7,17 @@ import SheetHeader from "@/components/custom/SheetHeader";
 import Task from "@/components/tasks/Task";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectTodayGroupById } from "@/store/tasks/selectors/task.selector";
+import { ScopeGroupId, ScopeScreenId } from "@/types/task.types";
+
+type LocalSearchParamsType = {
+  scopeId: ScopeScreenId;
+  groupId: ScopeGroupId;
+};
 
 const GroupTasksScreen = () => {
   const router = useRouter();
 
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+  const { groupId } = useLocalSearchParams<LocalSearchParamsType>();
 
   const { title, tasks } = useAppSelector((state) =>
     selectTodayGroupById(state, groupId),

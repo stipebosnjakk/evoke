@@ -40,6 +40,7 @@ export type ScopeGroupId =
   | "scope:today:overdue"
   | "scope:today:due_today"
   | "scope:today:ready"
-  | "scope:today:completed";
-
-  
+  | "scope:today:completed"
+  | "scope:upcoming:upcoming"
+  | "scope:upcoming:waiting"
+  | "scope:upcoming:someday";

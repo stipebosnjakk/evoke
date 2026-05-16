@@ -14,14 +14,6 @@ const isActiveTask = (task: NewTask | Task): boolean =>
   !task.is_completed && !task.is_deleted;
 
 /**
- * Checks if a task is planned.
- * @param task
- * @returns
- */
-const isPlanned = (task: NewTask | Task): boolean =>
-  Boolean(task.status) || Boolean(task.start_date) || Boolean(task.deadline);
-
-/**
  * Checks if a task is in the inbox (active, and no scheduling information).
  * @param task
  * @returns
@@ -34,12 +26,9 @@ export const isInboxTask = (task: NewTask | Task): boolean =>
  * @param task
  * @returns
  */
-export const isTodayTask = (
-  task: NewTask | Task,
-  todayDate = new Date(),
-): boolean => {
-  const today = toIsoDate(todayDate);
-  const todayRepeatIndex = getRepeatWeekdayIndex(todayDate);
+export const isTodayTask = (task: NewTask | Task): boolean => {
+  const today = toIsoDate(startOfToday());
+  const todayRepeatIndex = getRepeatWeekdayIndex(startOfToday());
   const repeat = task.repeat ?? [];
   const repeatMatchesToday =
     repeat.length === 0 || repeat.includes(todayRepeatIndex);
@@ -57,8 +46,19 @@ export const isTodayTask = (
  * @param task
  * @returns
  */
-export const isUpcomingTask = (task: NewTask | Task): boolean =>
-  isActiveTask(task) && !isInboxTask(task) && isPlanned(task);
+export const isUpcomingTask = (task: NewTask | Task): boolean => {
+  const today = toIsoDate(startOfToday());
+
+  return (
+    isActiveTask(task) &&
+    !isInboxTask(task) &&
+    (task.status === "waiting" ||
+      task.status === "someday" ||
+      (task.status === "next" &&
+        ((task.start_date ? task.start_date > today : false) ||
+          (task.deadline ? task.deadline > today : false))))
+  );
+};
 
 /**
  * Decides which screen the task belongs to.

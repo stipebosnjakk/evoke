@@ -31,9 +31,8 @@ export type NewTaskInitialState = {
 
 export type UserTheme = "light" | "dark" | "system";
 
-export type GroupByIdType = Record<
-  ScopeGroupId,
-  { title: string; tasks: Task[] }
+export type GroupByIdType = Partial<
+  Record<ScopeGroupId, { title: string; tasks: Task[] }>
 >;
 
 export type GroupConfig = {

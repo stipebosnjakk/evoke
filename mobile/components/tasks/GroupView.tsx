@@ -71,7 +71,7 @@ const GroupView = ({
   const navigateToGroupView = () => {
     router.push({
       pathname: "/tasks/group/[groupId]",
-      params: { groupId: group.id },
+      params: { scopeId: screenId, groupId: group.id },
     });
   };
 

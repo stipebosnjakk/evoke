@@ -7,6 +7,9 @@ import {
   TODAY_SCOPE_DUE_TODAY_ID,
   TODAY_SCOPE_OVERDUE_ID,
   TODAY_SCOPE_READY_ID,
+  UPCOMING_SCOPE_UPCOMING_ID,
+  UPCOMING_SCOPE_WAITING_ID,
+  UPCOMING_SCOPE_SOMEDAY_ID,
 } from "@/constants/scopeIds";
 import { UserConfig } from "@/types/initialState.types";
 
@@ -16,7 +19,7 @@ export const defaultUserConfig: UserConfig = {
   theme: "system",
   screens: {
     [TODAY_SCOPE_ID]: {
-      view: "group",
+      view: "list",
       group_order: [
         {
           id: TODAY_SCOPE_OVERDUE_ID,
@@ -42,7 +45,23 @@ export const defaultUserConfig: UserConfig = {
     },
     [UPCOMING_SCOPE_ID]: {
       view: "group",
-      group_order: [],
+      group_order: [
+        {
+          id: UPCOMING_SCOPE_UPCOMING_ID,
+          order_key: 3,
+          isOpen: true,
+        },
+        {
+          id: UPCOMING_SCOPE_WAITING_ID,
+          order_key: 2,
+          isOpen: true,
+        },
+        {
+          id: UPCOMING_SCOPE_SOMEDAY_ID,
+          order_key: 1,
+          isOpen: true,
+        },
+      ],
     },
     [PROJECTS_SCOPE_ID]: {
       view: null,
