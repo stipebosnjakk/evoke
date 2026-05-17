@@ -31,6 +31,11 @@ export const routes = {
     href: "/create/project",
     route: "create/project/index",
   },
+  create_project_color: {
+    title: "Project Color",
+    href: "/create/project/color",
+    route: "create/project/color",
+  },
   create_task: {
     title: "Create Task",
     href: "/create/task",
@@ -76,4 +81,5 @@ export const createSheetRoutes = [
   routes.create_task_repeat,
   routes.create_task_time,
   routes.create_project,
+  routes.create_project_color,
 ] as const;

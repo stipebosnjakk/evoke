@@ -45,19 +45,23 @@ const Header = () => {
     setTitle((prev) => TITLE_BY_ROUTE[active] ?? prev);
   }, [active]);
 
-  const navigateToCreateModal = () => {
-    router.push(routes.create_task.href);
+  const getMainScopeByRoute = (route: string): ScopeScreenId | undefined => {
+    if (route === "index") return TODAY_SCOPE_ID;
+    if (route === "upcoming") return UPCOMING_SCOPE_ID;
+    if (route === "inbox") return INBOX_SCOPE_ID;
+    if (route === "projects") return PROJECTS_SCOPE_ID;
   };
 
-  const getScopeBySegments = (): ScopeScreenId => {
-    if (active === "index") return TODAY_SCOPE_ID;
-    if (active === "upcoming") return UPCOMING_SCOPE_ID;
-    if (active === "inbox") return INBOX_SCOPE_ID;
-    if (active === "project") return PROJECTS_SCOPE_ID;
-    return TODAY_SCOPE_ID;
-  };
+  const activeMainScope = getMainScopeByRoute(active);
 
-  const scope = getScopeBySegments();
+  const [scope, setScope] = useState<ScopeScreenId>(
+    activeMainScope ?? TODAY_SCOPE_ID,
+  );
+
+  useEffect(() => {
+    if (!activeMainScope) return;
+    setScope(activeMainScope);
+  }, [activeMainScope]);
 
   const view = config ? config.screens[scope].view : null;
 
@@ -65,6 +69,10 @@ const Header = () => {
     if (!view) return;
     const nextView = view === "group" ? "list" : "group";
     dispatch(updateScreenViewAction({ scopeId: scope, view: nextView }));
+  };
+
+  const navigateToCreateModal = () => {
+    router.push(routes.create_task.href);
   };
 
   return (

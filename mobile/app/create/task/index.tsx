@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import {
   View,
-  Text,
   Pressable,
   StyleSheet,
   ScrollView,
@@ -90,7 +89,6 @@ const CreateTaskFormSheet = () => {
   return (
     <SheetWrapper>
       <View style={styles.headerFormContainer}>
-        <Text style={styles.helper}>Try #Project</Text>
         <View style={styles.fields}>
           <TextInput
             autoFocus
@@ -208,11 +206,6 @@ const styles = StyleSheet.create({
   },
   headerFormContainer: {
     padding: 16,
-  },
-  helper: {
-    marginTop: 6,
-    fontSize: 14,
-    opacity: 0.6,
   },
   fields: {
     marginTop: 16,

@@ -8,7 +8,6 @@ import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
 import GroupFlatList from "@/components/tasks/GroupFlatList";
 import Task from "@/components/tasks/Task";
-import { useEffect } from "react";
 
 const UpcomingScreen = () => {
   const insets = useSafeAreaInsets();
@@ -16,10 +15,6 @@ const UpcomingScreen = () => {
   const status = useAppSelector((state) => state.tasks.status);
   const config = useAppSelector((state) => state.user.config);
   const { groupsById, list, total } = useAppSelector(selectUpcomingTasks);
-
-  useEffect(() => {
-    console.log(JSON.stringify(config, null, 2))
-  }, [config])
 
   const headerH = insets.top + 44;
   const headerFadeExtra = 12;

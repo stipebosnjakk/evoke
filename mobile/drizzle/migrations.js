@@ -20,6 +20,8 @@ import m0015 from './0015_fair_namor.sql';
 import m0016 from './0016_lowly_gargoyle.sql';
 import m0017 from './0017_ancient_shatterstar.sql';
 import m0018 from './0018_organic_natasha_romanoff.sql';
+import m0019 from './0019_huge_dark_phoenix.sql';
+import m0020 from './0020_milky_giant_girl.sql';
 
   export default {
     journal,
@@ -42,7 +44,9 @@ m0014,
 m0015,
 m0016,
 m0017,
-m0018
+m0018,
+m0019,
+m0020
     }
   }
   
