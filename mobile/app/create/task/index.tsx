@@ -90,7 +90,7 @@ const CreateTaskFormSheet = () => {
   return (
     <SheetWrapper>
       <View style={styles.headerFormContainer}>
-        <Text style={styles.helper}>Try #Area/Project/Section</Text>
+        <Text style={styles.helper}>Try #Project</Text>
         <View style={styles.fields}>
           <TextInput
             autoFocus

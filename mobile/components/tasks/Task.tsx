@@ -29,8 +29,6 @@ type MetaType = {
   label?: string;
 };
 
-// TODO: fix due/start wording for past
-
 const Task = ({ task }: TaskGroupType) => {
   const dispatch = useAppDispatch();
   const locales = useLocales();

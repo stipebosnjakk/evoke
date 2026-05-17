@@ -27,8 +27,6 @@ export const tasks = t.sqliteTable("tasks", {
   deleted_at_utc: t.integer("deleted_at_utc"),
   status: t.text("status").$type<TaskStatus>(),
   project_id: t.text("project_id"),
-  section_id: t.text("section_id"),
-  area_id: t.text("area_id"),
   start_date: t.text("start_date").$type<IsoDate | null>(),
   start_time_min: t.integer("start_time_min"),
   duration_min: t.integer("duration_min"),

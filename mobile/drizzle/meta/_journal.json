@@ -127,6 +127,13 @@
       "when": 1778294060406,
       "tag": "0017_ancient_shatterstar",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1779034368967,
+      "tag": "0018_organic_natasha_romanoff",
+      "breakpoints": true
     }
   ]
 }

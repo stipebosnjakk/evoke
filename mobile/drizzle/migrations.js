@@ -19,6 +19,7 @@ import m0014 from './0014_abandoned_the_renegades.sql';
 import m0015 from './0015_fair_namor.sql';
 import m0016 from './0016_lowly_gargoyle.sql';
 import m0017 from './0017_ancient_shatterstar.sql';
+import m0018 from './0018_organic_natasha_romanoff.sql';
 
   export default {
     journal,
@@ -40,7 +41,8 @@ m0013,
 m0014,
 m0015,
 m0016,
-m0017
+m0017,
+m0018
     }
   }
   
