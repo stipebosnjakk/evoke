@@ -1,26 +1,32 @@
-import type { Task, NewTask } from "@/db";
-import {
-  ScopeGroupId,
-  ScopeScreenId,
-  TodayGroupId,
-  UpcomingGroupId,
-} from "./task.types";
+import type { Task, NewTask, NewProject, Project } from "@/db";
+import { ProjectColor } from "@/types/project.types";
+import { UserConfig } from "@/types/config.types";
 
 export type Status = "idle" | "loading" | "succeeded" | "failed";
 
-export type ScopeType = Record<string, number>;
-
-export type TasksObjectType = {
-  ids: string[];
-  byId: Record<string, Task>;
-};
-
-export type TasksState = {
+export type ScreenInfo = {
   status: Status;
   error: string | null;
-  tasks: TasksObjectType;
+};
+
+export type EntityObjectType<TItem> = {
+  ids: string[];
+  byId: Record<string, TItem>;
+};
+
+export type OrderObject = Record<string, number>;
+
+export type TasksState = ScreenInfo & {
+  tasks: EntityObjectType<Task>;
   taskOrder: {
-    inbox: ScopeType;
+    inbox: OrderObject;
+  };
+};
+
+export type ProjectsState = ScreenInfo & {
+  projects: EntityObjectType<Project>;
+  projectOrder: {
+    main: OrderObject;
   };
 };
 
@@ -34,41 +40,29 @@ export type NewTaskInitialState = {
   task: NewTask;
 };
 
-export type UserTheme = "light" | "dark" | "system";
-
-export type GroupData = {
-  title: string;
-  tasks: Task[];
-};
-
-export type TodayGroupsById = Record<TodayGroupId, GroupData>;
-
-export type UpcomingGroupsById = Record<UpcomingGroupId, GroupData>;
-
-export type GroupByIdType = Partial<
-  Record<TodayGroupId | UpcomingGroupId, GroupData>
->;
-
-export type GroupConfig = {
-  id: ScopeGroupId;
-  order_key: number;
-  isOpen: boolean;
-};
-
-export type ViewType = "group" | "list" | null;
-
-export type ScreenConfig = {
-  view: ViewType;
-  group_order: GroupConfig[];
-};
-
-export type UserConfig = {
-  theme: UserTheme;
-  screens: Record<ScopeScreenId, ScreenConfig>;
-};
-
-export type UserState = {
+export type UserState = ScreenInfo & {
   config: UserConfig | null;
-  status: Status;
-  error: string | null;
 };
+
+export type NewProjectStateFields = {
+  name: string | null;
+  color: ProjectColor;
+};
+
+export type NewProjectInitialState = {
+  loading: boolean;
+  error: string | null;
+  project: NewProject;
+};
+
+export type ValidationResult<T> =
+  | {
+      ok: true;
+      data: T;
+      message: string;
+    }
+  | {
+      ok: false;
+      data: null;
+      message: string;
+    };

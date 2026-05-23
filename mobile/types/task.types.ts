@@ -30,21 +30,3 @@ export type DateValueType = "start_date" | "deadline";
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export type ScopeScreenId =
-  | "scope:today"
-  | "scope:upcoming"
-  | "scope:projects"
-  | "scope:inbox";
-
-export type TodayGroupId =
-  | "scope:today:overdue"
-  | "scope:today:due_today"
-  | "scope:today:ready"
-  | "scope:today:completed";
-
-export type UpcomingGroupId =
-  | "scope:upcoming:upcoming"
-  | "scope:upcoming:waiting"
-  | "scope:upcoming:someday";
-
-export type ScopeGroupId = TodayGroupId | UpcomingGroupId;
