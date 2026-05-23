@@ -6,14 +6,14 @@ import {
   setUserConfigError,
   updateIsOpenGroup,
   updateScreenView,
-} from "@/store/user/slices/config.slice";
+} from "@/store/slices/config.slice";
 import { storeData } from "@/utils/storage";
 import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
 import {
   UpdateGroupOrderPayload,
   UpdateIsOpenGroupType,
   UpdateScreenViewType,
-} from "@/store/user/reducers/setUserConfig.reducer";
+} from "@/store/reducers/createUserConfig.reducer";
 
 export const updateGroupOrderAction =
   (payload: UpdateGroupOrderPayload) =>

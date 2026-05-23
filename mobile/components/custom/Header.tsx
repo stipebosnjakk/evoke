@@ -16,8 +16,8 @@ import {
   TODAY_SCOPE_ID,
 } from "@/constants/scopeIds";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { ScopeScreenId } from "@/types/task.types";
-import { updateScreenViewAction } from "@/store/user/thunks/config.thunks";
+import { ScopeScreenId } from "@/types/scope.types";
+import { updateScreenViewAction } from "@/store/thunks/config.thunks";
 
 const Header = () => {
   const dispatch = useAppDispatch();

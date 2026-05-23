@@ -10,8 +10,8 @@ import {
   validateTaskStatus,
   validateTaskTime,
   validateTaskTitle,
-} from "@/utils/validateTask";
-import { initialState } from "@/store/tasks/initialStates/newTask.initialState";
+} from "@/utils/validate";
+import { initialState } from "@/store/initialStates/newTask.initialState";
 import { toIsoDate } from "@/utils/date";
 
 export const setTitleReducer = (
@@ -179,4 +179,4 @@ export const clearCreateTaskErrorReducer = (state: NewTaskInitialState) => {
   state.error = null;
 };
 
-export const clearStateReducer = () => initialState;
+export const clearTaskStateReducer = () => initialState;

@@ -10,7 +10,7 @@ import { useAppDispatch } from "@/hooks/storeHooks";
 import {
   completeTaskAction,
   restoreCompletedTaskAction,
-} from "@/store/tasks/thunks/update.thunks";
+} from "@/store/thunks/update.thunks";
 import {
   formatTimeFromMin,
   getDateLabel,

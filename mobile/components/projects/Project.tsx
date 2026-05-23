@@ -1,24 +1,31 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SymbolView } from "expo-symbols";
+import { Project as ProjectType } from "@/db";
 
-const Project = () => {
+type ProjectProps = {
+  project: ProjectType;
+};
+
+const Project = ({ project }: ProjectProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeftSideContainer}>
           <View
-            style={[styles.colorContainer, { backgroundColor: "#8A6FDF" }]}
+            style={[styles.colorContainer, { backgroundColor: project.color }]}
           />
           <View style={styles.priorityBadge}>
-            <Text style={styles.priorityBadgeText}>Active</Text>
+            <Text style={styles.priorityBadgeText}>{project.status}</Text>
           </View>
         </View>
-        <SymbolView
-          name="ellipsis"
-          size={20}
-          type="monochrome"
-          tintColor="#9CA3AF"
-        />
+        <TouchableOpacity>
+          <SymbolView
+            name="ellipsis"
+            size={20}
+            type="monochrome"
+            tintColor="#9CA3AF"
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.textContainer}>
         <Text
@@ -26,7 +33,7 @@ const Project = () => {
           ellipsizeMode="tail"
           style={styles.projectTitle}
         >
-          Mobile App Bug Fixing
+          {project.name}
         </Text>
       </View>
       <View style={styles.footer}>
@@ -55,11 +62,11 @@ const Project = () => {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
     borderColor: "#efefef",
     borderRadius: 20,
     padding: 14,
-    gap: 14,
+    marginBottom: 12,
   },
   header: {
     flexDirection: "row",
@@ -80,6 +87,7 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems: "flex-start",
     justifyContent: "center",
+    marginTop: 8,
   },
   projectTitle: {
     color: "#18181B",

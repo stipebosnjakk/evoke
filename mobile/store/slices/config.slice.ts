@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { initialState } from "@/store/user/initialStates/config.initialState";
+import { initialState } from "@/store/initialStates/config.initialState";
 import {
   clearUserConfigErrorReducer,
   updateGroupOrderReducer,
@@ -9,7 +9,7 @@ import {
   setUserConfigReducer,
   updateIsOpenGroupReducer,
   updateScreenViewReducer,
-} from "@/store/user/reducers/setUserConfig.reducer";
+} from "@/store/reducers/createUserConfig.reducer";
 
 const configSlice = createSlice({
   name: "user",

@@ -14,14 +14,14 @@ import Toast from "react-native-toast-message";
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
 import Shortcuts from "@/components/features/Shortcuts";
-import { setStartDate, setTime } from "@/store/tasks/slices/newTask.slice";
+import { setStartDate, setTime } from "@/store/slices/newTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
 import { formatTimeFromMin, minDate } from "@/utils/date";
 import { routes } from "@/constants/routes";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskStartDate } from "@/utils/validateTask";
+import { validateTaskStartDate } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
 
 const DateFormSheet = () => {

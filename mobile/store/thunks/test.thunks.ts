@@ -4,7 +4,7 @@ import { tasks } from "@/db/schemas/task.schema";
 import { db } from "@/db/client";
 import { RejectWithValue } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
-import { list_order } from "@/db";
+import { list_order, projects } from "@/db";
 
 export const deleteAllTasksAction = createAsyncThunk<
   void,
@@ -14,6 +14,7 @@ export const deleteAllTasksAction = createAsyncThunk<
   try {
     await db.delete(tasks);
     await db.delete(list_order);
+    await db.delete(projects);
   } catch (error: unknown) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to delete all tasks"),

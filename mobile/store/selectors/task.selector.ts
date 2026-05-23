@@ -4,7 +4,13 @@ import { startOfToday } from "date-fns";
 import { Task } from "@/db";
 import { RootState } from "@/store/store";
 import { toIsoDate } from "@/utils/date";
-import { ScopeGroupId, TaskWithOrderKey } from "@/types/task.types";
+import { selectProjects } from "@/store/selectors/projects.selector";
+import {
+  ProjectsGroupId,
+  ScopeGroupId,
+  TodayGroupId,
+  UpcomingGroupId,
+} from "@/types/scope.types";
 import {
   isCompletedTodayTask,
   isInboxTask,
@@ -13,9 +19,9 @@ import {
 } from "@/utils/taskPlacement";
 import {
   GroupByIdType,
-  TodayGroupsById,
-  UpcomingGroupsById,
-} from "@/types/initialState.types";
+  GroupData,
+  SelectDataReturn,
+} from "@/types/group.types";
 import {
   TODAY_SCOPE_COMPLETED_ID,
   TODAY_SCOPE_DUE_TODAY_ID,
@@ -25,39 +31,38 @@ import {
   UPCOMING_SCOPE_UPCOMING_ID,
   UPCOMING_SCOPE_WAITING_ID,
 } from "@/constants/scopeIds";
+import { OrderObject } from "@/types/initialState.types";
+import { TaskWithOrderKey } from "@/types/task.types";
 
 export const selectTaskIds = (state: RootState) => state.tasks.tasks.ids;
 export const selectTasksById = (state: RootState) => state.tasks.tasks.byId;
 export const selectInboxOrder = (state: RootState) =>
   state.tasks.taskOrder.inbox;
 
-type SelectScreenReturn = {
-  groupsById: GroupByIdType;
-  list: Task[];
-  total: number;
-};
-
 export const selectTodayTasks = createSelector(
   [selectTaskIds, selectTasksById],
-  (ids, byId): SelectScreenReturn => {
+  (
+    ids: string[],
+    byId: Record<string, Task>,
+  ): SelectDataReturn<TodayGroupId> => {
     const today = toIsoDate(startOfToday());
 
-    const groupsById: TodayGroupsById = {
+    const groupsById: GroupByIdType<TodayGroupId> = {
       [TODAY_SCOPE_OVERDUE_ID]: {
         title: "Overdue",
-        tasks: [],
+        data: [],
       },
       [TODAY_SCOPE_DUE_TODAY_ID]: {
         title: "Due Today",
-        tasks: [],
+        data: [],
       },
       [TODAY_SCOPE_READY_ID]: {
         title: "Ready",
-        tasks: [],
+        data: [],
       },
       [TODAY_SCOPE_COMPLETED_ID]: {
         title: "Completed",
-        tasks: [],
+        data: [],
       },
     };
 
@@ -65,29 +70,29 @@ export const selectTodayTasks = createSelector(
       const task = byId[id];
 
       if (isCompletedTodayTask(task)) {
-        groupsById[TODAY_SCOPE_COMPLETED_ID].tasks.push(task);
+        groupsById[TODAY_SCOPE_COMPLETED_ID].data.push(task);
       }
 
       if (!isTodayTask(task)) continue;
 
       if (task.deadline && task.deadline < today) {
-        groupsById[TODAY_SCOPE_OVERDUE_ID].tasks.push(task);
+        groupsById[TODAY_SCOPE_OVERDUE_ID].data.push(task);
       }
 
       if (task.deadline === today) {
-        groupsById[TODAY_SCOPE_DUE_TODAY_ID].tasks.push(task);
+        groupsById[TODAY_SCOPE_DUE_TODAY_ID].data.push(task);
       }
 
       if (!task.deadline || task.deadline > today) {
-        groupsById[TODAY_SCOPE_READY_ID].tasks.push(task);
+        groupsById[TODAY_SCOPE_READY_ID].data.push(task);
       }
     }
 
-    const list = [
-      ...groupsById[TODAY_SCOPE_OVERDUE_ID].tasks,
-      ...groupsById[TODAY_SCOPE_DUE_TODAY_ID].tasks,
-      ...groupsById[TODAY_SCOPE_READY_ID].tasks,
-    ];
+    const list: Task[] = [];
+
+    Object.values(groupsById).forEach((group) => {
+      list.push(...group.data);
+    });
 
     return {
       total: list.length,
@@ -99,19 +104,22 @@ export const selectTodayTasks = createSelector(
 
 export const selectUpcomingTasks = createSelector(
   [selectTaskIds, selectTasksById],
-  (ids, byId): SelectScreenReturn => {
-    const groupsById: UpcomingGroupsById = {
+  (
+    ids: string[],
+    byId: Record<string, Task>,
+  ): SelectDataReturn<UpcomingGroupId> => {
+    const groupsById: GroupByIdType<UpcomingGroupId> = {
       [UPCOMING_SCOPE_UPCOMING_ID]: {
         title: "Upcoming",
-        tasks: [],
+        data: [],
       },
       [UPCOMING_SCOPE_WAITING_ID]: {
         title: "Waiting",
-        tasks: [],
+        data: [],
       },
       [UPCOMING_SCOPE_SOMEDAY_ID]: {
         title: "Someday",
-        tasks: [],
+        data: [],
       },
     };
 
@@ -121,23 +129,23 @@ export const selectUpcomingTasks = createSelector(
       if (!isUpcomingTask(task)) continue;
 
       if (task.status === "waiting") {
-        groupsById[UPCOMING_SCOPE_WAITING_ID].tasks.push(task);
+        groupsById[UPCOMING_SCOPE_WAITING_ID].data.push(task);
       }
 
       if (task.status === "someday") {
-        groupsById[UPCOMING_SCOPE_SOMEDAY_ID].tasks.push(task);
+        groupsById[UPCOMING_SCOPE_SOMEDAY_ID].data.push(task);
       }
 
       if (task.status === "next") {
-        groupsById[UPCOMING_SCOPE_UPCOMING_ID].tasks.push(task);
+        groupsById[UPCOMING_SCOPE_UPCOMING_ID].data.push(task);
       }
     }
 
-    const list = [
-      ...groupsById[UPCOMING_SCOPE_UPCOMING_ID].tasks,
-      ...groupsById[UPCOMING_SCOPE_WAITING_ID].tasks,
-      ...groupsById[UPCOMING_SCOPE_SOMEDAY_ID].tasks,
-    ];
+    const list: Task[] = [];
+
+    Object.values(groupsById).forEach((group) => {
+      list.push(...group.data);
+    });
 
     return {
       total: list.length,
@@ -147,30 +155,35 @@ export const selectUpcomingTasks = createSelector(
   },
 );
 
-type TodayGroupSelectReturn = {
-  title: string;
-  tasks: Task[];
-};
-
 export const selectTasksGroupById = createSelector(
   [
     selectTodayTasks,
     selectUpcomingTasks,
+    selectProjects,
     (_: RootState, groupId: ScopeGroupId) => groupId,
   ],
-  (today, upcoming, groupId): TodayGroupSelectReturn => {
-    const group = today.groupsById[groupId] ?? upcoming.groupsById[groupId];
-
-    return {
-      title: group?.title ?? "Tasks",
-      tasks: group?.tasks ?? [],
+  (
+    today: SelectDataReturn<TodayGroupId>,
+    upcoming: SelectDataReturn<UpcomingGroupId>,
+    projects: SelectDataReturn<ProjectsGroupId>,
+    groupId: ScopeGroupId,
+  ): GroupData => {
+    const groupsById: GroupByIdType<ScopeGroupId> = {
+      ...today.groupsById,
+      ...upcoming.groupsById,
+      ...projects.groupsById,
     };
+    return groupsById[groupId];
   },
 );
 
 export const selectInboxTasks = createSelector(
   [selectTaskIds, selectTasksById, selectInboxOrder],
-  (ids, byId, inboxOrder): TaskWithOrderKey[] => {
+  (
+    ids: string[],
+    byId: Record<string, Task>,
+    inboxOrder: OrderObject,
+  ): TaskWithOrderKey[] => {
     return ids
       .filter((id) => isInboxTask(byId[id]))
       .sort((a, b) => inboxOrder[b] - inboxOrder[a])

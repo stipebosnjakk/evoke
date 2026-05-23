@@ -8,7 +8,7 @@ import { useCalendars } from "expo-localization";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Toast from "react-native-toast-message";
 
-import { setTime as setTimeSlice } from "@/store/tasks/slices/newTask.slice";
+import { setTime as setTimeSlice } from "@/store/slices/newTask.slice";
 import {
   getDurationMin,
   getDurationFromDurationMin,
@@ -17,7 +17,7 @@ import {
 } from "@/utils/date";
 import { useAppSelector } from "@/hooks/storeHooks";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskTime } from "@/utils/validateTask";
+import { validateTaskTime } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
 
 const TimeFormSheet = () => {

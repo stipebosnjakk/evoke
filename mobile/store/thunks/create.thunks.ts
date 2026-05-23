@@ -2,19 +2,27 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 
-import { createTaskRepo } from "@/db/repositories/create.repo";
+import {
+  createProjectRepo,
+  createTaskRepo,
+} from "@/db/repositories/create.repo";
 import { RejectWithValue, TaskWithOrderKey } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import {
-  clearState,
+  clearTaskState,
   validateTextInputs,
-} from "@/store/tasks/slices/newTask.slice";
+} from "@/store/slices/newTask.slice";
 import { RootState } from "@/store/store";
 import {
   getTaskPlacement,
   getTaskScreenHref,
   getTaskScreenText,
 } from "@/utils/taskPlacement";
+import { ProjectWithOrderKey } from "@/types/project.types";
+import {
+  validateNameAndColor,
+  clearProjectState,
+} from "@/store/slices/newProject.slice";
 
 export const createTaskAction = createAsyncThunk<
   TaskWithOrderKey,
@@ -30,14 +38,6 @@ export const createTaskAction = createAsyncThunk<
     if (newTask.error) {
       return rejectWithValue({
         message: newTask.error,
-      });
-    }
-
-    const title = newTask.task.title?.trim();
-
-    if (!title) {
-      return rejectWithValue({
-        message: "Title is required",
       });
     }
 
@@ -65,12 +65,53 @@ export const createTaskAction = createAsyncThunk<
       },
     });
 
-    dispatch(clearState());
+    dispatch(clearTaskState());
 
     return res;
   } catch (error: unknown) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to create task"),
+    });
+  }
+});
+
+export const createProjectAction = createAsyncThunk<
+  ProjectWithOrderKey,
+  void,
+  { rejectValue: RejectWithValue }
+>("projects/create", async (_, { dispatch, getState, rejectWithValue }) => {
+  try {
+    await dispatch(validateNameAndColor());
+
+    const state = getState() as RootState;
+    const { newProject } = state;
+
+    if (newProject.error) {
+      return rejectWithValue({
+        message: newProject.error,
+      });
+    }
+
+    const res = await createProjectRepo(newProject.project);
+
+    if (!res.project) {
+      return rejectWithValue({
+        message: "Project was not created properly",
+      });
+    }
+
+    Toast.show({
+      type: "info",
+      text1: res.project.name || "Project created",
+      text2: "Project created successfully",
+    });
+
+    dispatch(clearProjectState());
+
+    return res;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to create a project"),
     });
   }
 });

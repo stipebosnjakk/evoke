@@ -2,7 +2,7 @@ import { ActivityIndicator, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppSelector } from "@/hooks/storeHooks";
-import { selectUpcomingTasks } from "@/store/tasks/selectors/task.selector";
+import { selectUpcomingTasks } from "@/store/selectors/task.selector";
 import { UPCOMING_SCOPE_ID } from "@/constants/scopeIds";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";

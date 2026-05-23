@@ -8,9 +8,9 @@ import Toast from "react-native-toast-message";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { REPEAT_OPTIONS } from "@/constants/repeat";
 import { Weekday } from "@/types/task.types";
-import { setRepeat } from "@/store/tasks/slices/newTask.slice";
+import { setRepeat } from "@/store/slices/newTask.slice";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskRepeat } from "@/utils/validateTask";
+import { validateTaskRepeat } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
 
 const RepeatFormSheet = () => {

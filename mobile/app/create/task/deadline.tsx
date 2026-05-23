@@ -1,5 +1,11 @@
 import { useState, useRef } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useDispatch } from "react-redux";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
@@ -10,10 +16,10 @@ import { IsoDate } from "@/types/task.types";
 import { minDate } from "@/utils/date";
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
-import { setDeadline } from "@/store/tasks/slices/newTask.slice";
+import { setDeadline } from "@/store/slices/newTask.slice";
 import Shortcuts from "@/components/features/Shortcuts";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskDeadline } from "@/utils/validateTask";
+import { validateTaskDeadline } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
 
 const DeadlineFormSheet = () => {
@@ -110,7 +116,10 @@ const DeadlineFormSheet = () => {
           </View>
           {deadlineValue && (
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.button} onPress={handleNoDeadline}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleNoDeadline}
+              >
                 <SymbolView
                   name="minus.circle"
                   weight="medium"

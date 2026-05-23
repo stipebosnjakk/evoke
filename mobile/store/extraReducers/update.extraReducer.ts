@@ -6,7 +6,7 @@ import {
   rebalanceOrderKeysAction,
   restoreCompletedTaskAction,
   updateTaskOrderKeyAction,
-} from "@/store/tasks/thunks/update.thunks";
+} from "@/store/thunks/update.thunks";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
 export const addReorderExtraReducers = (

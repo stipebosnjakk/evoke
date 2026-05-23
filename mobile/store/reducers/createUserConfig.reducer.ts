@@ -1,11 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import {
-  UserConfig,
-  UserState,
-  GroupConfig,
-  ViewType,
-} from "@/types/initialState.types";
-import { ScopeScreenId, ScopeGroupId } from "@/types/task.types";
+
+import { UserState } from "@/types/initialState.types";
+import { GroupConfig } from "@/types/group.types";
+import { UserConfig, ViewType } from "@/types/config.types";
+import { ScopeGroupId, ScopeScreenId } from "@/types/scope.types";
 
 export const setUserConfigLoadingReducer = (state: UserState) => {
   state.status = "loading";

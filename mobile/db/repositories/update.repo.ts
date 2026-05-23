@@ -81,7 +81,7 @@ export const rebalanceOrderKeys = async (
           .set({ order_key: item.order_key })
           .where(
             and(
-              eq(list_order.task_id, item.id),
+              eq(list_order.item_id, item.id),
               eq(list_order.scope_id, scopeId),
             ),
           );
@@ -114,7 +114,7 @@ export const updateTaskOrderKey = async (
     const result = await db
       .update(list_order)
       .set({ order_key })
-      .where(and(eq(list_order.task_id, id), eq(list_order.scope_id, scopeId)));
+      .where(and(eq(list_order.item_id, id), eq(list_order.scope_id, scopeId)));
 
     if (!result) {
       throw new Error(

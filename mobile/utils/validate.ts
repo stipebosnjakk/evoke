@@ -1,18 +1,8 @@
+import { projectColors } from "@/constants/colors";
 import { STATUS_OPTIONS } from "@/constants/status";
+import { ValidationResult } from "@/types/initialState.types";
 import { IsoDate, TaskStatusOptionsArray, Weekday } from "@/types/task.types";
 import { isValidIsoDate } from "@/utils/date";
-
-type ValidationResult<T> =
-  | {
-      ok: true;
-      data: T;
-      message: string;
-    }
-  | {
-      ok: false;
-      data: null;
-      message: string;
-    };
 
 export const validateTaskStatus = (
   data: TaskStatusOptionsArray | null,
@@ -347,5 +337,69 @@ export const validateTaskTime = (
       duration_min: normalizedDuration,
     },
     message: "Time saved successfully",
+  };
+};
+
+export const validateProjectName = (
+  data: string | null,
+): ValidationResult<string> => {
+  if (!data) {
+    return {
+      ok: false,
+      data: null,
+      message: "Project name is required",
+    };
+  }
+
+  const name = data.trim();
+
+  if (!name) {
+    return {
+      ok: false,
+      data: null,
+      message: "Project name is required",
+    };
+  }
+
+  if (name.length > 255) {
+    return {
+      ok: false,
+      data: null,
+      message: "Project name must be 255 characters or less",
+    };
+  }
+
+  return {
+    ok: true,
+    data: name,
+    message: "Project name saved successfully",
+  };
+};
+
+export const validateProjectColor = (
+  data: string | null,
+): ValidationResult<string> => {
+  if (!data) {
+    return {
+      ok: false,
+      data: null,
+      message: "Project color is required",
+    };
+  }
+
+  const color = projectColors.find((item) => item.hex === data);
+
+  if (!color) {
+    return {
+      ok: false,
+      data: null,
+      message: "Project color is invalid",
+    };
+  }
+
+  return {
+    ok: true,
+    data: color.hex,
+    message: "Project color saved successfully",
   };
 };

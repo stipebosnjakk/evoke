@@ -4,12 +4,12 @@ import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
 import { getItemFor, storeData } from "@/utils/storage";
 import { getErrorMessage } from "@/utils/error";
 import { useAppDispatch } from "@/hooks/storeHooks";
-import { UserConfig } from "@/types/initialState.types";
+import { UserConfig } from "@/types/config.types";
 import {
   setUserConfig,
   setUserConfigError,
   setUserConfigLoading,
-} from "@/store/user/slices/config.slice";
+} from "@/store/slices/config.slice";
 
 export const useLoadUserConfig = () => {
   const dispatch = useAppDispatch();

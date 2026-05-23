@@ -8,7 +8,7 @@ import DraggableFlatList, {
 import {
   rebalanceOrderKeysAction,
   updateTaskOrderKeyAction,
-} from "@/store/tasks/thunks/update.thunks";
+} from "@/store/thunks/update.thunks";
 import {
   calculateNewOrderKey,
   checkForRebalance,

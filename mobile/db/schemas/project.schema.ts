@@ -10,7 +10,7 @@ export const projects = t.sqliteTable("projects", {
     .primaryKey()
     .$defaultFn(() => createId()),
   name: t.text("name").notNull(),
-  color: t.text("color"),
+  color: t.text("color").notNull(),
   status: t.text("status").$type<ProjectStatus>().notNull().default("active"),
   completed_at: t.integer("completed_at"),
   archived_at: t.integer("archived_at"),

@@ -1,32 +1,49 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { useDispatch } from "react-redux";
 
 import { projectColors } from "@/constants/colors";
 import { SymbolView } from "expo-symbols";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
+import { setColor } from "@/store/slices/newProject.slice";
+import { useAppSelector } from "@/hooks/storeHooks";
 
 const ColorFormSheet = () => {
-  const selected = false;
+  const dispatch = useDispatch();
+
+  const selectedColor = useAppSelector(
+    (state) => state.newProject.project.color,
+  );
+
   return (
     <SheetWrapper>
       <SheetHeader title="Color" />
       <View style={styles.container}>
-        {projectColors.map((color) => (
-          <View
-            key={color.value}
-            style={[styles.colorContainer, { backgroundColor: color.value }]}
-          >
-            {selected && (
-              <SymbolView
-                name="checkmark"
-                weight="medium"
-                size={20}
-                type="monochrome"
-                tintColor="rgb(67, 67, 67)"
-              />
-            )}
-          </View>
-        ))}
+        {projectColors.map((projectColor) => {
+          const backgroundColor = projectColor.hex;
+          const isSelected = selectedColor === projectColor.hex;
+
+          return (
+            <TouchableOpacity
+              key={projectColor.hex}
+              onPress={() => {
+                dispatch(setColor({ color: projectColor.hex }));
+              }}
+              style={[styles.colorContainer, { backgroundColor }]}
+              activeOpacity={0.8}
+            >
+              {isSelected && (
+                <SymbolView
+                  name="checkmark"
+                  weight="medium"
+                  size={20}
+                  type="monochrome"
+                  tintColor="#FFFFFF"
+                />
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </SheetWrapper>
   );
@@ -46,6 +63,8 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

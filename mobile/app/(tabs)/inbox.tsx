@@ -4,7 +4,7 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/tasks/DraggableTaskList";
-import { selectInboxTasks } from "@/store/tasks/selectors/task.selector";
+import { selectInboxTasks } from "@/store/selectors/task.selector";
 
 const InboxScreen = () => {
   const status = useAppSelector((state) => state.tasks.status);

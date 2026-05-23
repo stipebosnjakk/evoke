@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { initialState } from "@/store/tasks/initialStates/newTask.initialState";
+import { initialState } from "@/store/initialStates/newTask.initialState";
 import {
   setDeadlineReducer,
   setDescriptionReducer,
@@ -11,9 +11,9 @@ import {
   setTitleReducer,
   validateTextInputsReducer,
   sendErrorMessageReducer,
-  clearStateReducer,
+  clearTaskStateReducer,
   clearCreateTaskErrorReducer,
-} from "@/store/tasks/reducers/createTask.reducer";
+} from "@/store/reducers/createTask.reducer";
 
 const newTaskSlice = createSlice({
   name: "newTask",
@@ -28,7 +28,7 @@ const newTaskSlice = createSlice({
     setDeadline: setDeadlineReducer,
     validateTextInputs: validateTextInputsReducer,
     sendErrorMessage: sendErrorMessageReducer,
-    clearState: clearStateReducer,
+    clearTaskState: clearTaskStateReducer,
     clearCreateTaskError: clearCreateTaskErrorReducer,
   },
 });
@@ -43,7 +43,7 @@ export const {
   setDeadline,
   validateTextInputs,
   sendErrorMessage,
-  clearState,
+  clearTaskState,
   clearCreateTaskError,
 } = newTaskSlice.actions;
 

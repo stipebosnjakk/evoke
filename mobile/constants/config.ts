@@ -10,8 +10,11 @@ import {
   UPCOMING_SCOPE_UPCOMING_ID,
   UPCOMING_SCOPE_WAITING_ID,
   UPCOMING_SCOPE_SOMEDAY_ID,
+  PROJECTS_SCOPE_ACTIVE_ID,
+  PROJECTS_SCOPE_ARCHIVED_ID,
+  PROJECTS_SCOPE_COMPLETED_ID,
 } from "@/constants/scopeIds";
-import { UserConfig } from "@/types/initialState.types";
+import { UserConfig } from "@/types/config.types";
 
 export const USER_CONFIG = process.env.EXPO_PUBLIC_USER_CONFIG ?? "USER_CONFIG";
 
@@ -64,8 +67,24 @@ export const defaultUserConfig: UserConfig = {
       ],
     },
     [PROJECTS_SCOPE_ID]: {
-      view: null,
-      group_order: [],
+      view: "list",
+      group_order: [
+        {
+          id: PROJECTS_SCOPE_ACTIVE_ID,
+          order_key: 3,
+          isOpen: true,
+        },
+        {
+          id: PROJECTS_SCOPE_ARCHIVED_ID,
+          order_key: 2,
+          isOpen: true,
+        },
+        {
+          id: PROJECTS_SCOPE_COMPLETED_ID,
+          order_key: 1,
+          isOpen: true,
+        },
+      ],
     },
     [INBOX_SCOPE_ID]: {
       view: null,

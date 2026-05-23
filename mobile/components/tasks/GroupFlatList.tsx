@@ -1,28 +1,44 @@
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, {
   DragEndParams,
 } from "react-native-draggable-flatlist";
+import {
+  ActivityIndicator,
+  View,
+  ListRenderItem,
+  ViewStyle,
+  StyleProp,
+} from "react-native";
 
-import GroupView, { GroupType } from "./GroupView";
+import GroupView from "./GroupView";
+import { Project, Task } from "@/db";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { updateGroupOrderAction } from "@/store/user/thunks/config.thunks";
-import { GroupByIdType, Status } from "@/types/initialState.types";
-import { ScopeScreenId } from "@/types/task.types";
+import { updateGroupOrderAction } from "@/store/thunks/config.thunks";
+import { ScopeScreenId } from "@/types/scope.types";
+import { GroupByIdType, ResolvedGroupConfig } from "@/types/group.types";
+import { Status } from "@/types/initialState.types";
 
 type RenderDraggableGroup = {
-  item: GroupType;
+  item: ResolvedGroupConfig<any>;
   drag: () => void;
 };
 
 type GroupFlatListType = {
-  groupsById: GroupByIdType;
+  groupsById: GroupByIdType<string>;
   scopeId: ScopeScreenId;
   status: Status;
+  renderItem: ListRenderItem<any>;
+  style?: StyleProp<ViewStyle>;
 };
 
-const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
+const GroupFlatList = ({
+  groupsById,
+  scopeId,
+  status,
+  renderItem,
+  style,
+}: GroupFlatListType) => {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
 
@@ -46,14 +62,18 @@ const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
           {
             ...group,
             title: groupData.title,
-            tasks: groupData.tasks,
+            data: groupData.data,
           },
         ];
       })
-      .sort((a: GroupType, b: GroupType) => b.order_key - a.order_key);
+      .sort((a, b) => b.order_key - a.order_key);
   }, [config, groupsById, scopeId]);
 
-  const handleOnDragEnd = ({ data, from, to }: DragEndParams<GroupType>) => {
+  const handleOnDragEnd = ({
+    data,
+    from,
+    to,
+  }: DragEndParams<ResolvedGroupConfig<Task | Project>>) => {
     setIsDraggingGroup(false);
 
     if (from === to) return;
@@ -74,7 +94,7 @@ const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
     });
   }, []);
 
-  const renderItem = useCallback(
+  const renderGroup = useCallback(
     ({ item, drag }: RenderDraggableGroup) => {
       return (
         <GroupView
@@ -82,10 +102,11 @@ const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
           group={item}
           onDragStart={() => handleOnDragStart(drag)}
           isDraggingGroup={isDraggingGroup}
+          renderItem={renderItem}
         />
       );
     },
-    [scopeId, handleOnDragStart, isDraggingGroup],
+    [scopeId, handleOnDragStart, isDraggingGroup, renderItem],
   );
 
   const ListFooterComponent = (
@@ -98,13 +119,18 @@ const GroupFlatList = ({ groupsById, scopeId, status }: GroupFlatListType) => {
     <DraggableFlatList
       data={groups}
       activationDistance={12}
-      keyExtractor={(group: GroupType) => group.id}
+      keyExtractor={(group: ResolvedGroupConfig<Task | Project>) => group.id}
       showsVerticalScrollIndicator={false}
       ListFooterComponent={ListFooterComponent}
-      renderItem={renderItem}
+      renderItem={renderGroup}
       onDragBegin={() => setIsDraggingGroup(true)}
       onDragEnd={handleOnDragEnd}
-      contentContainerStyle={{ paddingTop: headerH + headerFadeExtra }}
+      contentContainerStyle={[
+        {
+          paddingTop: headerH + headerFadeExtra,
+        },
+        style,
+      ]}
     />
   );
 };

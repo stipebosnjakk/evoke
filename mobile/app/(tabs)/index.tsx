@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
 import { useAppSelector } from "@/hooks/storeHooks";
-import { selectTodayTasks } from "@/store/tasks/selectors/task.selector";
+import { selectTodayTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import GroupFlatList from "@/components/tasks/GroupFlatList";
 import Task from "@/components/tasks/Task";
@@ -46,6 +46,7 @@ const TodayScreen = () => {
             groupsById={groupsById}
             scopeId={TODAY_SCOPE_ID}
             status={status}
+            renderItem={({ item }) => <Task task={item} />}
           />
         ) : (
           <FlatList

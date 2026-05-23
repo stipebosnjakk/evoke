@@ -6,6 +6,7 @@ import {
   View,
   Pressable,
   FlatList,
+  ListRenderItem,
 } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
@@ -18,25 +19,19 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import Task from "./Task";
-import { Task as TaskDBType } from "@/db";
-import { ScopeGroupId, ScopeScreenId } from "@/types/task.types";
-import { useAppDispatch } from "@/hooks/storeHooks";
-import { updateIsOpenGroupAction } from "@/store/user/thunks/config.thunks";
 
-export type GroupType = {
-  id: ScopeGroupId;
-  title: string;
-  isOpen: boolean;
-  order_key: number;
-  tasks: TaskDBType[];
-};
+import { ScopeScreenId } from "@/types/scope.types";
+import { useAppDispatch } from "@/hooks/storeHooks";
+import { updateIsOpenGroupAction } from "@/store/thunks/config.thunks";
+import { ResolvedGroupConfig } from "@/types/group.types";
+import { Project, Task as TaskDBType } from "@/db";
 
 type GroupViewType = {
   scopeId: ScopeScreenId;
-  group: GroupType;
+  group: ResolvedGroupConfig<TaskDBType | Project>;
   isDraggingGroup: boolean;
   onDragStart: () => void;
+  renderItem: ListRenderItem<any>;
 };
 
 const LIMIT_PER_GROUP = 3;
@@ -49,14 +44,15 @@ const GroupView = ({
   group,
   onDragStart,
   isDraggingGroup,
+  renderItem,
 }: GroupViewType) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const tasks = group.tasks.slice(0, LIMIT_PER_GROUP);
-  const viewMore = group.tasks.length - LIMIT_PER_GROUP;
+  const data = group.data.slice(0, LIMIT_PER_GROUP);
+  const viewMore = group.data.length - LIMIT_PER_GROUP;
 
-  const showTasks = group.isOpen && !isDraggingGroup;
+  const showData = group.isOpen && !isDraggingGroup;
 
   const toggleIsOpen = () => {
     dispatch(
@@ -75,16 +71,16 @@ const GroupView = ({
     });
   };
 
-  const arrowRotation = useSharedValue(showTasks ? 90 : 0);
+  const arrowRotation = useSharedValue(showData ? 90 : 0);
   const arrowStyle = useAnimatedStyle(() => ({
     transform: [{ rotateZ: `${arrowRotation.value}deg` }],
   }));
 
   useEffect(() => {
-    arrowRotation.value = withTiming(showTasks ? 90 : 0, { duration: 160 });
-  }, [showTasks, arrowRotation]);
+    arrowRotation.value = withTiming(showData ? 90 : 0, { duration: 160 });
+  }, [showData, arrowRotation]);
 
-  if (group.tasks.length === 0) return null;
+  if (group.data.length === 0) return null;
 
   return (
     <Animated.View
@@ -95,7 +91,7 @@ const GroupView = ({
         <Pressable onPress={navigateToGroupView} style={styles.sidesHeader}>
           <Text style={styles.title}>{group.title}</Text>
           <View style={styles.totalContainer}>
-            <Text style={styles.totalText}>{group.tasks.length}</Text>
+            <Text style={styles.totalText}>{group.data.length}</Text>
           </View>
           <SymbolView name="chevron.right" size={13} tintColor="#B7ADA1" />
         </Pressable>
@@ -118,7 +114,7 @@ const GroupView = ({
           </Pressable>
         </View>
       </View>
-      {showTasks && (
+      {showData && (
         <Animated.View
           style={styles.tasksContainer}
           entering={entering}
@@ -127,9 +123,9 @@ const GroupView = ({
           collapsable={false}
         >
           <FlatList
-            data={tasks}
-            keyExtractor={(task) => task.id}
-            renderItem={({ item }) => <Task task={item} />}
+            data={data}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
             showsVerticalScrollIndicator={false}
           />
           {viewMore > 0 && (

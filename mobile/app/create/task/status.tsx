@@ -6,10 +6,10 @@ import Toast from "react-native-toast-message";
 
 import { STATUS_OPTIONS } from "@/constants/status";
 import { TaskStatusOption } from "@/types/task.types";
-import { setStatus } from "@/store/tasks/slices/newTask.slice";
+import { setStatus } from "@/store/slices/newTask.slice";
 import { useAppSelector } from "@/hooks/storeHooks";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskStatus } from "@/utils/validateTask";
+import { validateTaskStatus } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
 import Info from "@/components/ui/Info";
 

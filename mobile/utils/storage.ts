@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { getErrorMessage } from "./error";
 import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
-import { setUserConfig } from "@/store/user/slices/config.slice";
+import { setUserConfig } from "@/store/slices/config.slice";
 import { AppDispatch } from "@/store/store";
 
 /**

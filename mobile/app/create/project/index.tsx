@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,22 +8,59 @@ import {
 } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
 import { routes } from "@/constants/routes";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { clearProjectState, setName } from "@/store/slices/newProject.slice";
+import { getErrorMessage } from "@/utils/error";
+import { createProjectAction } from "@/store/thunks/create.thunks";
+import { projectColors } from "@/constants/colors";
 
 const CreateProjectFormSheet = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const [name, setName] = useState("");
+  const loading = useAppSelector((state) => state.newProject.loading);
+  const name = useAppSelector((state) => state.newProject.project.name);
+  const color = useAppSelector((state) => state.newProject.project.color);
+
+  const selectedColor = projectColors.find((item) => item.hex === color);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearProjectState());
+    };
+  }, [dispatch]);
+
+  const handleSubmitFunction = async () => {
+    if (loading) return;
+    try {
+      await dispatch(createProjectAction()).unwrap();
+    } catch (error) {
+      console.error(error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to create a project",
+        text2: getErrorMessage(error, "Something went wrong."),
+      });
+    }
+  };
 
   const navigateToColor = () => {
     router.push(routes.create_project_color.href);
   };
+
   return (
     <SheetWrapper>
-      <SheetHeader title="Create a project" submitButtonVisible />
+      <SheetHeader
+        title="Create a project"
+        submitButtonVisible
+        submitDisabled={!name.trim() || loading}
+        onSubmit={handleSubmitFunction}
+      />
       <View style={styles.nameContainer}>
         <TextInput
           autoFocus
@@ -34,7 +71,9 @@ const CreateProjectFormSheet = () => {
           returnKeyType="next"
           blurOnSubmit={false}
           keyboardType="default"
-          onChangeText={setName}
+          onChangeText={(text) => {
+            dispatch(setName({ name: text }));
+          }}
         />
       </View>
       <TouchableOpacity
@@ -54,8 +93,15 @@ const CreateProjectFormSheet = () => {
           <Text style={styles.leftSideColorText}>Color</Text>
         </View>
         <View style={styles.rightSideColorContainer}>
-          <Text style={styles.rightSideColorText}>Charcoal</Text>
-          <View style={styles.colorElement} />
+          <Text style={styles.rightSideColorText}>
+            {selectedColor?.name || projectColors[0]?.name}
+          </Text>
+          <View
+            style={[
+              styles.colorElement,
+              { backgroundColor: selectedColor?.hex || projectColors[0]?.hex },
+            ]}
+          />
           <SymbolView
             name="chevron.right"
             size={12}
@@ -126,7 +172,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: "#3F3F46",
   },
 });
 

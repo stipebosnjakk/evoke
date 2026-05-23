@@ -13,17 +13,17 @@ import { useCalendars, useLocales } from "expo-localization";
 
 import Chip from "@/components/ui/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { createTaskAction } from "@/store/tasks/thunks/create.thunks";
+import { createTaskAction } from "@/store/thunks/create.thunks";
 import { getErrorMessage } from "@/utils/error";
 import { routes } from "@/constants/routes";
 import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
 import { STATUS_OPTIONS } from "@/constants/status";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import {
-  clearState,
+  clearTaskState,
   setDescription,
   setTitle,
-} from "@/store/tasks/slices/newTask.slice";
+} from "@/store/slices/newTask.slice";
 
 const CreateTaskFormSheet = () => {
   const router = useRouter();
@@ -65,7 +65,7 @@ const CreateTaskFormSheet = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearState());
+      dispatch(clearTaskState());
     };
   }, [dispatch]);
 

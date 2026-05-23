@@ -12,3 +12,6 @@ export const UPCOMING_SCOPE_WAITING_ID = "scope:upcoming:waiting";
 export const UPCOMING_SCOPE_SOMEDAY_ID = "scope:upcoming:someday";
 
 export const PROJECTS_SCOPE_ID = "scope:projects";
+export const PROJECTS_SCOPE_ACTIVE_ID = "scope:projects:active";
+export const PROJECTS_SCOPE_ARCHIVED_ID = "scope:projects:archived";
+export const PROJECTS_SCOPE_COMPLETED_ID = "scope:projects:completed";
