@@ -66,8 +66,8 @@ const GroupView = ({
 
   const navigateToGroupView = () => {
     router.push({
-      pathname: "/tasks/group/[groupId]",
-      params: { scopeId, groupId: group.id },
+      pathname: "/group/[groupId]",
+      params: { groupId: group.id, scopeId },
     });
   };
 

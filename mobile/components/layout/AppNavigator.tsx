@@ -78,7 +78,7 @@ const AppNavigator = () => {
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen
-              name={routes.task_single_group.route}
+              name={routes.single_group.route}
               options={{
                 presentation: "modal",
                 contentStyle: { backgroundColor: "white" },

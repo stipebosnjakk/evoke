@@ -66,10 +66,10 @@ export const routes = {
     href: "/create/task/status",
     route: "create/task/status",
   },
-  task_single_group: {
+  single_group: {
     title: "Group",
-    href: "/tasks/group/[groupId]",
-    route: "tasks/group/[groupId]",
+    href: "/group/[groupId]",
+    route: "group/[groupId]",
   },
 } as const;
 

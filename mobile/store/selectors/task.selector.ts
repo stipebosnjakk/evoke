@@ -155,7 +155,7 @@ export const selectUpcomingTasks = createSelector(
   },
 );
 
-export const selectTasksGroupById = createSelector(
+export const selectGroupById = createSelector(
   [
     selectTodayTasks,
     selectUpcomingTasks,
