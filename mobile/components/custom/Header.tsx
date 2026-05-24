@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { LinearGradient } from "expo-linear-gradient";
 import { easeGradient } from "react-native-easing-gradient";
@@ -18,6 +18,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { ScopeScreenId } from "@/types/scope.types";
 import { updateScreenViewAction } from "@/store/thunks/config.thunks";
+import Button from "@/components/ui/Button";
 
 const Header = () => {
   const dispatch = useAppDispatch();
@@ -110,14 +111,14 @@ const Header = () => {
         ]}
       >
         <View style={styles.left}>
-          <TouchableOpacity onPress={() => {}}>
+          <Button onPress={() => {}}>
             <SymbolView
               name="magnifyingglass"
               size={23}
               type="monochrome"
               tintColor="#111827"
             />
-          </TouchableOpacity>
+          </Button>
         </View>
         <View style={styles.center} pointerEvents="none">
           <Text style={styles.title} numberOfLines={1}>
@@ -127,7 +128,7 @@ const Header = () => {
         <View style={styles.right}>
           <View style={styles.rightActions}>
             {view && (
-              <TouchableOpacity onPress={toggleView}>
+              <Button onPress={toggleView}>
                 <SymbolView
                   name={
                     view === "group"
@@ -137,16 +138,16 @@ const Header = () => {
                   tintColor="black"
                   size={23}
                 />
-              </TouchableOpacity>
+              </Button>
             )}
-            <TouchableOpacity onPress={navigateToCreateModal}>
+            <Button onPress={navigateToCreateModal}>
               <SymbolView
                 name="plus"
                 size={23}
                 type="monochrome"
                 tintColor="#111827"
               />
-            </TouchableOpacity>
+            </Button>
           </View>
         </View>
       </View>
