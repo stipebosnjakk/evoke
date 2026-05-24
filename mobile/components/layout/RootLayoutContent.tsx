@@ -3,7 +3,6 @@ import { ActivityIndicator } from "react-native";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import Toast from "react-native-toast-message";
 
-import "@/global.css";
 import { toastConfig } from "@/components/ui/ToastConfig";
 import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
