@@ -1,5 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SymbolView } from "expo-symbols";
+
+import ProjectMenu from "./ProjectMenu";
+import AddTaskMenu from "./AddTaskMenu";
 import { Project as ProjectType } from "@/db";
 
 type ProjectProps = {
@@ -18,14 +21,7 @@ const Project = ({ project }: ProjectProps) => {
             <Text style={styles.priorityBadgeText}>{project.status}</Text>
           </View>
         </View>
-        <TouchableOpacity>
-          <SymbolView
-            name="ellipsis"
-            size={20}
-            type="monochrome"
-            tintColor="#9CA3AF"
-          />
-        </TouchableOpacity>
+        <ProjectMenu project={project} tasksCount={12} />
       </View>
       <View style={styles.textContainer}>
         <Text
@@ -46,15 +42,7 @@ const Project = ({ project }: ProjectProps) => {
           />
           <Text style={styles.completedTasksText}>6/9 completed tasks</Text>
         </View>
-        <TouchableOpacity style={styles.addTaskButton} activeOpacity={0.7}>
-          <SymbolView
-            name="plus"
-            size={17}
-            type="monochrome"
-            tintColor="#71717A"
-          />
-          <Text style={styles.addTaskText}>Add task</Text>
-        </TouchableOpacity>
+        <AddTaskMenu />
       </View>
     </View>
   );
@@ -139,20 +127,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   completedTasksText: {
-    color: "#71717A",
-    fontSize: 11,
-    fontWeight: "500",
-    lineHeight: 14,
-  },
-  addTaskButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 6,
-    borderRadius: 6,
-  },
-  addTaskText: {
     color: "#71717A",
     fontSize: 11,
     fontWeight: "500",
