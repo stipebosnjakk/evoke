@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { SymbolView } from "expo-symbols";
 import {
   DropdownMenu,

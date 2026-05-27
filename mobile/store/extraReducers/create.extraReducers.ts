@@ -16,7 +16,7 @@ export const addTaskCreateExtraReducers = (
     })
     .addCase(createTaskAction.rejected, (state, action) => {
       state.status = "failed";
-      state.error = action.payload?.message || "Failed to create task";
+      state.error = action.payload?.message ?? "Failed to create task";
     })
     .addCase(createTaskAction.fulfilled, (state, action) => {
       state.status = "succeeded";

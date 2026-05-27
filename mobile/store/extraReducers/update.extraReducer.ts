@@ -42,7 +42,13 @@ export const addReorderExtraReducers = (
     })
     .addCase(rebalanceOrderKeysAction.fulfilled, (state, action) => {
       state.error = null;
-    })
+    });
+};
+
+export const addTaskCompletionExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
     .addCase(completeTaskAction.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.payload?.message || "Failed to complete task";

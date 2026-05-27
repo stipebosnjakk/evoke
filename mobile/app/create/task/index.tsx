@@ -63,12 +63,6 @@ const CreateTaskFormSheet = () => {
       : null;
   const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearTaskState());
-    };
-  }, [dispatch]);
-
   const onSubmit = async () => {
     if (loading) return;
     try {
