@@ -50,9 +50,11 @@ export const createTaskAction = createAsyncThunk<
     }
 
     const placement = getTaskPlacement(res.task);
+    const href = getTaskScreenHref(placement);
 
     const handleNavigation = () => {
-      router.dismissTo(getTaskScreenHref(placement) as any);
+      Toast.hide();
+      router.dismissTo(href as any);
     };
 
     Toast.show({

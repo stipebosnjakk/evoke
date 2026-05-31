@@ -11,7 +11,6 @@ export const addTaskCreateExtraReducers = (
 ) => {
   builder
     .addCase(createTaskAction.pending, (state, _) => {
-      state.status = "loading";
       state.error = null;
     })
     .addCase(createTaskAction.rejected, (state, action) => {

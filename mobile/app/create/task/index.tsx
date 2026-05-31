@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   View,
   Pressable,
@@ -19,11 +18,7 @@ import { routes } from "@/constants/routes";
 import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
 import { STATUS_OPTIONS } from "@/constants/status";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import {
-  clearTaskState,
-  setDescription,
-  setTitle,
-} from "@/store/slices/newTask.slice";
+import { setDescription, setTitle } from "@/store/slices/newTask.slice";
 
 const CreateTaskFormSheet = () => {
   const router = useRouter();
