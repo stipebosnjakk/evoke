@@ -85,6 +85,7 @@ const Task = ({ task }: TaskGroupType) => {
         });
 
         dispatch(completeTaskAction({ taskId: task.id }));
+        setIsCompleting(false);
       }
     });
   };
