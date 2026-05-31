@@ -48,6 +48,7 @@ const UpcomingScreen = () => {
           groupsById={groupsById}
           scopeId={UPCOMING_SCOPE_ID}
           status={status}
+          renderItem={({ item }) => <Task task={item} />}
         />
       ) : (
         <FlatList
