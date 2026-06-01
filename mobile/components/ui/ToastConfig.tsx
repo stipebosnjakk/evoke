@@ -6,9 +6,11 @@ import {
   type ViewStyle,
   type StyleProp,
   Pressable,
+  GestureResponderEvent,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { SymbolView } from "expo-symbols";
+import Toast from "react-native-toast-message";
 
 type ToastRenderProps = {
   text1?: string;
@@ -74,29 +76,39 @@ const TaskInfoToastCard = ({
   text2,
   onPress,
   icon,
-}: TaskInfoToastCardProps) => (
-  <Pressable style={styles.toastInfoContainer} onPress={onPress}>
-    <View
-      style={{
-        justifyContent: "center",
-        alignItems: "flex-start",
-      }}
-    >
-      <Text style={styles.toastMetadataText} numberOfLines={1}>
-        {text2}
-      </Text>
-      <Text style={styles.toastTitleText} numberOfLines={1}>
-        {text1}
-      </Text>
-    </View>
-    <SymbolView
-      name={icon as any}
-      size={14}
-      type="monochrome"
-      tintColor="#111827"
-    />
-  </Pressable>
-);
+}: TaskInfoToastCardProps) => {
+  const handleClose = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+    Toast.hide();
+  };
+
+  return (
+    <Pressable style={styles.toastInfoContainer} onPress={onPress}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "flex-start",
+          flex: 1,
+        }}
+      >
+        <Text style={styles.toastMetadataText} numberOfLines={1}>
+          {text2}
+        </Text>
+        <Text style={styles.toastTitleText} numberOfLines={1}>
+          {text1}
+        </Text>
+      </View>
+      <Pressable onPress={handleClose} hitSlop={10}>
+        <SymbolView
+          name={icon as any}
+          size={14}
+          type="monochrome"
+          tintColor="#111827"
+        />
+      </Pressable>
+    </Pressable>
+  );
+};
 
 export type ToastType = "error" | "info";
 
