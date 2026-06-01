@@ -13,6 +13,7 @@ import {
   sendErrorMessageReducer,
   clearTaskStateReducer,
   clearCreateTaskErrorReducer,
+  setProjectIdReducer,
 } from "@/store/reducers/createTask.reducer";
 
 const newTaskSlice = createSlice({
@@ -26,6 +27,7 @@ const newTaskSlice = createSlice({
     setStartDate: setStartDateReducer,
     setTime: setTimeReducer,
     setDeadline: setDeadlineReducer,
+    setProjectId: setProjectIdReducer,
     validateTextInputs: validateTextInputsReducer,
     sendErrorMessage: sendErrorMessageReducer,
     clearTaskState: clearTaskStateReducer,
@@ -41,6 +43,7 @@ export const {
   setStartDate,
   setTime,
   setDeadline,
+  setProjectId,
   validateTextInputs,
   sendErrorMessage,
   clearTaskState,

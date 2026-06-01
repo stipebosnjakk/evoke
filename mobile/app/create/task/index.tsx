@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   View,
   Pressable,
@@ -6,9 +7,9 @@ import {
   TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useCalendars, useLocales } from "expo-localization";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
-import { useCalendars, useLocales } from "expo-localization";
 
 import Chip from "@/components/ui/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
@@ -18,7 +19,12 @@ import { routes } from "@/constants/routes";
 import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
 import { STATUS_OPTIONS } from "@/constants/status";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { setDescription, setTitle } from "@/store/slices/newTask.slice";
+import {
+  clearTaskState,
+  setDescription,
+  setTitle,
+} from "@/store/slices/newTask.slice";
+import SelectProject from "@/components/projects/SelectProject";
 
 const CreateTaskFormSheet = () => {
   const router = useRouter();
@@ -57,6 +63,12 @@ const CreateTaskFormSheet = () => {
       ? startTimeMin + durationMin
       : null;
   const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearTaskState());
+    };
+  }, [dispatch]);
 
   const onSubmit = async () => {
     if (loading) return;
@@ -155,6 +167,7 @@ const CreateTaskFormSheet = () => {
           </ScrollView>
         </View>
         <View style={styles.actions}>
+          <SelectProject />
           <Pressable
             onPress={onSubmit}
             disabled={!title || loading}
@@ -219,7 +232,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     padding: 16,
   },
   btnPrimary: {

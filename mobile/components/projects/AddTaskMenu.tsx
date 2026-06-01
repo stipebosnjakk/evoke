@@ -1,5 +1,7 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { SymbolView } from "expo-symbols";
+import { useRouter } from "expo-router";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +10,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Text } from "@/components/ui/text";
+import { routes } from "@/constants/routes";
 
-const AddTaskMenu = () => {
+type AddTaskMenuType = {
+  projectId: string;
+};
+
+const AddTaskMenu = ({ projectId }: AddTaskMenuType) => {
+  const router = useRouter();
+
+  const navigateToTaskCreate = () => {
+    router.push({
+      pathname: routes.create_task.href,
+      params: { projectId },
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,7 +40,7 @@ const AddTaskMenu = () => {
         </TouchableOpacity>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} style={styles.content}>
-        <DropdownMenuItem>
+        <DropdownMenuItem onPress={navigateToTaskCreate}>
           <SymbolView
             name="plus.circle"
             size={23}

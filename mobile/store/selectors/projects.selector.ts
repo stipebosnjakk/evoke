@@ -58,3 +58,11 @@ export const selectProjects = createSelector(
     };
   },
 );
+
+export const selectProjectById = createSelector(
+  [selectProjectsById, (_state: RootState, projectId?: string) => projectId],
+  (byId, projectId): Project | undefined => {
+    if (!projectId) return undefined;
+    return byId[projectId];
+  },
+);

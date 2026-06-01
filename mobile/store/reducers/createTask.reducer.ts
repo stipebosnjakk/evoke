@@ -175,6 +175,13 @@ export const sendErrorMessageReducer = (
   state.error = null;
 };
 
+export const setProjectIdReducer = (
+  state: NewTaskInitialState,
+  action: PayloadAction<{ projectId: string | null }>,
+) => {
+  state.task.project_id = action.payload.projectId;
+};
+
 export const clearCreateTaskErrorReducer = (state: NewTaskInitialState) => {
   state.error = null;
 };

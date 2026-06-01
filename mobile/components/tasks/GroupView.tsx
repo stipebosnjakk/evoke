@@ -25,6 +25,7 @@ import { useAppDispatch } from "@/hooks/storeHooks";
 import { updateIsOpenGroupAction } from "@/store/thunks/config.thunks";
 import { ResolvedGroupConfig } from "@/types/group.types";
 import { Project, Task as TaskDBType } from "@/db";
+import { routes } from "@/constants/routes";
 
 type GroupViewType = {
   scopeId: ScopeScreenId;
@@ -66,7 +67,7 @@ const GroupView = ({
 
   const navigateToGroupView = () => {
     router.push({
-      pathname: "/group/[groupId]",
+      pathname: routes.single_group.href,
       params: { groupId: group.id, scopeId },
     });
   };

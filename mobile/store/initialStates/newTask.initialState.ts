@@ -16,5 +16,6 @@ export const initialState: NewTaskInitialState = {
     duration_min: null,
     deadline: null,
     repeat: null,
+    project_id: null,
   },
 };

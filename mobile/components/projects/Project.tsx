@@ -24,11 +24,7 @@ const Project = ({ project }: ProjectProps) => {
         <ProjectMenu project={project} tasksCount={12} />
       </View>
       <View style={styles.textContainer}>
-        <Text
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          style={styles.projectTitle}
-        >
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.projectName}>
           {project.name}
         </Text>
       </View>
@@ -42,7 +38,7 @@ const Project = ({ project }: ProjectProps) => {
           />
           <Text style={styles.completedTasksText}>6/9 completed tasks</Text>
         </View>
-        <AddTaskMenu />
+        <AddTaskMenu projectId={project.id} />
       </View>
     </View>
   );
@@ -77,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 8,
   },
-  projectTitle: {
+  projectName: {
     color: "#18181B",
     fontSize: 14,
     fontWeight: "700",
