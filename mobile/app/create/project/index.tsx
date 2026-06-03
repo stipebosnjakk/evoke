@@ -29,11 +29,13 @@ const CreateProjectFormSheet = () => {
 
   const selectedColor = projectColors.find((item) => item.hex === color);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearProjectState());
-    };
-  }, [dispatch]);
+  // TODO: clear state
+  
+  // useEffect(() => {
+  //   return () => {
+  //     dispatch(clearProjectState());
+  //   };
+  // }, [dispatch]);
 
   const handleSubmitFunction = async () => {
     if (loading) return;

@@ -50,6 +50,24 @@ export const createTaskRepo = async (task: NewTask): Promise<CreatedTask> => {
         });
       }
 
+      if (task.project_id) {
+        const last = await tx
+          .select()
+          .from(list_order)
+          .where(eq(list_order.scope_id, task.project_id))
+          .orderBy(desc(list_order.order_key))
+          .limit(1);
+
+        const maxOrderKey = last[0]?.order_key ?? 0;
+        newOrderKey = maxOrderKey + 1000 || 1000;
+
+        await tx.insert(list_order).values({
+          scope_id: task.project_id,
+          item_id: id,
+          order_key: newOrderKey,
+        });
+      }
+
       await tx.insert(tasks).values({
         ...normalizedTask,
         id,

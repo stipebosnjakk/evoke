@@ -3,10 +3,10 @@ import { SymbolView } from "expo-symbols";
 
 import ProjectMenu from "./ProjectMenu";
 import AddTaskMenu from "./AddTaskMenu";
-import { Project as ProjectType } from "@/db";
+import { ProjectStateData } from "@/types/project.types";
 
 type ProjectProps = {
-  project: ProjectType;
+  project: ProjectStateData;
 };
 
 const Project = ({ project }: ProjectProps) => {
@@ -31,12 +31,16 @@ const Project = ({ project }: ProjectProps) => {
       <View style={styles.footer}>
         <View style={styles.completedTasksRow}>
           <SymbolView
-            name="checkmark"
+            name="list.bullet"
             size={13}
             type="monochrome"
             tintColor="#71717A"
           />
-          <Text style={styles.completedTasksText}>6/9 completed tasks</Text>
+          <Text style={styles.tasksLengthText}>
+            {project.tasks.length === 1
+              ? `${project.tasks.length} task`
+              : `${project.tasks.length} tasks`}
+          </Text>
         </View>
         <AddTaskMenu projectId={project.id} />
       </View>
@@ -122,7 +126,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
   },
-  completedTasksText: {
+  tasksLengthText: {
     color: "#71717A",
     fontSize: 11,
     fontWeight: "500",

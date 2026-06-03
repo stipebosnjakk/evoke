@@ -3,13 +3,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RejectWithValue, TaskStateData } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
-import { Project } from "@/db/schemas/project.schema";
 import { OrderObject, EntityObjectType } from "@/types/initialState.types";
 import {
   fetchActiveTasks,
   fetchProjects,
   fetchScopeOrder,
 } from "@/db/repositories/fetch.repo";
+import { ProjectStateData } from "@/types/project.types";
 
 type ActiveTasksType = {
   tasks: EntityObjectType<TaskStateData>;
@@ -35,7 +35,7 @@ export const getActiveTasksAction = createAsyncThunk<
 });
 
 type ProjectsType = {
-  projects: EntityObjectType<Project>;
+  projects: EntityObjectType<ProjectStateData>;
 };
 
 export const getProjectsAction = createAsyncThunk<

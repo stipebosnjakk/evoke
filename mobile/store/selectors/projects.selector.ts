@@ -1,6 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { Project } from "@/db";
 import { RootState } from "@/store/store";
 import { ProjectsGroupId } from "@/types/scope.types";
 import { GroupByIdType, SelectDataReturn } from "@/types/group.types";
@@ -9,6 +8,7 @@ import {
   PROJECTS_SCOPE_ARCHIVED_ID,
   PROJECTS_SCOPE_COMPLETED_ID,
 } from "@/constants/scopeIds";
+import { ProjectStateData } from "@/types/project.types";
 
 export const selectProjectIds = (state: RootState) =>
   state.projects.projects.ids;
@@ -45,7 +45,7 @@ export const selectProjects = createSelector(
       }
     });
 
-    const list: Project[] = [];
+    const list: ProjectStateData[] = [];
 
     Object.values(groupsById).forEach((group) => {
       list.push(...group.data);
@@ -61,7 +61,7 @@ export const selectProjects = createSelector(
 
 export const selectProjectById = createSelector(
   [selectProjectsById, (_state: RootState, projectId?: string) => projectId],
-  (byId, projectId): Project | undefined => {
+  (byId, projectId): ProjectStateData | undefined => {
     if (!projectId) return undefined;
     return byId[projectId];
   },

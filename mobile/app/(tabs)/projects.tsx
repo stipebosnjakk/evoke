@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView } from "expo-symbols";
@@ -25,6 +26,8 @@ const ProjectsScreen = () => {
   const config = useAppSelector((state) => state.user.config);
   const status = useAppSelector((state) => state.projects.status);
   const { groupsById, list, total } = useAppSelector(selectProjects);
+
+  console.log(JSON.stringify(list, null, 2));
 
   const view = config ? config.screens[PROJECTS_SCOPE_ID].view : null;
 
@@ -53,6 +56,13 @@ const ProjectsScreen = () => {
         <Text style={styles.noProjectsSubtitleText}>
           Create your first project to organize related tasks in one place.
         </Text>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={navigateToCreateProject}
+          style={styles.primaryButton}
+        >
+          <Text style={styles.primaryButtonText}>Create Project</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -155,6 +165,19 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#7B8798",
     textAlign: "center",
+  },
+  primaryButton: {
+    width: "86%",
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#191919",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  primaryButtonText: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#FFFFFF",
   },
 });
 

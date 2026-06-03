@@ -1,9 +1,10 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
-import { db, list_order, Project, projects, tasks } from "@/db";
+import { db, list_order, projects, tasks } from "@/db";
 import { throwDbError } from "@/utils/error";
 import { EntityObjectType, OrderObject } from "@/types/initialState.types";
 import { TaskStateData } from "@/types/task.types";
+import { ProjectStateData } from "@/types/project.types";
 
 export const fetchActiveTasks = async (): Promise<
   EntityObjectType<TaskStateData>
@@ -72,18 +73,42 @@ export const fetchScopeOrder = async (
   }
 };
 
-export const fetchProjects = async (): Promise<EntityObjectType<Project>> => {
+export const fetchProjects = async (): Promise<
+  EntityObjectType<ProjectStateData>
+> => {
   try {
-    const rows = await db.select().from(projects);
+    const rows = await db
+      .select({
+        project: projects,
+        task: {
+          id: list_order.item_id,
+          order_key: list_order.order_key,
+        },
+      })
+      .from(projects)
+      .leftJoin(list_order, eq(projects.id, list_order.scope_id))
+      .orderBy(projects.created_at, list_order.order_key);
 
-    const data: EntityObjectType<Project> = {
+    const data: EntityObjectType<ProjectStateData> = {
       ids: [],
       byId: {},
     };
 
     for (const row of rows) {
-      data.ids.push(row.id);
-      data.byId[row.id] = row;
+      const projectId = row.project.id;
+
+      if (!data.byId[projectId]) {
+        data.ids.push(projectId);
+
+        data.byId[projectId] = {
+          ...row.project,
+          tasks: [],
+        };
+      }
+
+      if (row.task) {
+        data.byId[projectId].tasks.push(row.task);
+      }
     }
 
     return data;

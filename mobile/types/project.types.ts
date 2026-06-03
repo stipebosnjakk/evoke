@@ -3,11 +3,20 @@ import { Project } from "@/db";
 export type ProjectStatus = "active" | "completed" | "archived";
 
 export type ProjectWithOrderKey = {
-  project: Project;
+  project: ProjectStateData;
   order_key: number | null;
 };
 
 export type ProjectColor = {
   name: string;
   hex: string;
+};
+
+export type ProjectTask = {
+  id: string;
+  order_key: number | null;
+};
+
+export type ProjectStateData = Project & {
+  tasks: ProjectTask[];
 };

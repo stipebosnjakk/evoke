@@ -1,5 +1,5 @@
-import type { NewTask, NewProject, Project } from "@/db";
-import { ProjectColor } from "@/types/project.types";
+import type { NewTask, NewProject } from "@/db";
+import { ProjectColor, ProjectStateData } from "@/types/project.types";
 import { UserConfig } from "@/types/config.types";
 import { TaskStateData } from "./task.types";
 
@@ -25,7 +25,7 @@ export type TasksState = ScreenInfo & {
 };
 
 export type ProjectsState = ScreenInfo & {
-  projects: EntityObjectType<Project>;
+  projects: EntityObjectType<ProjectStateData>;
   projectOrder: {
     main: OrderObject;
   };

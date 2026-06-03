@@ -50,18 +50,13 @@ export const addProjectCreateExtraReducers = (
     })
     .addCase(createProjectAction.rejected, (state, action) => {
       state.status = "failed";
-      state.error = action.payload?.message || "Failed to create a project";
+      state.error = action.payload?.message ?? "Failed to create a project";
     })
     .addCase(createProjectAction.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.error = null;
 
       const { project, order_key } = action.payload;
-
-      if (!project) {
-        state.error = "Failed to create a project";
-        return;
-      }
 
       if (!state.projects.ids.includes(project.id)) {
         state.projects.ids.push(project.id);
@@ -72,5 +67,19 @@ export const addProjectCreateExtraReducers = (
       }
 
       state.projects.byId[project.id] = project;
+    })
+    .addCase(createTaskAction.fulfilled, (state, action) => {
+      const { task, order_key } = action.payload;
+
+      if (!task.project_id || order_key === null) return;
+
+      const project = state.projects.byId[task.project_id];
+
+      if (!project) return;
+
+      project.tasks.push({
+        id: task.id,
+        order_key,
+      });
     });
 };
