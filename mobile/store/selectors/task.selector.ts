@@ -32,7 +32,7 @@ import {
   UPCOMING_SCOPE_WAITING_ID,
 } from "@/constants/scopeIds";
 import { OrderObject } from "@/types/initialState.types";
-import { TaskWithOrderKey } from "@/types/task.types";
+import { TaskStateData, TaskWithOrderKey } from "@/types/task.types";
 
 export const selectTaskIds = (state: RootState) => state.tasks.tasks.ids;
 export const selectTasksById = (state: RootState) => state.tasks.tasks.byId;
@@ -43,7 +43,7 @@ export const selectTodayTasks = createSelector(
   [selectTaskIds, selectTasksById],
   (
     ids: string[],
-    byId: Record<string, Task>,
+    byId: Record<string, TaskStateData>,
   ): SelectDataReturn<TodayGroupId> => {
     const today = toIsoDate(startOfToday());
 
@@ -181,7 +181,7 @@ export const selectInboxTasks = createSelector(
   [selectTaskIds, selectTasksById, selectInboxOrder],
   (
     ids: string[],
-    byId: Record<string, Task>,
+    byId: Record<string, TaskStateData>,
     inboxOrder: OrderObject,
   ): TaskWithOrderKey[] => {
     return ids

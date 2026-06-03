@@ -16,7 +16,7 @@ import { routes } from "@/constants/routes";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectProjects } from "@/store/selectors/projects.selector";
 import { PROJECTS_SCOPE_ID } from "@/constants/scopeIds";
-import GroupFlatList from "@/components/tasks/GroupFlatList";
+import GroupFlatList from "@/components/group/GroupFlatList";
 
 const ProjectsScreen = () => {
   const router = useRouter();

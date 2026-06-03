@@ -1,0 +1,100 @@
+import { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { SymbolView } from "expo-symbols";
+
+import { TaskStateData } from "@/types/task.types";
+import CompleteTask from "./CompleteTask";
+import TaskMeta from "./TaskMeta";
+
+type TaskGroupType = {
+  task: TaskStateData;
+  onDrag?: () => void;
+};
+
+const Task = ({ task, onDrag }: TaskGroupType) => {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleOnLongPress = () => {
+    if (!onDrag) return;
+    setIsDragging(true);
+    onDrag();
+  };
+
+  return (
+    <View style={[styles.taskContainer, isDragging && { opacity: 0.4 }]}>
+      <View style={styles.taskHeader}>
+        <CompleteTask task={task} />
+        {onDrag && (
+          <TouchableOpacity
+            style={styles.menuIcon}
+            onLongPress={handleOnLongPress}
+            onPressOut={() => setIsDragging(false)}
+            delayLongPress={100}
+          >
+            <SymbolView
+              name="line.3.horizontal"
+              size={26}
+              tintColor="#DADADA"
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+      <View style={styles.taskMetaContainer}>
+        {task.project && (
+          <View style={styles.taskMetaItem}>
+            <SymbolView
+              name="circle.fill"
+              size={6}
+              tintColor={task.project.color}
+            />
+            <Text style={styles.taskMetaText}>{task.project.name}</Text>
+          </View>
+        )}
+        <TaskMeta task={task} />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  taskContainer: {
+    padding: 12,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    backgroundColor: "white",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#efefef",
+    marginBottom: 12,
+  },
+  taskMetaContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    marginLeft: 30,
+  },
+  taskMetaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  taskMetaText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: "#77776F",
+    fontWeight: "500",
+  },
+  taskHeader: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  menuIcon: {
+    flexShrink: 0,
+  },
+});
+
+export default Task;

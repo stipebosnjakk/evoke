@@ -1,12 +1,12 @@
 import { ActivityIndicator, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
+import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectTodayTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
-import GroupFlatList from "@/components/tasks/GroupFlatList";
-import Task from "@/components/tasks/Task";
+import GroupFlatList from "@/components/group/GroupFlatList";
+import Task from "@/components/task/Task";
 import { TODAY_SCOPE_ID } from "@/constants/scopeIds";
 
 const TodayScreen = () => {

@@ -6,7 +6,7 @@ import {
   createProjectRepo,
   createTaskRepo,
 } from "@/db/repositories/create.repo";
-import { RejectWithValue, TaskWithOrderKey } from "@/types/task.types";
+import { CreatedTask, RejectWithValue } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import {
   clearTaskState,
@@ -25,7 +25,7 @@ import {
 } from "@/store/slices/newProject.slice";
 
 export const createTaskAction = createAsyncThunk<
-  TaskWithOrderKey,
+  CreatedTask,
   void,
   { rejectValue: RejectWithValue }
 >("tasks/create", async (_, { dispatch, getState, rejectWithValue }) => {

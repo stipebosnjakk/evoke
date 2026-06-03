@@ -1,9 +1,9 @@
 import { ActivityIndicator } from "react-native";
 
 import { useAppSelector } from "@/hooks/storeHooks";
-import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
+import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
-import DraggableTaskList from "@/components/tasks/DraggableTaskList";
+import DraggableTaskList from "@/components/group/DraggableTaskList";
 import { selectInboxTasks } from "@/store/selectors/task.selector";
 
 const InboxScreen = () => {

@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
-import Task from "@/components/tasks/Task";
+import Task from "@/components/task/Task";
 import Project from "@/components/projects/Project";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectGroupById } from "@/store/selectors/task.selector";

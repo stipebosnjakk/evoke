@@ -11,7 +11,7 @@ import {
   StyleProp,
 } from "react-native";
 
-import GroupView from "./GroupView";
+import GroupView from "@/components/group/GroupView";
 import { Project, Task } from "@/db";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { updateGroupOrderAction } from "@/store/thunks/config.thunks";

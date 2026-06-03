@@ -1,11 +1,13 @@
 import { eq, and } from "drizzle-orm";
 
-import { db, list_order, tasks } from "@/db";
-import { OrderTaskItem } from "@/types/task.types";
+import { db, list_order, projects, tasks } from "@/db";
+import { OrderTaskItem, TaskStateData } from "@/types/task.types";
 import { throwDbError } from "@/utils/error";
 import { getUnixTime } from "date-fns";
 
-export const restoreCompletedTask = async (taskId: string) => {
+export const restoreCompletedTask = async (
+  taskId: string,
+): Promise<TaskStateData> => {
   try {
     const now = getUnixTime(new Date());
 
@@ -13,7 +15,7 @@ export const restoreCompletedTask = async (taskId: string) => {
       throw new Error("Task ID is required");
     }
 
-    const [task] = await db
+    const [updatedTask] = await db
       .update(tasks)
       .set({
         is_completed: false,
@@ -21,13 +23,34 @@ export const restoreCompletedTask = async (taskId: string) => {
         updated_at: now,
       })
       .where(eq(tasks.id, taskId))
-      .returning();
+      .returning({ id: tasks.id });
 
-    if (!task) {
-      throw new Error(`Failed to restore task "${taskId}""`);
+    if (!updatedTask) {
+      throw new Error(`Failed to restore task "${taskId}"`);
     }
 
-    return task;
+    const [row] = await db
+      .select({
+        task: tasks,
+        project: {
+          id: projects.id,
+          name: projects.name,
+          color: projects.color,
+        },
+      })
+      .from(tasks)
+      .leftJoin(projects, eq(tasks.project_id, projects.id))
+      .where(eq(tasks.id, updatedTask.id))
+      .limit(1);
+
+    if (!row) {
+      throw new Error(`Failed to fetch restored task "${taskId}"`);
+    }
+
+    return {
+      ...row.task,
+      project: row.project,
+    };
   } catch (error) {
     return throwDbError(error, "Failed to restore task");
   }

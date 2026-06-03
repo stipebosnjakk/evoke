@@ -5,14 +5,12 @@ import { db, list_order, NewProject, NewTask, projects, tasks } from "@/db";
 import { throwDbError } from "@/utils/error";
 import { INBOX_SCOPE_ID, PROJECTS_SCOPE_ID } from "@/constants/scopeIds";
 import { isInboxTask } from "@/utils/taskPlacement";
-import { TaskStatus, TaskWithOrderKey } from "@/types/task.types";
+import { CreatedTask, TaskStatus } from "@/types/task.types";
 import { ProjectStatus, ProjectWithOrderKey } from "@/types/project.types";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
-export const createTaskRepo = async (
-  task: NewTask,
-): Promise<TaskWithOrderKey> => {
+export const createTaskRepo = async (task: NewTask): Promise<CreatedTask> => {
   try {
     return await db.transaction(async (tx) => {
       if (!task.title) {
@@ -57,18 +55,29 @@ export const createTaskRepo = async (
         id,
       });
 
-      const [createdTask] = await tx
-        .select()
+      const [createdRow] = await tx
+        .select({
+          task: tasks,
+          project: {
+            id: projects.id,
+            name: projects.name,
+            color: projects.color,
+          },
+        })
         .from(tasks)
+        .leftJoin(projects, eq(tasks.project_id, projects.id))
         .where(eq(tasks.id, id))
         .limit(1);
 
-      if (!createdTask) {
+      if (!createdRow) {
         throw new Error("Failed to create task");
       }
 
       return {
-        task: createdTask,
+        task: {
+          ...createdRow.task,
+          project: createdRow.project,
+        },
         order_key: newOrderKey,
       };
     });

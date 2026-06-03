@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import { Task } from "@/db/schemas/task.schema";
-import { RejectWithValue } from "@/types/task.types";
+import { RejectWithValue, TaskStateData } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 import { Project } from "@/db/schemas/project.schema";
@@ -13,7 +12,7 @@ import {
 } from "@/db/repositories/fetch.repo";
 
 type ActiveTasksType = {
-  tasks: EntityObjectType<Task>;
+  tasks: EntityObjectType<TaskStateData>;
   inboxOrder: OrderObject;
 };
 

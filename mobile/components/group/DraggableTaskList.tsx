@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, {
   DragEndParams,
@@ -14,13 +14,18 @@ import {
   checkForRebalance,
   handleRebalance,
 } from "@/utils/rebalance";
-import { TaskWithOrderKey } from "@/types/task.types";
 import { useAppDispatch } from "@/hooks/storeHooks";
-import DraggableTask, { type RenderDraggableTask } from "./DraggableTask";
 import { Status } from "@/types/initialState.types";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
+import { TaskWithOrderKey } from "@/types/task.types";
+import Task from "../task/Task";
 
 // TODO: try to make a draggable wrapper
+
+type RenderDraggableTask = {
+  item: TaskWithOrderKey;
+  drag: () => void;
+};
 
 type DraggableTaskListProps = {
   data: TaskWithOrderKey[];
@@ -35,16 +40,6 @@ const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
   const headerFadeExtra = 12;
-
-  const renderItem = useCallback(({ item, drag }: RenderDraggableTask) => {
-    return <DraggableTask item={item} drag={drag} />;
-  }, []);
-
-  const ListFooterComponent = (
-    <View style={{ height: 16 + insets.bottom }}>
-      {status === "loading" ? <ActivityIndicator size="small" /> : null}
-    </View>
-  );
 
   const handleOnDragEnd = ({
     data,
@@ -95,6 +90,16 @@ const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
       }),
     );
   };
+
+  const renderItem = useCallback(({ item, drag }: RenderDraggableTask) => {
+    return <Task task={item.task} onDrag={drag} />;
+  }, []);
+
+  const ListFooterComponent = (
+    <View style={{ height: 16 + insets.bottom }}>
+      {status === "loading" ? <ActivityIndicator size="small" /> : null}
+    </View>
+  );
 
   return (
     <DraggableFlatList

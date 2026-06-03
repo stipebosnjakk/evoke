@@ -5,9 +5,9 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { selectUpcomingTasks } from "@/store/selectors/task.selector";
 import { UPCOMING_SCOPE_ID } from "@/constants/scopeIds";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
-import NoTasksViewWrapper from "@/components/tasks/NoTasksViewWrapper";
-import GroupFlatList from "@/components/tasks/GroupFlatList";
-import Task from "@/components/tasks/Task";
+import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
+import GroupFlatList from "@/components/group/GroupFlatList";
+import Task from "@/components/task/Task";
 
 const UpcomingScreen = () => {
   const insets = useSafeAreaInsets();

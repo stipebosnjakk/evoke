@@ -11,8 +11,13 @@ export type TaskStatus = "next" | "waiting" | "someday";
 // TODO: check this type
 export type TaskStatusOption = (typeof STATUS_OPTIONS)[number];
 
+export type CreatedTask = {
+  task: TaskStateData;
+  order_key: number | null;
+};
+
 export type TaskWithOrderKey = {
-  task: Task;
+  task: TaskStateData;
   order_key: number | null;
 };
 export type RejectWithValue = {
@@ -30,3 +35,12 @@ export type DateValueType = "start_date" | "deadline";
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+export type TaskProject = {
+  id: string;
+  name: string;
+  color: string;
+};
+
+export type TaskStateData = Task & {
+  project: TaskProject | null;
+};

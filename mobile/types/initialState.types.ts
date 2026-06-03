@@ -1,6 +1,7 @@
-import type { Task, NewTask, NewProject, Project } from "@/db";
+import type { NewTask, NewProject, Project } from "@/db";
 import { ProjectColor } from "@/types/project.types";
 import { UserConfig } from "@/types/config.types";
+import { TaskStateData } from "./task.types";
 
 export type Status = "idle" | "loading" | "succeeded" | "failed";
 
@@ -17,7 +18,7 @@ export type EntityObjectType<TItem> = {
 export type OrderObject = Record<string, number>;
 
 export type TasksState = ScreenInfo & {
-  tasks: EntityObjectType<Task>;
+  tasks: EntityObjectType<TaskStateData>;
   taskOrder: {
     inbox: OrderObject;
   };
