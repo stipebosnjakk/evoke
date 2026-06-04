@@ -39,19 +39,21 @@ const Task = ({ task, onDrag }: TaskGroupType) => {
           </TouchableOpacity>
         )}
       </View>
-      <View style={styles.taskMetaContainer}>
-        {task.project && (
-          <View style={styles.taskMetaItem}>
-            <SymbolView
-              name="circle.fill"
-              size={6}
-              tintColor={task.project.color}
-            />
-            <Text style={styles.taskMetaText}>{task.project.name}</Text>
-          </View>
-        )}
-        <TaskMeta task={task} />
-      </View>
+      {!task.is_completed && (
+        <View style={styles.taskMetaContainer}>
+          {task.project && (
+            <View style={styles.taskMetaItem}>
+              <SymbolView
+                name="circle.fill"
+                size={6}
+                tintColor={task.project.color}
+              />
+              <Text style={styles.taskMetaText}>{task.project.name}</Text>
+            </View>
+          )}
+          <TaskMeta task={task} />
+        </View>
+      )}
     </View>
   );
 };

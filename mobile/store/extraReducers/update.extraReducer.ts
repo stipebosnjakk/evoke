@@ -1,46 +1,31 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
-import { TasksState } from "@/types/initialState.types";
+import { ProjectsState, TasksState } from "@/types/initialState.types";
 import {
   completeTaskAction,
-  rebalanceOrderKeysAction,
   restoreCompletedTaskAction,
-  updateTaskOrderKeyAction,
+  updateOrderKeysAction,
 } from "@/store/thunks/update.thunks";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
-export const addReorderExtraReducers = (
+export const addInboxReorderExtraReducers = (
   builder: ActionReducerMapBuilder<TasksState>,
 ) => {
   builder
-    .addCase(updateTaskOrderKeyAction.pending, (state, action) => {
-      state.error = null;
-      const { newOrder, scopeId } = action.meta.arg;
-      if (scopeId === INBOX_SCOPE_ID) {
-        state.taskOrder.inbox[newOrder.id] = newOrder.order_key;
-      }
-    })
-    .addCase(updateTaskOrderKeyAction.rejected, (state, action) => {
-      state.error =
-        action.payload?.message || "Failed to update task order key";
-    })
-    .addCase(updateTaskOrderKeyAction.fulfilled, (state, _) => {
-      state.error = null;
-    })
-    .addCase(rebalanceOrderKeysAction.pending, (state, action) => {
-      state.error = null;
+    .addCase(updateOrderKeysAction.pending, (state, action) => {
       const { orderArray, scopeId } = action.meta.arg;
-      if (scopeId === INBOX_SCOPE_ID) {
-        for (const item of orderArray) {
-          state.taskOrder.inbox[item.id] = item.order_key;
-        }
+      if (scopeId !== INBOX_SCOPE_ID) return;
+      state.error = null;
+      for (const item of orderArray) {
+        state.taskOrder.inbox[item.id] = item.order_key;
       }
     })
-    .addCase(rebalanceOrderKeysAction.rejected, (state, action) => {
-      state.status = "failed";
-      state.error = action.payload?.message || "Failed to rebalance order keys";
+    .addCase(updateOrderKeysAction.rejected, (state, action) => {
+      if (action.meta.arg.scopeId !== INBOX_SCOPE_ID) return;
+      state.error = action.payload?.message || "Failed to update order keys";
     })
-    .addCase(rebalanceOrderKeysAction.fulfilled, (state, action) => {
+    .addCase(updateOrderKeysAction.fulfilled, (state, action) => {
+      if (action.payload.scopeId !== INBOX_SCOPE_ID) return;
       state.error = null;
     });
 };
@@ -78,5 +63,44 @@ export const addTaskCompletionExtraReducers = (
       if (!state.tasks.ids.includes(task.id)) {
         state.tasks.ids.push(task.id);
       }
+    });
+};
+
+export const addProjectTaskReorderExtraReducers = (
+  builder: ActionReducerMapBuilder<ProjectsState>,
+) => {
+  builder
+    .addCase(updateOrderKeysAction.pending, (state, action) => {
+      const { orderArray, scopeId } = action.meta.arg;
+      const project = state.projects.byId[scopeId];
+
+      if (!project) return;
+
+      state.error = null;
+
+      const orderByTaskId = new Map(
+        orderArray.map((item) => [item.id, item.order_key]),
+      );
+
+      for (const task of project.tasks) {
+        const orderKey = orderByTaskId.get(task.id);
+        if (orderKey !== undefined) {
+          task.order_key = orderKey;
+        }
+      }
+    })
+    .addCase(updateOrderKeysAction.rejected, (state, action) => {
+      const project = state.projects.byId[action.meta.arg.scopeId];
+
+      if (!project) return;
+
+      state.error = action.payload?.message || "Failed to update order keys";
+    })
+    .addCase(updateOrderKeysAction.fulfilled, (state, action) => {
+      const project = state.projects.byId[action.payload.scopeId];
+
+      if (!project) return;
+
+      state.error = null;
     });
 };

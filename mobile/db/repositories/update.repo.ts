@@ -56,7 +56,7 @@ export const restoreCompletedTask = async (
   }
 };
 
-export const completeTask = async (taskId: string) => {
+export const completeTask = async (taskId: string): Promise<TaskStateData> => {
   try {
     const now = getUnixTime(new Date());
 
@@ -64,7 +64,7 @@ export const completeTask = async (taskId: string) => {
       throw new Error("Task ID is required");
     }
 
-    const [task] = await db
+    const [updatedTask] = await db
       .update(tasks)
       .set({
         is_completed: true,
@@ -74,77 +74,70 @@ export const completeTask = async (taskId: string) => {
       .where(eq(tasks.id, taskId))
       .returning();
 
-    if (!task) {
+    if (!updatedTask) {
       throw new Error(`Failed to complete task "${taskId}""`);
     }
 
-    return task;
+    const [row] = await db
+      .select({
+        task: tasks,
+        project: {
+          id: projects.id,
+          name: projects.name,
+          color: projects.color,
+        },
+      })
+      .from(tasks)
+      .leftJoin(projects, eq(tasks.project_id, projects.id))
+      .where(eq(tasks.id, updatedTask.id))
+      .limit(1);
+
+    if (!row) {
+      throw new Error(`Failed to fetch restored task "${taskId}"`);
+    }
+
+    return {
+      ...row.task,
+      project: row.project,
+    };
   } catch (error) {
     return throwDbError(error, "Failed to complete task");
   }
 };
 
-export const rebalanceOrderKeys = async (
+export const updateOrderKeys = async (
   orderArray: OrderTaskItem[],
   scopeId: string,
 ) => {
   try {
     if (!scopeId) {
-      throw new Error("Scope ID cannot be empty");
+      throw new Error("Scope ID is required");
     }
 
-    if (orderArray.length === 0) {
-      throw new Error("Order array cannot be empty");
+    if (!orderArray.length) {
+      throw new Error("Order array is required");
+    }
+
+    for (const { id, order_key } of orderArray) {
+      if (!id) {
+        throw new Error("Task ID is required");
+      }
+      if (!Number.isFinite(order_key)) {
+        throw new Error(`Order key ${order_key} must be a valid number`);
+      }
     }
 
     await db.transaction(async (tx) => {
-      for (const item of orderArray) {
+      for (const { id, order_key } of orderArray) {
         await tx
           .update(list_order)
-          .set({ order_key: item.order_key })
+          .set({ order_key })
           .where(
-            and(
-              eq(list_order.item_id, item.id),
-              eq(list_order.scope_id, scopeId),
-            ),
+            and(eq(list_order.item_id, id), eq(list_order.scope_id, scopeId)),
           );
       }
     });
   } catch (error: unknown) {
-    return throwDbError(error, "Failed to rebalance order keys");
-  }
-};
-
-export const updateTaskOrderKey = async (
-  newOrder: OrderTaskItem,
-  scopeId: string,
-) => {
-  try {
-    const { id, order_key } = newOrder;
-
-    if (!id) {
-      throw new Error("Task ID is required");
-    }
-
-    if (!scopeId) {
-      throw new Error("Scope ID is required");
-    }
-
-    if (!Number.isFinite(order_key)) {
-      throw new Error(`New order key:${order_key} must be a valid number`);
-    }
-
-    const result = await db
-      .update(list_order)
-      .set({ order_key })
-      .where(and(eq(list_order.item_id, id), eq(list_order.scope_id, scopeId)));
-
-    if (!result) {
-      throw new Error(
-        `Failed to update order key for task "${id}" in scope "${scopeId}"`,
-      );
-    }
-  } catch (error: unknown) {
-    return throwDbError(error, "Failed to update task order key");
+    return throwDbError(error, "Failed to update order keys");
   }
 };

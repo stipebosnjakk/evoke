@@ -5,6 +5,7 @@ import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/group/DraggableTaskList";
 import { selectInboxTasks } from "@/store/selectors/task.selector";
+import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
 const InboxScreen = () => {
   const status = useAppSelector((state) => state.tasks.status);
@@ -30,7 +31,7 @@ const InboxScreen = () => {
   if (status === "succeeded") {
     return (
       <ScreenWrapper>
-        <DraggableTaskList data={data} status={status} />
+        <DraggableTaskList data={data} scopeId={INBOX_SCOPE_ID} />
       </ScreenWrapper>
     );
   }

@@ -78,6 +78,13 @@ const AppNavigator = () => {
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen
+              name={routes.single_project.route}
+              options={{
+                presentation: "card",
+                contentStyle: { backgroundColor: "white" },
+              }}
+            />
+            <Stack.Screen
               name={routes.single_group.route}
               options={{
                 presentation: "modal",

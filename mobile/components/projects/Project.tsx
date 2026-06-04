@@ -1,17 +1,27 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { SymbolView } from "expo-symbols";
+import { useRouter } from "expo-router";
 
 import ProjectMenu from "./ProjectMenu";
 import AddTaskMenu from "./AddTaskMenu";
 import { ProjectStateData } from "@/types/project.types";
+import { routes } from "@/constants/routes";
 
 type ProjectProps = {
   project: ProjectStateData;
 };
 
 const Project = ({ project }: ProjectProps) => {
+  const router = useRouter();
+
+  const navigateToSingleProject = () => {
+    router.push({
+      pathname: routes.single_project.href,
+      params: { projectId: project.id },
+    });
+  };
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={navigateToSingleProject}>
       <View style={styles.header}>
         <View style={styles.headerLeftSideContainer}>
           <View
@@ -44,7 +54,7 @@ const Project = ({ project }: ProjectProps) => {
         </View>
         <AddTaskMenu projectId={project.id} />
       </View>
-    </View>
+    </Pressable>
   );
 };
 

@@ -27,8 +27,6 @@ const ProjectsScreen = () => {
   const status = useAppSelector((state) => state.projects.status);
   const { groupsById, list, total } = useAppSelector(selectProjects);
 
-  console.log(JSON.stringify(list, null, 2));
-
   const view = config ? config.screens[PROJECTS_SCOPE_ID].view : null;
 
   const headerH = insets.top + 44;

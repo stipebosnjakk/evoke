@@ -14,7 +14,7 @@ export type ProjectColor = {
 
 export type ProjectTask = {
   id: string;
-  order_key: number | null;
+  order_key: number;
 };
 
 export type ProjectStateData = Project & {

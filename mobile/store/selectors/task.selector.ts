@@ -193,3 +193,38 @@ export const selectInboxTasks = createSelector(
       }));
   },
 );
+
+type ProjectTasksType = {
+  name: string;
+  data: TaskWithOrderKey[];
+};
+
+export const selectProjectTasks = createSelector(
+  [
+    selectTasksById,
+    (state: RootState, projectId: string) =>
+      state.projects.projects.byId[projectId],
+  ],
+  (byId: Record<string, TaskStateData>, project): ProjectTasksType => {
+    const data = project.tasks
+      .slice()
+      .sort((a, b) => b.order_key - a.order_key)
+      .flatMap((project) => {
+        const task = byId[project.id];
+
+        if (!task) return [];
+
+        return [
+          {
+            task,
+            order_key: project.order_key,
+          },
+        ];
+      });
+
+    return {
+      name: project.name,
+      data,
+    };
+  },
+);

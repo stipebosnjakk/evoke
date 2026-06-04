@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import { initialState } from "@/store/initialStates/projects.initialState";
 import { addProjectCreateExtraReducers } from "@/store/extraReducers/create.extraReducers";
 import { clearProjectScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
-import { addProjectsExtraReducers } from "../extraReducers/fetch.extraReducer";
+import { addProjectsExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
+import { addProjectTaskReorderExtraReducers } from "@/store/extraReducers/update.extraReducer";
 
 const projectsSlice = createSlice({
   name: "projects",
@@ -14,6 +15,7 @@ const projectsSlice = createSlice({
   extraReducers: (builder) => {
     addProjectsExtraReducers(builder);
     addProjectCreateExtraReducers(builder);
+    addProjectTaskReorderExtraReducers(builder);
   },
 });
 

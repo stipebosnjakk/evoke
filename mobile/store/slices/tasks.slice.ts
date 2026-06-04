@@ -5,7 +5,7 @@ import { addTaskCreateExtraReducers } from "@/store/extraReducers/create.extraRe
 import { clearTaskScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
 import { addActiveTasksExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
-  addReorderExtraReducers,
+  addInboxReorderExtraReducers,
   addTaskCompletionExtraReducers,
 } from "@/store/extraReducers/update.extraReducer";
 
@@ -17,7 +17,7 @@ const tasksSlice = createSlice({
   },
   extraReducers: (builder) => {
     addActiveTasksExtraReducers(builder);
-    addReorderExtraReducers(builder);
+    addInboxReorderExtraReducers(builder);
     addTaskCreateExtraReducers(builder);
     addTaskCompletionExtraReducers(builder);
   },

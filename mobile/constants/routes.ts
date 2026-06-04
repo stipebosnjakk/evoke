@@ -71,6 +71,11 @@ export const routes = {
     href: "/group/[groupId]",
     route: "group/[groupId]",
   },
+  single_project: {
+    title: "Project",
+    href: "/project/[projectId]",
+    route: "project/[projectId]",
+  },
 } as const;
 
 export const createSheetRoutes = [

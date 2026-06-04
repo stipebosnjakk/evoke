@@ -154,7 +154,7 @@ export const createProjectRepo = async (
       }
 
       return {
-        project: createdProject,
+        project: { ...createdProject, tasks: [] },
         order_key: newOrderKey,
       };
     });

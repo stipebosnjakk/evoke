@@ -1,26 +1,19 @@
 import { useCallback } from "react";
-import { View, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, {
   DragEndParams,
 } from "react-native-draggable-flatlist";
 
-import {
-  rebalanceOrderKeysAction,
-  updateTaskOrderKeyAction,
-} from "@/store/thunks/update.thunks";
+import { updateOrderKeysAction } from "@/store/thunks/update.thunks";
 import {
   calculateNewOrderKey,
   checkForRebalance,
   handleRebalance,
 } from "@/utils/rebalance";
 import { useAppDispatch } from "@/hooks/storeHooks";
-import { Status } from "@/types/initialState.types";
-import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
-import { TaskWithOrderKey } from "@/types/task.types";
-import Task from "../task/Task";
-
-// TODO: try to make a draggable wrapper
+import { TaskWithOrderKey, OrderTaskItem } from "@/types/task.types";
+import Task from "@/components/task/Task";
 
 type RenderDraggableTask = {
   item: TaskWithOrderKey;
@@ -29,14 +22,18 @@ type RenderDraggableTask = {
 
 type DraggableTaskListProps = {
   data: TaskWithOrderKey[];
-  status: Status;
+  scopeId: string;
+  isLoading?: boolean;
 };
 
 const ORDER_KEY_GAP = 1000;
 
-const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
+const DraggableTaskList = ({
+  data,
+  scopeId,
+  isLoading,
+}: DraggableTaskListProps) => {
   const dispatch = useAppDispatch();
-
   const insets = useSafeAreaInsets();
   const headerH = insets.top + 44;
   const headerFadeExtra = 12;
@@ -54,7 +51,9 @@ const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
 
     if (!moved) return;
 
-    if (checkForRebalance(top, bottom)) {
+    let orderArray: OrderTaskItem[];
+
+    if (top && bottom && checkForRebalance(top, bottom)) {
       const { newTopOrderKey, newBottomOrderKey } = handleRebalance(
         data,
         to,
@@ -63,43 +62,34 @@ const DraggableTaskList = ({ data, status }: DraggableTaskListProps) => {
 
       const movedKey = (newTopOrderKey + newBottomOrderKey) / 2;
 
-      dispatch(
-        rebalanceOrderKeysAction({
-          orderArray: [
-            { id: top.task.id, order_key: newTopOrderKey },
-            { id: moved.task.id, order_key: movedKey },
-            { id: bottom.task.id, order_key: newBottomOrderKey },
-          ],
-          scopeId: INBOX_SCOPE_ID,
-        }),
-      );
-
-      return;
+      orderArray = [
+        { id: top.task.id, order_key: newTopOrderKey },
+        { id: moved.task.id, order_key: movedKey },
+        { id: bottom.task.id, order_key: newBottomOrderKey },
+      ];
+    } else {
+      orderArray = [
+        {
+          id: moved.task.id,
+          order_key: calculateNewOrderKey(top, bottom, moved, ORDER_KEY_GAP),
+        },
+      ];
     }
 
-    const newOrderKey = calculateNewOrderKey(top, bottom, moved, ORDER_KEY_GAP);
-    const newOrder = {
-      id: moved.task.id,
-      order_key: newOrderKey,
-    };
-
-    dispatch(
-      updateTaskOrderKeyAction({
-        newOrder,
-        scopeId: INBOX_SCOPE_ID,
-      }),
-    );
+    dispatch(updateOrderKeysAction({ orderArray, scopeId }));
   };
 
   const renderItem = useCallback(({ item, drag }: RenderDraggableTask) => {
     return <Task task={item.task} onDrag={drag} />;
   }, []);
 
-  const ListFooterComponent = (
-    <View style={{ height: 16 + insets.bottom }}>
-      {status === "loading" ? <ActivityIndicator size="small" /> : null}
-    </View>
-  );
+  const ListFooterComponent = () => {
+    return (
+      <View style={{ height: 16 + insets.bottom }}>
+        {isLoading ? <ActivityIndicator size="small" /> : null}
+      </View>
+    );
+  };
 
   return (
     <DraggableFlatList
