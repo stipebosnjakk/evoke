@@ -75,6 +75,7 @@ const SelectProject = () => {
   return (
     <Select
       value={selectedProjectValue}
+      disabled={projects.length === 0}
       onValueChange={(project) => {
         handleOnValueChange(project);
       }}
