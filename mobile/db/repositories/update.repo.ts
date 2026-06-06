@@ -1,9 +1,10 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray, desc } from "drizzle-orm";
 
 import { db, list_order, projects, tasks } from "@/db";
-import { OrderTaskItem, TaskStateData } from "@/types/task.types";
+import { OrderTaskItem, TaskProject, TaskStateData } from "@/types/task.types";
 import { throwDbError } from "@/utils/error";
 import { getUnixTime } from "date-fns";
+import { ProjectTask } from "@/types/project.types";
 
 export const restoreCompletedTask = async (
   taskId: string,
@@ -139,5 +140,75 @@ export const updateOrderKeys = async (
     });
   } catch (error: unknown) {
     return throwDbError(error, "Failed to update order keys");
+  }
+};
+
+type AddTasksToProjectReturnType = {
+  projectTasks: ProjectTask[];
+  project: TaskProject;
+};
+
+export const addTasksToProject = async (
+  taskIds: string[],
+  projectId: string,
+): Promise<AddTasksToProjectReturnType> => {
+  try {
+    const now = getUnixTime(new Date());
+
+    if (!taskIds.length) {
+      throw new Error("Task IDs are required");
+    }
+
+    if (!projectId) {
+      throw new Error("Project ID is required");
+    }
+
+    return await db.transaction(async (tx) => {
+      const [project] = await tx
+        .select({ id: projects.id, name: projects.name, color: projects.color })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+
+      if (!project) {
+        throw new Error(`Project "${projectId}" does not exist`);
+      }
+
+      const last = await tx
+        .select({ order_key: list_order.order_key })
+        .from(list_order)
+        .where(eq(list_order.scope_id, projectId))
+        .orderBy(desc(list_order.order_key))
+        .limit(1);
+
+      const maxOrderKey = last[0]?.order_key ?? 0;
+      const projectTasks: ProjectTask[] = taskIds.map((taskId, index) => ({
+        id: taskId,
+        order_key: maxOrderKey + (taskIds.length - index) * 1000,
+      }));
+
+      await tx
+        .update(tasks)
+        .set({
+          project_id: projectId,
+          updated_at: now,
+        })
+        .where(inArray(tasks.id, taskIds));
+
+      await tx.insert(list_order).values(
+        projectTasks.map((task) => ({
+          scope_id: projectId,
+          item_id: task.id,
+          order_key: task.order_key,
+        })),
+      );
+
+      return {
+        projectTasks,
+        project,
+      };
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to add tasks to project");
   }
 };

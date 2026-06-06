@@ -7,7 +7,7 @@ import { selectProjectTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/group/DraggableTaskList";
 import Button from "@/components/ui/Button";
-import HeaderWrapper from "@/components/custom/HeaderWrapper";
+import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 
 type LocalSearchParamsType = {
   projectId: string;

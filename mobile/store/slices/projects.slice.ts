@@ -4,7 +4,10 @@ import { initialState } from "@/store/initialStates/projects.initialState";
 import { addProjectCreateExtraReducers } from "@/store/extraReducers/create.extraReducers";
 import { clearProjectScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
 import { addProjectsExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
-import { addProjectTaskReorderExtraReducers } from "@/store/extraReducers/update.extraReducer";
+import {
+  addProjectTaskReorderExtraReducers,
+  addTasksToProjectExtraReducers,
+} from "@/store/extraReducers/update.extraReducer";
 
 const projectsSlice = createSlice({
   name: "projects",
@@ -16,6 +19,7 @@ const projectsSlice = createSlice({
     addProjectsExtraReducers(builder);
     addProjectCreateExtraReducers(builder);
     addProjectTaskReorderExtraReducers(builder);
+    addTasksToProjectExtraReducers(builder);
   },
 });
 

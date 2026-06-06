@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { startOfToday } from "date-fns";
 
-import { Task } from "@/db";
+import { Task, tasks } from "@/db";
 import { RootState } from "@/store/store";
 import { toIsoDate } from "@/utils/date";
 import { selectProjects } from "@/store/selectors/projects.selector";
@@ -226,5 +226,19 @@ export const selectProjectTasks = createSelector(
       name: project.name,
       data,
     };
+  },
+);
+
+export const selectTasksWithoutProject = createSelector(
+  [selectTaskIds, selectTasksById],
+  (ids: string[], byId: Record<string, TaskStateData>): TaskStateData[] => {
+    return ids
+      .map((id) => byId[id])
+      .filter(
+        (task) =>
+          task.project_id == null &&
+          task.project == null &&
+          !task.is_completed
+      );
   },
 );

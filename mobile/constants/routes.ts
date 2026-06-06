@@ -76,6 +76,11 @@ export const routes = {
     href: "/project/[projectId]",
     route: "project/[projectId]",
   },
+  add_tasks_to_project: {
+    title: "Add",
+    href: "/project/add/[projectId]",
+    route: "project/add/[projectId]",
+  },
 } as const;
 
 export const createSheetRoutes = [

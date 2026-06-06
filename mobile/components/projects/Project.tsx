@@ -20,6 +20,7 @@ const Project = ({ project }: ProjectProps) => {
       params: { projectId: project.id },
     });
   };
+
   return (
     <Pressable style={styles.container} onPress={navigateToSingleProject}>
       <View style={styles.header}>

@@ -7,6 +7,7 @@ import { addActiveTasksExtraReducers } from "@/store/extraReducers/fetch.extraRe
 import {
   addInboxReorderExtraReducers,
   addTaskCompletionExtraReducers,
+  addTasksToProjectTaskExtraReducers,
 } from "@/store/extraReducers/update.extraReducer";
 
 const tasksSlice = createSlice({
@@ -20,6 +21,7 @@ const tasksSlice = createSlice({
     addInboxReorderExtraReducers(builder);
     addTaskCreateExtraReducers(builder);
     addTaskCompletionExtraReducers(builder);
+    addTasksToProjectTaskExtraReducers(builder);
   },
 });
 

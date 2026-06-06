@@ -26,6 +26,13 @@ const AddTaskMenu = ({ projectId }: AddTaskMenuType) => {
     });
   };
 
+  const navigateToAddExistingTasks = () => {
+    router.push({
+      pathname: routes.add_tasks_to_project.href,
+      params: { projectId },
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -50,7 +57,7 @@ const AddTaskMenu = ({ projectId }: AddTaskMenuType) => {
           <Text style={styles.itemText}>Create New Task</Text>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onPress={navigateToAddExistingTasks}>
           <SymbolView
             name="tray.and.arrow.down"
             size={23}

@@ -2,6 +2,7 @@ import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 import { ProjectsState, TasksState } from "@/types/initialState.types";
 import {
+  addTasksToProjectAction,
   completeTaskAction,
   restoreCompletedTaskAction,
   updateOrderKeysAction,
@@ -102,5 +103,61 @@ export const addProjectTaskReorderExtraReducers = (
       if (!project) return;
 
       state.error = null;
+    });
+};
+
+export const addTasksToProjectTaskExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(addTasksToProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(addTasksToProjectAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to add tasks to project";
+    })
+    .addCase(addTasksToProjectAction.fulfilled, (state, action) => {
+      const { projectTasks, project } = action.payload;
+
+      state.status = "succeeded";
+      state.error = null;
+
+      for (const projectTask of projectTasks) {
+        const task = state.tasks.byId[projectTask.id];
+
+        if (!task) continue;
+
+        task.project_id = project.id;
+        task.project = project;
+      }
+    });
+};
+
+export const addTasksToProjectExtraReducers = (
+  builder: ActionReducerMapBuilder<ProjectsState>,
+) => {
+  builder
+    .addCase(addTasksToProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(addTasksToProjectAction.rejected, (state, action) => {
+      state.error = action.payload?.message || "Failed to add tasks to project";
+    })
+    .addCase(addTasksToProjectAction.fulfilled, (state, action) => {
+      const { projectTasks, project } = action.payload;
+
+      const stateProject = state.projects.byId[project.id];
+
+      if (!stateProject) return;
+
+      state.error = null;
+
+      const addedTaskIds = new Set(projectTasks.map((task) => task.id));
+
+      stateProject.tasks = [
+        ...projectTasks,
+        ...stateProject.tasks.filter((task) => !addedTaskIds.has(task.id)),
+      ];
     });
 };

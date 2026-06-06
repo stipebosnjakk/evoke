@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import {
+  addTasksToProject,
   completeTask,
   restoreCompletedTask,
   updateOrderKeys,
@@ -8,6 +9,7 @@ import {
 import {
   OrderTaskItem,
   RejectWithValue,
+  TaskProject,
   TaskStateData,
 } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
@@ -26,6 +28,7 @@ import {
 } from "@/store/slices/config.slice";
 import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
 import { storeData } from "@/utils/storage";
+import { ProjectTask } from "@/types/project.types";
 
 export const restoreCompletedTaskAction = createAsyncThunk<
   { task: TaskStateData },
@@ -119,6 +122,32 @@ export const updateScreenViewAction =
       dispatch(setUserConfigError(message));
     }
   };
+
+export const addTasksToProjectAction = createAsyncThunk<
+  {
+    projectTasks: ProjectTask[];
+    project: TaskProject;
+  },
+  {
+    taskIds: string[];
+    projectId: string;
+  },
+  {
+    rejectValue: RejectWithValue;
+  }
+>(
+  "tasks/addTasksToProject",
+  async ({ taskIds, projectId }, { rejectWithValue }) => {
+    try {
+      const data = await addTasksToProject(taskIds, projectId);
+      return data;
+    } catch (error) {
+      return rejectWithValue({
+        message: getErrorMessage(error, "Failed to add tasks to project"),
+      });
+    }
+  },
+);
 // TODO: remove
 export const resetUserConfig = () => async (dispatch: AppDispatch) => {
   await storeData(USER_CONFIG, JSON.stringify(defaultUserConfig));

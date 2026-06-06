@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { ScopeScreenId } from "@/types/scope.types";
 import { updateScreenViewAction } from "@/store/thunks/config.thunks";
 import Button from "@/components/ui/Button";
-import HeaderWrapper from "./HeaderWrapper";
+import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 
 const Header = () => {
   const dispatch = useAppDispatch();

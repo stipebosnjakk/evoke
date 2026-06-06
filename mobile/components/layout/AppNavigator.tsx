@@ -91,6 +91,13 @@ const AppNavigator = () => {
                 contentStyle: { backgroundColor: "white" },
               }}
             />
+            <Stack.Screen
+              name={routes.add_tasks_to_project.route}
+              options={{
+                presentation: "modal",
+                contentStyle: { backgroundColor: "white" },
+              }}
+            />
             {createSheetRoutes.map((item) => (
               <Stack.Screen
                 key={item.route}
