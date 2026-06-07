@@ -60,7 +60,10 @@ export const selectProjects = createSelector(
 );
 
 export const selectProjectById = createSelector(
-  [selectProjectsById, (_state: RootState, projectId?: string) => projectId],
+  [
+    selectProjectsById,
+    (_state: RootState, projectId?: string | null) => projectId,
+  ],
   (byId, projectId): ProjectStateData | undefined => {
     if (!projectId) return undefined;
     return byId[projectId];

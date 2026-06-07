@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
-import SelectTask from "@/components/task/SelectTask";
+import TaskPicker from "@/components/task/TaskPicker";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { selectTasksWithoutProject } from "@/store/selectors/task.selector";
 import { addTasksToProjectAction } from "@/store/thunks/update.thunks";
@@ -53,7 +53,7 @@ const AddTasksToProjectFormSheet = () => {
   };
 
   const renderItem = ({ item }: { item: TaskStateData }) => (
-    <SelectTask
+    <TaskPicker
       task={item}
       isSelected={selectedTaskIds.includes(item.id)}
       onPress={() => toggleTask(item.id)}

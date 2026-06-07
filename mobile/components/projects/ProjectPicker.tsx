@@ -9,7 +9,7 @@ type SelectProjectProps = {
   onPress: () => void;
 };
 
-const SelectProject = ({
+const ProjectPicker = ({
   project,
   isSelected,
   onPress,
@@ -109,4 +109,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-export default SelectProject;
+export default ProjectPicker;

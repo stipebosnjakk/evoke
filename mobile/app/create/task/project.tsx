@@ -7,7 +7,7 @@ import { selectProjects } from "@/store/selectors/projects.selector";
 import { ProjectStateData } from "@/types/project.types";
 import SheetHeader from "@/components/custom/SheetHeader";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import SelectProject from "@/components/projects/SelectProject";
+import ProjectPicker from "@/components/projects/ProjectPicker";
 import { useEffect, useState } from "react";
 import { setProjectId } from "@/store/slices/newTask.slice";
 
@@ -48,7 +48,7 @@ const ProjectFormSheet = () => {
   };
 
   const renderItem = ({ item }: RenderItemType) => (
-    <SelectProject
+    <ProjectPicker
       project={item}
       isSelected={selectedProjectId === item.id}
       onPress={() => {

@@ -7,7 +7,7 @@ type SelectTaskProps = {
   isSelected: boolean;
   onPress: () => void;
 };
-const SelectTask = ({ task, isSelected, onPress }: SelectTaskProps) => {
+const TaskPicker = ({ task, isSelected, onPress }: SelectTaskProps) => {
   return (
     <Pressable
       onPress={onPress}
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-export default SelectTask;
+export default TaskPicker;
