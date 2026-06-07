@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { FlatList, View } from "react-native";
+import { FlatList } from "react-native";
 
 import { routes } from "@/constants/routes";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
@@ -62,7 +62,7 @@ const ProjectFormSheet = () => {
   return (
     <SheetWrapper>
       <SheetHeader
-        title="Select project"
+        title={routes.create_task_project.title}
         onSubmit={handleSubmit}
         submitButtonVisible={true}
         submitDisabled={isSubmitting || selectedProjectId === newProjectId}

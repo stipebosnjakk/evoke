@@ -97,5 +97,4 @@ export const createSheetRoutes = [
   routes.create_task_time,
   routes.create_project,
   routes.create_project_color,
-  routes.create_task_project,
 ] as const;
