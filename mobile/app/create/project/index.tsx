@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,7 +13,7 @@ import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
 import { routes } from "@/constants/routes";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { clearProjectState, setName } from "@/store/slices/newProject.slice";
+import { setName } from "@/store/slices/newProject.slice";
 import { getErrorMessage } from "@/utils/error";
 import { createProjectAction } from "@/store/thunks/create.thunks";
 import { projectColors } from "@/constants/colors";
@@ -30,7 +29,7 @@ const CreateProjectFormSheet = () => {
   const selectedColor = projectColors.find((item) => item.hex === color);
 
   // TODO: clear state
-  
+
   // useEffect(() => {
   //   return () => {
   //     dispatch(clearProjectState());

@@ -48,7 +48,13 @@ const Task = ({ task, onDrag }: TaskGroupType) => {
                 size={6}
                 tintColor={task.project.color}
               />
-              <Text style={styles.taskMetaText}>{task.project.name}</Text>
+              <Text
+                style={styles.taskMetaText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {task.project.name}
+              </Text>
             </View>
           )}
           <TaskMeta task={task} />
@@ -70,18 +76,23 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   taskMetaContainer: {
+    width: "100%",
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "center",
     marginLeft: 30,
+    paddingRight: 30,
   },
   taskMetaItem: {
+    maxWidth: "100%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: 4,
   },
   taskMetaText: {
+    flexShrink: 1,
+    minWidth: 0,
     fontSize: 12,
     lineHeight: 16,
     color: "#77776F",

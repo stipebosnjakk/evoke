@@ -177,7 +177,7 @@ export const sendErrorMessageReducer = (
 
 export const setProjectIdReducer = (
   state: NewTaskInitialState,
-  action: PayloadAction<{ projectId: string | null }>,
+  action: PayloadAction<{ projectId: string | null | undefined }>,
 ) => {
   state.task.project_id = action.payload.projectId;
 };

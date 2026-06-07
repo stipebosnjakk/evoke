@@ -38,7 +38,7 @@ const GroupScreen = () => {
   };
 
   return (
-    <SheetWrapper style={{ flex: 1 }}>
+    <SheetWrapper>
       <SheetHeader title={title} />
       <FlatList
         data={data}

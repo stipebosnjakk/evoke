@@ -1,172 +1,112 @@
-import { Platform, View, Text, StyleSheet } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDispatch } from "react-redux";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { SymbolView } from "expo-symbols";
 
-import { useAppSelector } from "@/hooks/storeHooks";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useEffect } from "react";
-import { setProjectId } from "@/store/slices/newTask.slice";
-import {
-  selectProjectById,
-  selectProjects,
-} from "@/store/selectors/projects.selector";
-import { Option } from "@rn-primitives/select";
+import { ProjectStateData } from "@/types/project.types";
 
-type LocalSearchParamsType = {
-  projectId?: string;
+type SelectProjectProps = {
+  project: ProjectStateData;
+  isSelected: boolean;
+  onPress: () => void;
 };
 
-const SelectProject = () => {
-  const dispatch = useDispatch();
-  const insets = useSafeAreaInsets();
-
-  const { projectId } = useLocalSearchParams<LocalSearchParamsType>();
-
-  const projects = useAppSelector((state) => selectProjects(state).list);
-  const newTaskProjectId = useAppSelector(
-    (state) => state.newTask.task.project_id,
-  );
-  const selectedProject = useAppSelector((state) =>
-    selectProjectById(state, newTaskProjectId ?? undefined),
-  );
-
-  const selectedProjectValue: Option = selectedProject
-    ? {
-        label: selectedProject.name,
-        value: selectedProject.id,
-      }
-    : undefined;
-
-  const contentInsets = {
-    top: insets.top,
-    bottom: Platform.select({
-      ios: insets.bottom,
-      android: insets.bottom + 24,
-    }),
-    left: 12,
-    right: 12,
-  };
-
-  useEffect(() => {
-    if (projectId) {
-      dispatch(setProjectId({ projectId }));
-    }
-  }, [projectId, dispatch]);
-
-  const handleOnValueChange = (project: Option) => {
-    if (!project) return;
-    if (newTaskProjectId === project.value) {
-      dispatch(setProjectId({ projectId: null }));
-      return;
-    }
-    dispatch(setProjectId({ projectId: project.value }));
-  };
-
-  //   TODO: fetch only active and archieved projects, add limits to projects, and later on on completed tasks
-
+const SelectProject = ({
+  project,
+  isSelected,
+  onPress,
+}: SelectProjectProps) => {
   return (
-    <Select
-      value={selectedProjectValue}
-      disabled={projects.length === 0}
-      onValueChange={(project) => {
-        handleOnValueChange(project);
-      }}
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.projectContainer,
+        isSelected && styles.projectContainerSelected,
+      ]}
     >
-      <SelectTrigger style={styles.width}>
-        {selectedProject ? (
-          <>
-            <View
-              style={[
-                styles.colorContainer,
-                { backgroundColor: selectedProject.color },
-              ]}
-            />
-            <SelectValue
-              placeholder={selectedProjectValue?.label || "Project"}
-            />
-          </>
-        ) : (
-          <SelectValue placeholder={"Project"} />
-        )}
-      </SelectTrigger>
-      <SelectContent
-        insets={contentInsets}
-        style={styles.width}
-        sideOffset={6}
-        align="start"
-      >
-        <SelectGroup>
-          {projects.map((project) => (
-            <SelectItem
-              key={project.id}
-              label={project.name}
-              value={project.id}
-            >
-              <View style={styles.selectItemContainer}>
-                <View
-                  style={[
-                    styles.colorContainer,
-                    { backgroundColor: project.color },
-                  ]}
-                />
-                <Text
-                  style={styles.projectName}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {project.name}
-                </Text>
-              </View>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+      <View style={styles.projectHeader}>
+        <View style={styles.projectTitleSide}>
+          <SymbolView name="circle.fill" size={6} tintColor={project.color} />
+          <Text
+            style={styles.projectTitle}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {project.name}
+          </Text>
+        </View>
+        <View style={styles.completionCircle}>
+          {isSelected && <View style={styles.completionCircleFill} />}
+          {isSelected && (
+            <View style={styles.completionCheck}>
+              <SymbolView
+                name="checkmark"
+                size={10}
+                weight="bold"
+                tintColor="#FFFFFF"
+              />
+            </View>
+          )}
+        </View>
+      </View>
+    </Pressable>
   );
 };
-
 const styles = StyleSheet.create({
-  selectItemContainer: {
+  projectContainer: {
+    padding: 12,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    backgroundColor: "white",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#efefef",
+    marginBottom: 12,
+  },
+  projectContainerSelected: {
+    borderColor: "#BDB7AD",
+  },
+  projectHeader: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
-    gap: 8,
+    justifyContent: "space-between",
+    gap: 12,
   },
-  colorContainer: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  projectName: {
-    color: "#18181B",
-    fontSize: 14,
-    fontWeight: "500",
-    lineHeight: 18,
-  },
-  createProjectButton: {
-    height: 42,
+  projectTitleSide: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    justifyContent: "flex-start",
   },
-  createProjectText: {
-    color: "#52525B",
-    fontSize: 14,
-    fontWeight: "500",
-    lineHeight: 18,
+  projectTitle: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: "600",
+    color: "#1F1F1D",
   },
-  width: {
-    width: 180,
+  completionCircle: {
+    flexShrink: 0,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1.2,
+    borderColor: "#E6E2DC",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+    overflow: "hidden",
+  },
+  completionCircleFill: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#2F2F2D",
+    borderRadius: 9,
+  },
+  completionCheck: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
-
 export default SelectProject;

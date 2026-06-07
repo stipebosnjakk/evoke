@@ -5,6 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
+  Text,
+  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCalendars, useLocales } from "expo-localization";
@@ -24,7 +26,6 @@ import {
   setDescription,
   setTitle,
 } from "@/store/slices/newTask.slice";
-import SelectProject from "@/components/projects/SelectProject";
 
 const CreateTaskFormSheet = () => {
   const router = useRouter();
@@ -167,7 +168,27 @@ const CreateTaskFormSheet = () => {
           </ScrollView>
         </View>
         <View style={styles.actions}>
-          <SelectProject />
+          <TouchableOpacity
+            style={styles.projectSelector}
+            onPress={() => {
+              router.push(routes.create_task_project.href);
+            }}
+          >
+            <SymbolView
+              name="folder"
+              size={20}
+              type="monochrome"
+              tintColor="#6B6B6B"
+            />
+            <Text
+              style={styles.projectSelectorText}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              Select project
+            </Text>
+            <SymbolView name="chevron.down" size={13} tintColor="#6B6B6B" />
+          </TouchableOpacity>
           <Pressable
             onPress={onSubmit}
             disabled={!title || loading}
@@ -236,9 +257,30 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   btnPrimary: {
-    padding: 15,
-    borderRadius: 999,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: "#191919",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  projectSelector: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 12,
+    marginRight: 16,
+    paddingVertical: 12,
+  },
+  projectSelectorText: {
+    flexShrink: 1,
+    minWidth: 0,
+    fontSize: 13,
+    lineHeight: 28,
+    fontWeight: "500",
+    color: "#6B6B6B",
   },
   row: {
     flexDirection: "row",

@@ -26,7 +26,7 @@ const SheetWrapper = ({ children, style }: SheetWrapperProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0,
+    flex: 1,
     padding: 0,
     paddingTop: 20,
   },

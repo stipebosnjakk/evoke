@@ -26,24 +26,22 @@ const ProjectTasksScreen = () => {
   return (
     <ScreenWrapper>
       <HeaderWrapper>
-        <HeaderWrapper>
-          <View style={styles.side}>
-            <Button onPress={() => router.back()}>
-              <SymbolView
-                name="chevron.left"
-                size={23}
-                type="monochrome"
-                tintColor="#111827"
-              />
-            </Button>
-          </View>
-          <View style={styles.center} pointerEvents="none">
-            <Text style={styles.title} numberOfLines={1}>
-              {name}
-            </Text>
-          </View>
-          <View style={styles.side} />
-        </HeaderWrapper>
+        <View style={styles.side}>
+          <Button onPress={() => router.back()}>
+            <SymbolView
+              name="chevron.left"
+              size={23}
+              type="monochrome"
+              tintColor="#111827"
+            />
+          </Button>
+        </View>
+        <View style={styles.center} pointerEvents="none">
+          <Text style={styles.title} numberOfLines={1}>
+            {name}
+          </Text>
+        </View>
+        <View style={styles.side} />
       </HeaderWrapper>
       <DraggableTaskList
         data={data}

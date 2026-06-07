@@ -66,6 +66,11 @@ export const routes = {
     href: "/create/task/status",
     route: "create/task/status",
   },
+  create_task_project: {
+    title: "Select project",
+    href: "/create/task/project",
+    route: "create/task/project",
+  },
   single_group: {
     title: "Group",
     href: "/group/[groupId]",
@@ -92,4 +97,5 @@ export const createSheetRoutes = [
   routes.create_task_time,
   routes.create_project,
   routes.create_project_color,
+  routes.create_task_project,
 ] as const;
