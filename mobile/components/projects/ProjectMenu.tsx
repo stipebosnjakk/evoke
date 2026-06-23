@@ -1,5 +1,8 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import { SymbolView } from "expo-symbols";
+import { useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Text } from "@/components/ui/text";
 import { Project } from "@/db/schemas/project.schema";
+import { setColor, setName } from "@/store/slices/newProject.slice";
+import { routes } from "@/constants/routes";
 
 type ProjectMenuType = {
   project: Project;
@@ -16,6 +21,19 @@ type ProjectMenuType = {
 };
 
 const ProjectMenu = ({ project, tasksCount }: ProjectMenuType) => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const navigateToEditProject = () => {
+    dispatch(setName({ name: project.name }));
+    dispatch(setColor({ color: project.color }));
+
+    router.push({
+      pathname: routes.form_project.href,
+      params: { mode: "edit", projectId: project.id },
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,7 +47,7 @@ const ProjectMenu = ({ project, tasksCount }: ProjectMenuType) => {
         </Pressable>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} style={styles.content}>
-        <DropdownMenuItem>
+        <DropdownMenuItem onPress={navigateToEditProject}>
           <View style={styles.projectMenuItem}>
             <View style={styles.projectMenuItemLeftSide}>
               <View

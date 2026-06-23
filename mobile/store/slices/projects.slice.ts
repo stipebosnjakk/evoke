@@ -7,6 +7,7 @@ import { addProjectsExtraReducers } from "@/store/extraReducers/fetch.extraReduc
 import {
   addProjectTaskReorderExtraReducers,
   addTasksToProjectExtraReducers,
+  addUpdateProjectExtraReducers,
 } from "@/store/extraReducers/update.extraReducer";
 
 const projectsSlice = createSlice({
@@ -20,6 +21,7 @@ const projectsSlice = createSlice({
     addProjectCreateExtraReducers(builder);
     addProjectTaskReorderExtraReducers(builder);
     addTasksToProjectExtraReducers(builder);
+    addUpdateProjectExtraReducers(builder);
   },
 });
 

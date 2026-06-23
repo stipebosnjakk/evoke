@@ -6,6 +6,7 @@ import {
   completeTaskAction,
   restoreCompletedTaskAction,
   updateOrderKeysAction,
+  updateProjectAction,
 } from "@/store/thunks/update.thunks";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
@@ -159,5 +160,34 @@ export const addTasksToProjectExtraReducers = (
         ...projectTasks,
         ...stateProject.tasks.filter((task) => !addedTaskIds.has(task.id)),
       ];
+    });
+};
+
+export const addUpdateProjectExtraReducers = (
+  builder: ActionReducerMapBuilder<ProjectsState>,
+) => {
+  builder
+    .addCase(updateProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateProjectAction.rejected, (state, action) => {
+      state.error = action.payload?.message || "Failed to update project";
+    })
+    .addCase(updateProjectAction.fulfilled, (state, action) => {
+      const { project } = action.payload;
+      console.log(action.payload)
+      const existingProject = state.projects.byId[project.id];
+
+      if (!existingProject) {
+        state.error = "Failed to get project data";
+        return;
+      }
+
+      state.error = null;
+
+      state.projects.byId[project.id] = {
+        ...existingProject,
+        ...project,
+      };
     });
 };

@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import { SymbolView } from "expo-symbols";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
@@ -17,6 +17,12 @@ import { setName } from "@/store/slices/newProject.slice";
 import { getErrorMessage } from "@/utils/error";
 import { createProjectAction } from "@/store/thunks/create.thunks";
 import { projectColors } from "@/constants/colors";
+import { updateProjectAction } from "@/store/thunks/update.thunks";
+
+type LocalSearchParamsType = {
+  mode?: "create" | "edit";
+  projectId?: string;
+};
 
 const CreateProjectFormSheet = () => {
   const router = useRouter();
@@ -28,6 +34,8 @@ const CreateProjectFormSheet = () => {
 
   const selectedColor = projectColors.find((item) => item.hex === color);
 
+  const { mode, projectId } = useLocalSearchParams<LocalSearchParamsType>();
+
   // TODO: clear state
 
   // useEffect(() => {
@@ -38,12 +46,25 @@ const CreateProjectFormSheet = () => {
 
   const handleSubmitFunction = async () => {
     if (loading) return;
+
     try {
+      if (mode === "edit") {
+        if (!projectId) {
+          throw new Error("Project ID is required");
+        }
+
+        await dispatch(updateProjectAction(projectId)).unwrap();
+        return;
+      }
+
       await dispatch(createProjectAction()).unwrap();
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Failed to create a project",
+        text1:
+          mode === "edit"
+            ? "Failed to update project"
+            : "Failed to create a project",
         text2: getErrorMessage(error, "Something went wrong."),
       });
     }

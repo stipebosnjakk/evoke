@@ -41,7 +41,6 @@ const StatusFormSheet = () => {
     router.back();
   };
 
-  // TODO: edit SheetHeader title
   return (
     <SheetWrapper>
       <SheetHeader title="Status" onClose={() => router.back()} />

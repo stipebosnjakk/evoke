@@ -212,3 +212,78 @@ export const addTasksToProject = async (
     return throwDbError(error, "Failed to add tasks to project");
   }
 };
+
+export type UpdateProjectInput = {
+  id: string;
+  name?: string;
+  color?: string;
+};
+
+export type UpdateProjectReturnType = {
+  project: {
+    id: string;
+    name: string;
+    color: string;
+  };
+};
+
+export const updateProject = async (
+  project: UpdateProjectInput,
+): Promise<UpdateProjectReturnType> => {
+  try {
+    const now = getUnixTime(new Date());
+
+    if (!project) {
+      throw new Error("Project data is required");
+    }
+
+    if (!project.id) {
+      throw new Error("Project ID is required");
+    }
+
+    if (project.name === undefined && project.color === undefined) {
+      throw new Error("No project fields provided");
+    }
+
+    return await db.transaction(async (tx) => {
+      const [existingProject] = await tx
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.id, project.id))
+        .limit(1);
+
+      if (!existingProject) {
+        throw new Error(`Project "${project.id}" does not exist`);
+      }
+
+      await tx
+        .update(projects)
+        .set({
+          updated_at: now,
+          name: project.name,
+          color: project.color,
+        })
+        .where(eq(projects.id, project.id));
+
+      const [updatedProject] = await tx
+        .select({
+          id: projects.id,
+          name: projects.name,
+          color: projects.color,
+        })
+        .from(projects)
+        .where(eq(projects.id, project.id))
+        .limit(1);
+
+      if (!updatedProject) {
+        throw new Error(`Failed to fetch updated project "${project.id}"`);
+      }
+
+      return {
+        project: updatedProject,
+      };
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to update project");
+  }
+};

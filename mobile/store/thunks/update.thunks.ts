@@ -5,6 +5,9 @@ import {
   completeTask,
   restoreCompletedTask,
   updateOrderKeys,
+  updateProject,
+  UpdateProjectInput,
+  UpdateProjectReturnType,
 } from "@/db/repositories/update.repo";
 import {
   OrderTaskItem,
@@ -148,6 +151,50 @@ export const addTasksToProjectAction = createAsyncThunk<
     }
   },
 );
+
+type ProjectId = string | null;
+
+export const updateProjectAction = createAsyncThunk<
+  UpdateProjectReturnType,
+  ProjectId,
+  {
+    state: RootState;
+    rejectValue: RejectWithValue;
+  }
+>(
+  "projects/updateProject",
+  async (projectId, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const { newProject } = state;
+
+      if (newProject.error) {
+        return rejectWithValue({
+          message: newProject.error,
+        });
+      }
+
+      if (!projectId) {
+        return rejectWithValue({
+          message: "Project ID is required",
+        });
+      }
+
+      const data = await updateProject({
+        id: projectId,
+        name: newProject.project.name,
+        color: newProject.project.color,
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue({
+        message: getErrorMessage(error, "Failed to update project"),
+      });
+    }
+  },
+);
+
 // TODO: remove
 export const resetUserConfig = () => async (dispatch: AppDispatch) => {
   await storeData(USER_CONFIG, JSON.stringify(defaultUserConfig));
