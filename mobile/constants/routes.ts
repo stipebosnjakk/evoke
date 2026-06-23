@@ -26,50 +26,50 @@ export const routes = {
     href: "/project",
     route: "projects",
   },
-  create_project: {
-    title: "Create Project",
-    href: "/create/project",
-    route: "create/project/index",
+  form_project: {
+    title: "Project",
+    href: "/form/project",
+    route: "form/project/index",
   },
-  create_project_color: {
+  form_project_color: {
     title: "Project Color",
-    href: "/create/project/color",
-    route: "create/project/color",
+    href: "/form/project/color",
+    route: "form/project/color",
   },
-  create_task: {
-    title: "Create Task",
-    href: "/create/task",
-    route: "create/task/index",
+  form_task: {
+    title: "Task",
+    href: "/form/task",
+    route: "form/task/index",
   },
-  create_task_date: {
+  form_task_date: {
     title: "Date",
-    href: "/create/task/date",
-    route: "create/task/date",
+    href: "/form/task/date",
+    route: "form/task/date",
   },
-  create_task_deadline: {
+  form_task_deadline: {
     title: "Deadline",
-    href: "/create/task/deadline",
-    route: "create/task/deadline",
+    href: "/form/task/deadline",
+    route: "form/task/deadline",
   },
-  create_task_time: {
+  form_task_time: {
     title: "Time",
-    href: "/create/task/time",
-    route: "create/task/time",
+    href: "/form/task/time",
+    route: "form/task/time",
   },
-  create_task_repeat: {
+  form_task_repeat: {
     title: "Repeat",
-    href: "/create/task/repeat",
-    route: "create/task/repeat",
+    href: "/form/task/repeat",
+    route: "form/task/repeat",
   },
-  create_task_status: {
+  form_task_status: {
     title: "Status",
-    href: "/create/task/status",
-    route: "create/task/status",
+    href: "/form/task/status",
+    route: "form/task/status",
   },
-  create_task_project: {
+  form_task_project: {
     title: "Select project",
-    href: "/create/task/project",
-    route: "create/task/project",
+    href: "/form/task/project",
+    route: "form/task/project",
   },
   single_group: {
     title: "Group",
@@ -89,12 +89,12 @@ export const routes = {
 } as const;
 
 export const createSheetRoutes = [
-  routes.create_task,
-  routes.create_task_date,
-  routes.create_task_deadline,
-  routes.create_task_status,
-  routes.create_task_repeat,
-  routes.create_task_time,
-  routes.create_project,
-  routes.create_project_color,
+  routes.form_task,
+  routes.form_task_date,
+  routes.form_task_deadline,
+  routes.form_task_status,
+  routes.form_task_repeat,
+  routes.form_task_time,
+  routes.form_project,
+  routes.form_project_color,
 ] as const;

@@ -62,7 +62,7 @@ const ProjectFormSheet = () => {
   return (
     <SheetWrapper>
       <SheetHeader
-        title={routes.create_task_project.title}
+        title={routes.form_task_project.title}
         onSubmit={handleSubmit}
         submitButtonVisible={true}
         submitDisabled={isSubmitting || selectedProjectId === newProjectId}

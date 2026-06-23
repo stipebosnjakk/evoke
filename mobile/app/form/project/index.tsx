@@ -41,7 +41,6 @@ const CreateProjectFormSheet = () => {
     try {
       await dispatch(createProjectAction()).unwrap();
     } catch (error) {
-      console.error(error);
       Toast.show({
         type: "error",
         text1: "Failed to create a project",
@@ -51,7 +50,7 @@ const CreateProjectFormSheet = () => {
   };
 
   const navigateToColor = () => {
-    router.push(routes.create_project_color.href);
+    router.push(routes.form_project_color.href);
   };
 
   return (

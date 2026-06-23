@@ -99,7 +99,7 @@ const AppNavigator = () => {
               }}
             />
             <Stack.Screen
-              name={routes.create_task_project.route}
+              name={routes.form_task_project.route}
               options={{
                 presentation: "modal",
                 contentStyle: { backgroundColor: "white" },

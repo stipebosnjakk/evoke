@@ -150,7 +150,7 @@ const DateFormSheet = () => {
             <TouchableOpacity
               style={[styles.button, { justifyContent: "space-between" }]}
               onPress={() => {
-                router.push(routes.create_task_time.href);
+                router.push(routes.form_task_time.href);
               }}
             >
               <View style={styles.buttonContent}>

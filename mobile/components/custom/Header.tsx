@@ -59,7 +59,7 @@ const Header = () => {
   };
 
   const navigateToCreateModal = () => {
-    router.push(routes.create_task.href);
+    router.push(routes.form_task.href);
   };
 
   return (

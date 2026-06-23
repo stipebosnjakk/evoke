@@ -128,7 +128,7 @@ const CreateTaskFormSheet = () => {
                 icon={status ? status.icon : "tag"}
                 label={status ? status.label : "Status"}
                 onPress={() => {
-                  router.push(routes.create_task_status.href);
+                  router.push(routes.form_task_status.href);
                 }}
               />
               <Chip
@@ -143,21 +143,21 @@ const CreateTaskFormSheet = () => {
                     : "Date"
                 }
                 onPress={() => {
-                  router.push(routes.create_task_date.href);
+                  router.push(routes.form_task_date.href);
                 }}
               />
               <Chip
                 icon="calendar.badge.clock"
                 label={deadline ? getDateLabel(deadline) : "Deadline"}
                 onPress={() => {
-                  router.push(routes.create_task_deadline.href);
+                  router.push(routes.form_task_deadline.href);
                 }}
               />
               <Chip
                 icon="repeat"
                 label={getRepeatLabel(repeatValue)}
                 onPress={() => {
-                  router.push(routes.create_task_repeat.href);
+                  router.push(routes.form_task_repeat.href);
                 }}
               />
             </View>

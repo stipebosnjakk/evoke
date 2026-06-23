@@ -18,7 +18,7 @@ const SelectProjectButton = () => {
     <TouchableOpacity
       style={styles.projectSelector}
       onPress={() => {
-        router.push(routes.create_task_project.href);
+        router.push(routes.form_task_project.href);
       }}
     >
       <SymbolView

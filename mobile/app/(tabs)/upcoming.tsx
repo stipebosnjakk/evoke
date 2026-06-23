@@ -22,8 +22,6 @@ const UpcomingScreen = () => {
 
   const view = config ? config.screens[UPCOMING_SCOPE_ID].view : null;
 
-  // TODO: check for status and errors for selectors
-
   if (status === "loading") {
     return (
       <ScreenWrapper style={{ justifyContent: "center", alignItems: "center" }}>

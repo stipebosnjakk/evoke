@@ -37,7 +37,7 @@ const ProjectsScreen = () => {
   const paddingTop = headerH + headerFadeExtra + createButtonHeight + gap;
 
   const navigateToCreateProject = () => {
-    router.push(routes.create_project.href);
+    router.push(routes.form_project.href);
   };
 
   if (status === "loading") {
