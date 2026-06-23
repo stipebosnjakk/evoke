@@ -1,13 +1,14 @@
 import { ActivityIndicator, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
+import NoTasksView from "@/components/task/NoTasksView";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectTodayTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
 import { TODAY_SCOPE_ID } from "@/constants/scopeIds";
+import ErrorView from "@/components/ui/ErrorView";
 
 const TodayScreen = () => {
   const insets = useSafeAreaInsets();
@@ -31,11 +32,15 @@ const TodayScreen = () => {
 
   if (status === "succeeded" && !total) {
     return (
-      <NoTasksViewWrapper
+      <NoTasksView
         title="Today is clear"
         subtitle={`Today shows tasks that are ready now.\nOnly tasks marked as Next appear here.`}
       />
     );
+  }
+
+  if (status === "failed") {
+    return <ErrorView />;
   }
 
   if (status === "succeeded") {

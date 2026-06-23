@@ -4,17 +4,17 @@ import { useRouter } from "expo-router";
 import { routes } from "@/constants/routes";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 
-type NoTasksViewWrapperType = {
+type NoTasksViewType = {
   title: string;
   subtitle?: string;
   isUpcoming?: boolean;
 };
 
-const NoTasksViewWrapper = ({
+const NoTasksView = ({
   title,
   subtitle,
   isUpcoming = false,
-}: NoTasksViewWrapperType) => {
+}: NoTasksViewType) => {
   const router = useRouter();
 
   const navigateToCreateModal = () => {
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NoTasksViewWrapper;
+export default NoTasksView;

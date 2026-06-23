@@ -75,16 +75,13 @@ const CreateTaskFormSheet = () => {
     try {
       await dispatch(createTaskAction()).unwrap();
     } catch (error: unknown) {
-      showErrorToast(getErrorMessage(error, "Something went wrong."));
+      Toast.show({
+        type: "error",
+        text1:
+          getErrorMessage(error, "Something went wrong.") ||
+          "Failed to create task",
+      });
     }
-  };
-
-  const showErrorToast = (message: string) => {
-    Toast.show({
-      type: "error",
-      text1: "Failed to create a task",
-      text2: message || "Something went wrong.",
-    });
   };
 
   return (

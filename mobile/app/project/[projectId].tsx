@@ -8,6 +8,7 @@ import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/group/DraggableTaskList";
 import Button from "@/components/ui/Button";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
+import NoProjectTasksView from "@/components/projects/NoProjectTaskView";
 
 type LocalSearchParamsType = {
   projectId: string;
@@ -43,11 +44,15 @@ const ProjectTasksScreen = () => {
         </View>
         <View style={styles.side} />
       </HeaderWrapper>
-      <DraggableTaskList
-        data={data}
-        scopeId={projectId}
-        isLoading={status === "loading"}
-      />
+      {!data.length && status === "succeeded" ? (
+        <NoProjectTasksView projectId={projectId} projectName={name} />
+      ) : (
+        <DraggableTaskList
+          data={data}
+          scopeId={projectId}
+          isLoading={status === "loading"}
+        />
+      )}
     </ScreenWrapper>
   );
 };

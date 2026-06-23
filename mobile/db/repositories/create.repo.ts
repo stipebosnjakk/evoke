@@ -14,7 +14,7 @@ export const createTaskRepo = async (task: NewTask): Promise<CreatedTask> => {
   try {
     return await db.transaction(async (tx) => {
       if (!task.title) {
-        throw new Error("Title is required");
+        throwDbError(null, "Title is required");
       }
 
       const taskStatus: TaskStatus | null = !task.status

@@ -111,7 +111,7 @@ export const createProjectAction = createAsyncThunk<
     dispatch(clearProjectState());
 
     return res;
-  } catch (error) {
+  } catch (error: unknown) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to create a project"),
     });

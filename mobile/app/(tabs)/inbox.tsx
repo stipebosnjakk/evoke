@@ -1,11 +1,12 @@
 import { ActivityIndicator } from "react-native";
 
 import { useAppSelector } from "@/hooks/storeHooks";
-import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
+import NoTasksView from "@/components/task/NoTasksView";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/group/DraggableTaskList";
 import { selectInboxTasks } from "@/store/selectors/task.selector";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
+import ErrorView from "@/components/ui/ErrorView";
 
 const InboxScreen = () => {
   const status = useAppSelector((state) => state.tasks.status);
@@ -21,11 +22,15 @@ const InboxScreen = () => {
 
   if (status === "succeeded" && !data.length) {
     return (
-      <NoTasksViewWrapper
+      <NoTasksView
         title="Your inbox is clear"
         subtitle={`Inbox holds unprocessed tasks.\nCapture tasks here and organize\nthem later.`}
       />
     );
+  }
+
+  if (status === "failed") {
+    return <ErrorView />;
   }
 
   if (status === "succeeded") {

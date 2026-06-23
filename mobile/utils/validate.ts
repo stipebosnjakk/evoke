@@ -361,7 +361,7 @@ export const validateProjectName = (
     };
   }
 
-  if (name.length > 255) {
+  if (name.length > 250) {
     return {
       ok: false,
       data: null,

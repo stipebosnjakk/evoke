@@ -1,11 +1,17 @@
 /**
- * It returns a message string, If the error is a real Error, it returns its message, otherwise it returns the provided fallback message or a default one.
+ * It returns a error message string
  * @param error The error to handle, can be of any type
  * @param fallback The message to return if the error is not an instance of Error, or if it doesn't have a message. If not provided, it defaults to "Something went wrong."
  * @returns A string message extracted from the error or the fallback message
  */
 export const getErrorMessage = (error: unknown, fallback: string) => {
-  return error instanceof Error ? error.message : fallback;
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const message = error.message;
+    if (typeof message === "string") return message;
+  }
+  return fallback;
 };
 
 /**

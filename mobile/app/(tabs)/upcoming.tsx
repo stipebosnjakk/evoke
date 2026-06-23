@@ -5,9 +5,10 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { selectUpcomingTasks } from "@/store/selectors/task.selector";
 import { UPCOMING_SCOPE_ID } from "@/constants/scopeIds";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
-import NoTasksViewWrapper from "@/components/task/NoTasksViewWrapper";
+import NoTasksView from "@/components/task/NoTasksView";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
+import ErrorView from "@/components/ui/ErrorView";
 
 const UpcomingScreen = () => {
   const insets = useSafeAreaInsets();
@@ -33,12 +34,16 @@ const UpcomingScreen = () => {
 
   if (status === "succeeded" && !total) {
     return (
-      <NoTasksViewWrapper
+      <NoTasksView
         isUpcoming={true}
         title="Upcoming is clear"
         subtitle={`Upcoming shows tasks planned for later.\nWaiting and Someday tasks also appear here.`}
       />
     );
+  }
+
+  if (status === "failed") {
+    return <ErrorView />;
   }
 
   return (

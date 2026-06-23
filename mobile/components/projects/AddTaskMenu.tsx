@@ -1,6 +1,7 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
 
 import {
   DropdownMenu,
@@ -11,19 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Text } from "@/components/ui/text";
 import { routes } from "@/constants/routes";
+import { setProjectId } from "@/store/slices/newTask.slice";
 
 type AddTaskMenuType = {
   projectId: string;
 };
 
 const AddTaskMenu = ({ projectId }: AddTaskMenuType) => {
+  const dispatch = useDispatch();
   const router = useRouter();
 
   const navigateToTaskCreate = () => {
-    router.push({
-      pathname: routes.create_task.href,
-      params: { projectId },
-    });
+    dispatch(setProjectId({ projectId }));
+    router.push(routes.create_task.href);
   };
 
   const navigateToAddExistingTasks = () => {

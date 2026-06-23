@@ -51,7 +51,7 @@ const AppNavigator = () => {
     if (tasksError) {
       Toast.show({
         type: "error",
-        text1: "Failed to get data",
+        text1: "Failed to get tasks",
         text2: tasksError,
       });
     }
