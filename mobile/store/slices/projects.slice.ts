@@ -5,6 +5,7 @@ import { addProjectCreateExtraReducers } from "@/store/extraReducers/create.extr
 import { clearProjectScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
 import { addProjectsExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
+  addCompleteProjectExtraReducers,
   addProjectTaskReorderExtraReducers,
   addTasksToProjectExtraReducers,
   addUpdateProjectExtraReducers,
@@ -22,6 +23,7 @@ const projectsSlice = createSlice({
     addProjectTaskReorderExtraReducers(builder);
     addTasksToProjectExtraReducers(builder);
     addUpdateProjectExtraReducers(builder);
+    addCompleteProjectExtraReducers(builder);
   },
 });
 

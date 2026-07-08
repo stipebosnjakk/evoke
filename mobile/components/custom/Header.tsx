@@ -13,7 +13,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { ScopeScreenId } from "@/types/scope.types";
 import { updateScreenViewAction } from "@/store/thunks/config.thunks";
-import Button from "@/components/ui/Button";
+import CustomButton from "@/components/ui/CustomButton";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 
 const Header = () => {
@@ -65,14 +65,14 @@ const Header = () => {
   return (
     <HeaderWrapper>
       <View style={styles.left}>
-        <Button onPress={() => {}}>
+        <CustomButton onPress={() => {}}>
           <SymbolView
             name="magnifyingglass"
             size={23}
             type="monochrome"
             tintColor="#111827"
           />
-        </Button>
+        </CustomButton>
       </View>
       <View style={styles.center} pointerEvents="none">
         <Text style={styles.title} numberOfLines={1}>
@@ -82,7 +82,7 @@ const Header = () => {
       <View style={styles.right}>
         <View style={styles.rightActions}>
           {view && (
-            <Button onPress={toggleView}>
+            <CustomButton onPress={toggleView}>
               <SymbolView
                 name={
                   view === "group"
@@ -92,16 +92,16 @@ const Header = () => {
                 tintColor="black"
                 size={23}
               />
-            </Button>
+            </CustomButton>
           )}
-          <Button onPress={navigateToCreateModal}>
+          <CustomButton onPress={navigateToCreateModal}>
             <SymbolView
               name="plus"
               size={23}
               type="monochrome"
               tintColor="#111827"
             />
-          </Button>
+          </CustomButton>
         </View>
       </View>
     </HeaderWrapper>

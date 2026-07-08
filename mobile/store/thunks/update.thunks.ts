@@ -1,12 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import {
-  addTasksToProject,
-  completeTask,
-  restoreCompletedTask,
-  updateOrderKeys,
-  updateProject,
-  UpdateProjectInput,
+  addTasksToProjectRepo,
+  completeProjectRepo,
+  CompleteProjectReturnType,
+  completeProjectTasksRepo,
+  CompleteProjectTasksType,
+  completeTaskRepo,
+  restoreCompletedTaskRepo,
+  updateOrderKeysRepo,
+  updateProjectRepo,
   UpdateProjectReturnType,
 } from "@/db/repositories/update.repo";
 import {
@@ -39,7 +42,7 @@ export const restoreCompletedTaskAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/restoreCompletedTask", async ({ taskId }, { rejectWithValue }) => {
   try {
-    const task = await restoreCompletedTask(taskId);
+    const task = await restoreCompletedTaskRepo(taskId);
     return { task };
   } catch (error) {
     return rejectWithValue({
@@ -54,7 +57,7 @@ export const completeTaskAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/completeTask", async ({ taskId }, { rejectWithValue }) => {
   try {
-    const task = await completeTask(taskId);
+    const task = await completeTaskRepo(taskId);
     return { task };
   } catch (error) {
     return rejectWithValue({
@@ -71,7 +74,7 @@ export const updateOrderKeysAction = createAsyncThunk<
   "order/updateOrderKeys",
   async ({ orderArray, scopeId }, { rejectWithValue }) => {
     try {
-      await updateOrderKeys(orderArray, scopeId);
+      await updateOrderKeysRepo(orderArray, scopeId);
       return { orderArray, scopeId };
     } catch (error) {
       return rejectWithValue({
@@ -142,7 +145,7 @@ export const addTasksToProjectAction = createAsyncThunk<
   "tasks/addTasksToProject",
   async ({ taskIds, projectId }, { rejectWithValue }) => {
     try {
-      const data = await addTasksToProject(taskIds, projectId);
+      const data = await addTasksToProjectRepo(taskIds, projectId);
       return data;
     } catch (error) {
       return rejectWithValue({
@@ -180,7 +183,7 @@ export const updateProjectAction = createAsyncThunk<
         });
       }
 
-      const data = await updateProject({
+      const data = await updateProjectRepo({
         id: projectId,
         name: newProject.project.name,
         color: newProject.project.color,
@@ -190,6 +193,66 @@ export const updateProjectAction = createAsyncThunk<
     } catch (error) {
       return rejectWithValue({
         message: getErrorMessage(error, "Failed to update project"),
+      });
+    }
+  },
+);
+
+type CompleteProjectActionType = {
+  projectId: ProjectId;
+};
+
+export const completeProjectAction = createAsyncThunk<
+  CompleteProjectReturnType,
+  CompleteProjectActionType,
+  {
+    state: RootState;
+    rejectValue: RejectWithValue;
+  }
+>("projects/completeProject", async ({ projectId }, { rejectWithValue }) => {
+  try {
+    if (!projectId) {
+      return rejectWithValue({
+        message: "Project ID is required",
+      });
+    }
+
+    const data = await completeProjectRepo(projectId);
+    return data;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to complete project"),
+    });
+  }
+});
+
+type CompleteProjectTasksActionType = {
+  projectId: ProjectId;
+  taskIds: string[];
+};
+
+export const completeProjectTasksAction = createAsyncThunk<
+  CompleteProjectTasksType,
+  CompleteProjectTasksActionType,
+  {
+    state: RootState;
+    rejectValue: RejectWithValue;
+  }
+>(
+  "tasks/completeProjectTasks",
+  async ({ projectId, taskIds }, { rejectWithValue }) => {
+    try {
+      if (!projectId) {
+        return rejectWithValue({
+          message: "Project ID is required",
+        });
+      }
+
+      const data = await completeProjectTasksRepo(projectId, taskIds);
+      return data;
+    } catch (error) {
+      return rejectWithValue({
+        message: getErrorMessage(error, "Failed to complete tasks project"),
       });
     }
   },

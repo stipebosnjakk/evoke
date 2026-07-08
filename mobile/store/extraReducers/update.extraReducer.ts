@@ -3,6 +3,8 @@ import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 import { ProjectsState, TasksState } from "@/types/initialState.types";
 import {
   addTasksToProjectAction,
+  completeProjectAction,
+  completeProjectTasksAction,
   completeTaskAction,
   restoreCompletedTaskAction,
   updateOrderKeysAction,
@@ -175,7 +177,6 @@ export const addUpdateProjectExtraReducers = (
     })
     .addCase(updateProjectAction.fulfilled, (state, action) => {
       const { project } = action.payload;
-      console.log(action.payload)
       const existingProject = state.projects.byId[project.id];
 
       if (!existingProject) {
@@ -189,5 +190,62 @@ export const addUpdateProjectExtraReducers = (
         ...existingProject,
         ...project,
       };
+    });
+};
+
+export const addCompleteProjectExtraReducers = (
+  builder: ActionReducerMapBuilder<ProjectsState>,
+) => {
+  builder
+    .addCase(completeProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(completeProjectAction.rejected, (state, action) => {
+      state.error = action.payload?.message || "Failed to complete project";
+    })
+    .addCase(completeProjectAction.fulfilled, (state, action) => {
+      const { project } = action.payload;
+      const existingProject = state.projects.byId[project.id];
+
+      if (!existingProject) {
+        state.error = "Failed to get project data";
+        return;
+      }
+
+      state.error = null;
+      state.projects.byId[project.id] = {
+        ...existingProject,
+        ...project,
+      };
+    });
+};
+
+export const addCompleteProjectTasksExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(completeProjectTasksAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(completeProjectTasksAction.rejected, (state, action) => {
+      state.error =
+        action.payload?.message || "Failed to complete project tasks";
+    })
+    .addCase(completeProjectTasksAction.fulfilled, (state, action) => {
+      const { tasks } = action.payload;
+      state.error = null;
+
+      for (const task of tasks) {
+        const oldTask = state.tasks.byId[task.id];
+
+        state.tasks.byId[task.id] = {
+          ...oldTask,
+          ...task,
+        };
+
+        if (!state.tasks.ids.includes(task.id)) {
+          state.tasks.ids.push(task.id);
+        }
+      }
     });
 };

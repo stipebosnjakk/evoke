@@ -6,7 +6,7 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { selectProjectTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/group/DraggableTaskList";
-import Button from "@/components/ui/Button";
+import CustomButton from "@/components/ui/CustomButton";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 import NoProjectTasksView from "@/components/projects/NoProjectTaskView";
 
@@ -28,14 +28,14 @@ const ProjectTasksScreen = () => {
     <ScreenWrapper>
       <HeaderWrapper>
         <View style={styles.side}>
-          <Button onPress={() => router.back()}>
+          <CustomButton onPress={() => router.back()}>
             <SymbolView
               name="chevron.left"
               size={23}
               type="monochrome"
               tintColor="#111827"
             />
-          </Button>
+          </CustomButton>
         </View>
         <View style={styles.center} pointerEvents="none">
           <Text style={styles.title} numberOfLines={1}>
