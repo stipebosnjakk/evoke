@@ -1,7 +1,11 @@
 import { routes } from "@/constants/routes";
 import { NewTask } from "@/db";
 import { TaskStateData } from "@/types/task.types";
-import { getRepeatWeekdayIndex, toIsoDate } from "@/utils/date";
+import {
+  getRepeatWeekdayIndex,
+  getUpcomingTaskDate,
+  toIsoDate,
+} from "@/utils/date";
 import { addDays, getUnixTime, startOfToday } from "date-fns";
 
 type TaskScreen = "inbox" | "today" | "upcoming" | "none";
@@ -11,7 +15,7 @@ type TaskScreen = "inbox" | "today" | "upcoming" | "none";
  * @param task
  * @returns
  */
-const isActiveTask = (task: TaskStateData | NewTask): boolean =>
+export const isActiveTask = (task: TaskStateData | NewTask): boolean =>
   !task.is_completed && !task.is_deleted;
 
 /**
@@ -20,7 +24,11 @@ const isActiveTask = (task: TaskStateData | NewTask): boolean =>
  * @returns
  */
 export const isInboxTask = (task: TaskStateData | NewTask): boolean =>
-  isActiveTask(task) && !task.start_date && !task.deadline && !task.status;
+  isActiveTask(task) &&
+  !task.start_date &&
+  !task.deadline &&
+  !task.status &&
+  !task.repeat;
 
 /**
  * Checks if a task is ready for today.
@@ -56,17 +64,13 @@ export const isTodayTask = (task: TaskStateData): boolean => {
  * @returns
  */
 export const isUpcomingTask = (task: TaskStateData): boolean => {
-  const today = toIsoDate(startOfToday());
+  if (!isActiveTask(task) || isInboxTask(task)) return false;
 
-  return (
-    isActiveTask(task) &&
-    !isInboxTask(task) &&
-    (task.status === "waiting" ||
-      task.status === "someday" ||
-      (task.status === "next" &&
-        ((task.start_date ? task.start_date > today : false) ||
-          (task.deadline ? task.deadline > today : false))))
-  );
+  if (task.status === "waiting" || task.status === "someday") {
+    return true;
+  }
+
+  return getUpcomingTaskDate(task) !== null;
 };
 
 /**

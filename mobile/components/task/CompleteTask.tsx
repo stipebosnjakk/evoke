@@ -15,9 +15,10 @@ import { toIsoDate } from "@/utils/date";
 
 type CompleteTaskType = {
   task: TaskStateData;
+  isPreview?: boolean;
 };
 
-const CompleteTask = ({ task }: CompleteTaskType) => {
+const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
   const dispatch = useAppDispatch();
 
   const [isCompleting, setIsCompleting] = useState<boolean>(false);
@@ -95,37 +96,41 @@ const CompleteTask = ({ task }: CompleteTaskType) => {
 
   return (
     <View style={styles.topTaskSide}>
-      <Pressable
-        onPress={handleComplete}
-        disabled={isCompletedOrCompleting || task.is_deleted}
-        style={styles.completionCircle}
-      >
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.completionCircleFill,
-            {
-              opacity: completionProgress,
-            },
-          ]}
-        />
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.completionCheck,
-            {
-              opacity: completionProgress,
-            },
-          ]}
+      {isPreview ? (
+        <SymbolView name="clock" size={15} tintColor="#A0A09A" />
+      ) : (
+        <Pressable
+          onPress={handleComplete}
+          disabled={isCompletedOrCompleting || task.is_deleted}
+          style={styles.completionCircle}
         >
-          <SymbolView
-            name="checkmark"
-            size={10}
-            weight="bold"
-            tintColor="#FFFFFF"
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.completionCircleFill,
+              {
+                opacity: completionProgress,
+              },
+            ]}
           />
-        </Animated.View>
-      </Pressable>
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.completionCheck,
+              {
+                opacity: completionProgress,
+              },
+            ]}
+          >
+            <SymbolView
+              name="checkmark"
+              size={10}
+              weight="bold"
+              tintColor="#FFFFFF"
+            />
+          </Animated.View>
+        </Pressable>
+      )}
       <Text
         style={[
           styles.taskTitle,

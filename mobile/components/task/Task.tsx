@@ -9,9 +9,10 @@ import TaskMeta from "./TaskMeta";
 type TaskGroupType = {
   task: TaskStateData;
   onDrag?: () => void;
+  isPreview?: boolean;
 };
 
-const Task = ({ task, onDrag }: TaskGroupType) => {
+const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleOnLongPress = () => {
@@ -23,7 +24,7 @@ const Task = ({ task, onDrag }: TaskGroupType) => {
   return (
     <View style={[styles.taskContainer, isDragging && { opacity: 0.4 }]}>
       <View style={styles.taskHeader}>
-        <CompleteTask task={task} />
+        <CompleteTask task={task} isPreview={isPreview} />
         {onDrag && (
           <TouchableOpacity
             style={styles.menuIcon}

@@ -9,6 +9,7 @@ import NoTasksView from "@/components/task/NoTasksView";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
 import ErrorView from "@/components/ui/ErrorView";
+import { getUpcomingTaskDate } from "@/utils/date";
 
 const UpcomingScreen = () => {
   const insets = useSafeAreaInsets();
@@ -51,13 +52,29 @@ const UpcomingScreen = () => {
           groupsById={groupsById}
           scopeId={UPCOMING_SCOPE_ID}
           status={status}
-          renderItem={({ item }) => <Task task={item} />}
+          renderItem={({ item }) => (
+            <Task
+              task={item}
+              isPreview={
+                Boolean(item.repeat?.length) &&
+                getUpcomingTaskDate(item) !== null
+              }
+            />
+          )}
         />
       ) : (
         <FlatList
           data={list}
           keyExtractor={(task) => task.id}
-          renderItem={({ item }) => <Task task={item} />}
+          renderItem={({ item }) => (
+            <Task
+              task={item}
+              isPreview={
+                Boolean(item.repeat?.length) &&
+                getUpcomingTaskDate(item) !== null
+              }
+            />
+          )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingTop: headerH + headerFadeExtra }}
         />
