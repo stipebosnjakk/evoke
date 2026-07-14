@@ -1,10 +1,24 @@
 import { eq, and, inArray, desc, isNotNull } from "drizzle-orm";
 
-import { db, list_order, Project, projects, Task, tasks } from "@/db";
-import { OrderTaskItem, TaskProject, TaskStateData } from "@/types/task.types";
+import {
+  db,
+  list_order,
+  Project,
+  projects,
+  Task,
+  task_completions,
+  tasks,
+} from "@/db";
+import {
+  IsoDate,
+  OrderTaskItem,
+  TaskProject,
+  TaskStateData,
+} from "@/types/task.types";
 import { throwDbError } from "@/utils/error";
 import { getUnixTime } from "date-fns";
 import { ProjectTask } from "@/types/project.types";
+import { toIsoDate } from "@/utils/date";
 
 export const restoreCompletedTaskRepo = async (
   taskId: string,
@@ -30,9 +44,12 @@ export const restoreCompletedTaskRepo = async (
       throw new Error(`Failed to restore task "${taskId}"`);
     }
 
+    const today = toIsoDate(new Date());
+
     const [row] = await db
       .select({
         task: tasks,
+        task_completion: task_completions,
         project: {
           id: projects.id,
           name: projects.name,
@@ -41,6 +58,13 @@ export const restoreCompletedTaskRepo = async (
       })
       .from(tasks)
       .leftJoin(projects, eq(tasks.project_id, projects.id))
+      .leftJoin(
+        task_completions,
+        and(
+          eq(tasks.id, task_completions.task_id),
+          eq(task_completions.completion_date, today),
+        ),
+      )
       .where(eq(tasks.id, updatedTask.id))
       .limit(1);
 
@@ -48,10 +72,46 @@ export const restoreCompletedTaskRepo = async (
       throw new Error(`Failed to fetch restored task "${taskId}"`);
     }
 
-    return {
+    const isRepeating = Boolean(row.task.repeat?.length);
+
+    const task: TaskStateData = {
       ...row.task,
       project: row.project,
+
+      repeat_today_status: isRepeating
+        ? row.task_completion
+          ? "completed_today"
+          : "not_completed_today"
+        : null,
     };
+
+    return task;
+  } catch (error) {
+    return throwDbError(error, "Failed to restore task");
+  }
+};
+
+export const restoreCompletedRepeatTaskRepo = async (
+  taskId: string,
+  completionDate: IsoDate,
+) => {
+  try {
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    if (!completionDate) {
+      throw new Error("Completion date is required");
+    }
+
+    await db
+      .delete(task_completions)
+      .where(
+        and(
+          eq(task_completions.task_id, taskId),
+          eq(task_completions.completion_date, completionDate),
+        ),
+      );
   } catch (error) {
     return throwDbError(error, "Failed to restore task");
   }
@@ -99,10 +159,13 @@ export const completeTaskRepo = async (
       throw new Error(`Failed to fetch restored task "${taskId}"`);
     }
 
-    return {
+    const task: TaskStateData = {
       ...row.task,
       project: row.project,
+      repeat_today_status: null,
     };
+
+    return task;
   } catch (error) {
     return throwDbError(error, "Failed to complete task");
   }

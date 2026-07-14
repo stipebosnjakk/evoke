@@ -7,12 +7,14 @@ import {
   completeProjectTasksRepo,
   CompleteProjectTasksType,
   completeTaskRepo,
+  restoreCompletedRepeatTaskRepo,
   restoreCompletedTaskRepo,
   updateOrderKeysRepo,
   updateProjectRepo,
   UpdateProjectReturnType,
 } from "@/db/repositories/update.repo";
 import {
+  IsoDate,
   OrderTaskItem,
   RejectWithValue,
   TaskProject,
@@ -50,6 +52,34 @@ export const restoreCompletedTaskAction = createAsyncThunk<
     });
   }
 });
+
+export const restoreCompletedRepeatTaskAction = createAsyncThunk<
+  {
+    taskId: string;
+  },
+  {
+    taskId: string;
+    completionDate: IsoDate;
+  },
+  {
+    rejectValue: RejectWithValue;
+  }
+>(
+  "tasks/restoreCompletedRepeatTask",
+  async ({ taskId, completionDate }, { rejectWithValue }) => {
+    try {
+      await restoreCompletedRepeatTaskRepo(taskId, completionDate);
+
+      return {
+        taskId,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: getErrorMessage(error, "Failed to restore repeating task"),
+      });
+    }
+  },
+);
 
 export const completeTaskAction = createAsyncThunk<
   { task: TaskStateData },

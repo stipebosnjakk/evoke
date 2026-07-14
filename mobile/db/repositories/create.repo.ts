@@ -5,8 +5,16 @@ import { db, list_order, NewProject, NewTask, projects, tasks } from "@/db";
 import { throwDbError } from "@/utils/error";
 import { INBOX_SCOPE_ID, PROJECTS_SCOPE_ID } from "@/constants/scopeIds";
 import { isInboxTask } from "@/utils/taskPlacement";
-import { CreatedTask, TaskStatus } from "@/types/task.types";
+import {
+  CreatedTask,
+  IsoDate,
+  RepeatTodayStatus,
+  TaskStateData,
+  TaskStatus,
+} from "@/types/task.types";
 import { ProjectStatus, ProjectWithOrderKey } from "@/types/project.types";
+import { getUnixTime } from "date-fns";
+import { task_completions } from "../schemas/task_completions.schema";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
@@ -91,11 +99,20 @@ export const createTaskRepo = async (task: NewTask): Promise<CreatedTask> => {
         throw new Error("Failed to create task");
       }
 
+      const isRepeating = Boolean(createdRow.task.repeat?.length);
+
+      const repeatTodayStatus: RepeatTodayStatus = isRepeating
+        ? "not_completed_today"
+        : null;
+
+      const createdTask: TaskStateData = {
+        ...createdRow.task,
+        project: createdRow.project,
+        repeat_today_status: repeatTodayStatus,
+      };
+
       return {
-        task: {
-          ...createdRow.task,
-          project: createdRow.project,
-        },
+        task: createdTask,
         order_key: newOrderKey,
       };
     });
@@ -159,6 +176,28 @@ export const createProjectRepo = async (
       };
     });
   } catch (error) {
-    return throwDbError(error, "Failed to create  a project");
+    return throwDbError(error, "Failed to create a project");
+  }
+};
+
+export const RepeatTaskCompletionRepo = async (
+  taskId: string | null,
+  completionDate: IsoDate,
+) => {
+  try {
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    const now = new Date();
+
+    await db.insert(task_completions).values({
+      id: createId(),
+      task_id: taskId,
+      completed_at: getUnixTime(now),
+      completion_date: completionDate,
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to complete a task");
   }
 };

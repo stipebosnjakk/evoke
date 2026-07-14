@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { initialState } from "@/store/initialStates/tasks.initialState";
-import { addTaskCreateExtraReducers } from "@/store/extraReducers/create.extraReducers";
+import {
+  addTaskComplationExtraReducers,
+  addTaskCreateExtraReducers,
+} from "@/store/extraReducers/create.extraReducers";
 import { clearTaskScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
 import { addActiveTasksExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
@@ -24,6 +27,7 @@ const tasksSlice = createSlice({
     addTaskCompletionExtraReducers(builder);
     addTasksToProjectTaskExtraReducers(builder);
     addCompleteProjectTasksExtraReducers(builder);
+    addTaskComplationExtraReducers(builder);
   },
 });
 

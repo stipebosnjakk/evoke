@@ -39,7 +39,7 @@ const Task = ({ task, onDrag }: TaskGroupType) => {
           </TouchableOpacity>
         )}
       </View>
-      {!task.is_completed && (
+      {!task.is_completed && task.repeat_today_status !== "completed_today" && (
         <View style={styles.taskMetaContainer}>
           {task.project && (
             <View style={styles.taskMetaItem}>

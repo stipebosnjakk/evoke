@@ -1,7 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import * as SQLite from "expo-sqlite";
 
 import { tasks } from "@/db/schemas/task.schema";
-import { db } from "@/db/client";
+import { db, expo } from "@/db/client";
 import { RejectWithValue } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import { list_order, projects } from "@/db";
@@ -12,9 +13,8 @@ export const deleteAllTasksAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/deleteAll", async (_, { rejectWithValue }) => {
   try {
-    await db.delete(tasks);
-    await db.delete(list_order);
-    await db.delete(projects);
+    await expo.closeAsync();
+    await SQLite.deleteDatabaseAsync(process.env.EXPO_PUBLIC_DATABASE_NAME!);
   } catch (error: unknown) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to delete all tasks"),

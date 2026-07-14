@@ -54,19 +54,21 @@ const ProjectsScreen = () => {
 
   if (status === "succeeded" && total === 0) {
     return (
-      <View style={styles.noProjectContainer}>
-        <Text style={styles.noProjectsTitleText}>No project yet</Text>
-        <Text style={styles.noProjectsSubtitleText}>
-          Create your first project to organize related tasks in one place.
-        </Text>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={navigateToCreateProject}
-          style={styles.primaryButton}
-        >
-          <Text style={styles.primaryButtonText}>Create Project</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenWrapper>
+        <View style={styles.noProjectContainer}>
+          <Text style={styles.noProjectsTitleText}>No project yet</Text>
+          <Text style={styles.noProjectsSubtitleText}>
+            Create your first project to organize related tasks in one place.
+          </Text>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={navigateToCreateProject}
+            style={styles.primaryButton}
+          >
+            <Text style={styles.primaryButtonText}>Create Project</Text>
+          </TouchableOpacity>
+        </View>
+      </ScreenWrapper>
     );
   }
 

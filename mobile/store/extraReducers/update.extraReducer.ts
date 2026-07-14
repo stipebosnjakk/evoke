@@ -6,6 +6,7 @@ import {
   completeProjectAction,
   completeProjectTasksAction,
   completeTaskAction,
+  restoreCompletedRepeatTaskAction,
   restoreCompletedTaskAction,
   updateOrderKeysAction,
   updateProjectAction,
@@ -67,6 +68,22 @@ export const addTaskCompletionExtraReducers = (
       if (!state.tasks.ids.includes(task.id)) {
         state.tasks.ids.push(task.id);
       }
+    })
+    .addCase(restoreCompletedRepeatTaskAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error =
+        action.payload?.message || "Failed to restore repeating task";
+    })
+    .addCase(restoreCompletedRepeatTaskAction.fulfilled, (state, action) => {
+      const { taskId } = action.payload;
+      const task = state.tasks.byId[taskId];
+
+      state.status = "succeeded";
+      state.error = null;
+
+      if (!task) return;
+
+      task.repeat_today_status = "not_completed_today";
     });
 };
 

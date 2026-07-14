@@ -1,18 +1,22 @@
 import { eq, desc, and } from "drizzle-orm";
 
-import { db, list_order, projects, tasks } from "@/db";
+import { db, list_order, projects, tasks, task_completions } from "@/db";
 import { throwDbError } from "@/utils/error";
 import { EntityObjectType, OrderObject } from "@/types/initialState.types";
 import { TaskStateData } from "@/types/task.types";
 import { ProjectStateData } from "@/types/project.types";
+import { toIsoDate } from "@/utils/date";
 
 export const fetchActiveTasks = async (): Promise<
   EntityObjectType<TaskStateData>
 > => {
   try {
+    const today = toIsoDate(new Date());
+
     const rows = await db
       .select({
         task: tasks,
+        task_completion: task_completions,
         project: {
           id: projects.id,
           name: projects.name,
@@ -21,6 +25,13 @@ export const fetchActiveTasks = async (): Promise<
       })
       .from(tasks)
       .leftJoin(projects, eq(tasks.project_id, projects.id))
+      .leftJoin(
+        task_completions,
+        and(
+          eq(tasks.id, task_completions.task_id),
+          eq(task_completions.completion_date, today),
+        ),
+      )
       .where(eq(tasks.is_deleted, false));
 
     const data: EntityObjectType<TaskStateData> = {
@@ -29,9 +40,17 @@ export const fetchActiveTasks = async (): Promise<
     };
 
     for (const row of rows) {
+      const isRepeating = Boolean(row.task.repeat?.length);
+
       const task: TaskStateData = {
         ...row.task,
         project: row.project,
+
+        repeat_today_status: isRepeating
+          ? row.task_completion
+            ? "completed_today"
+            : "not_completed_today"
+          : null,
       };
 
       data.ids.push(task.id);

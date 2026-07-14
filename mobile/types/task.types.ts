@@ -41,6 +41,12 @@ export type TaskProject = {
   color: string;
 };
 
+export type RepeatTodayStatus =
+  | "completed_today"
+  | "not_completed_today"
+  | null;
+
 export type TaskStateData = Task & {
   project: TaskProject | null;
+  repeat_today_status: RepeatTodayStatus;
 };

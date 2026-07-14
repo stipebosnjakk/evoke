@@ -23,6 +23,7 @@ import m0018 from './0018_organic_natasha_romanoff.sql';
 import m0019 from './0019_huge_dark_phoenix.sql';
 import m0020 from './0020_milky_giant_girl.sql';
 import m0021 from './0021_majestic_mongoose.sql';
+import m0022 from './0022_thin_blockbuster.sql';
 
   export default {
     journal,
@@ -48,7 +49,8 @@ m0017,
 m0018,
 m0019,
 m0020,
-m0021
+m0021,
+m0022
     }
   }
   

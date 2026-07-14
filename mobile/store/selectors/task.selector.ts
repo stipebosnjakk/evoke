@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { startOfToday } from "date-fns";
 
-import { Task, tasks } from "@/db";
+import { Task } from "@/db";
 import { RootState } from "@/store/store";
 import { toIsoDate } from "@/utils/date";
 import { selectProjects } from "@/store/selectors/projects.selector";
@@ -71,6 +71,7 @@ export const selectTodayTasks = createSelector(
 
       if (isCompletedTodayTask(task)) {
         groupsById[TODAY_SCOPE_COMPLETED_ID].data.push(task);
+        continue;
       }
 
       if (!isTodayTask(task)) continue;
@@ -106,7 +107,7 @@ export const selectUpcomingTasks = createSelector(
   [selectTaskIds, selectTasksById],
   (
     ids: string[],
-    byId: Record<string, Task>,
+    byId: Record<string, TaskStateData>,
   ): SelectDataReturn<UpcomingGroupId> => {
     const groupsById: GroupByIdType<UpcomingGroupId> = {
       [UPCOMING_SCOPE_UPCOMING_ID]: {
@@ -236,9 +237,7 @@ export const selectTasksWithoutProject = createSelector(
       .map((id) => byId[id])
       .filter(
         (task) =>
-          task.project_id == null &&
-          task.project == null &&
-          !task.is_completed
+          task.project_id == null && task.project == null && !task.is_completed,
       );
   },
 );

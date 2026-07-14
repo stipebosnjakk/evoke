@@ -4,6 +4,7 @@ import { ProjectsState, TasksState } from "@/types/initialState.types";
 import {
   createProjectAction,
   createTaskAction,
+  RepeatTaskCompletionAction,
 } from "@/store/thunks/create.thunks";
 
 export const addTaskCreateExtraReducers = (
@@ -80,5 +81,29 @@ export const addProjectCreateExtraReducers = (
         id: task.id,
         order_key,
       });
+    });
+};
+
+export const addTaskComplationExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(RepeatTaskCompletionAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(RepeatTaskCompletionAction.rejected, (state, action) => {
+      state.error =
+        action.payload?.message ?? "Failed to complete repeating task";
+    })
+    .addCase(RepeatTaskCompletionAction.fulfilled, (state, action) => {
+      state.error = null;
+
+      const { taskId } = action.payload;
+
+      const task = state.tasks.byId[taskId];
+
+      if (!task) return;
+
+      task.repeat_today_status = "completed_today";
     });
 };

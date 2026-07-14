@@ -17,8 +17,8 @@ const TodayScreen = () => {
   const status = useAppSelector((state) => state.tasks.status);
   const { list, groupsById, total } = useAppSelector(selectTodayTasks);
 
-  const headerH = insets.top + 44;
   const headerFadeExtra = 12;
+  const headerH = insets.top + 44;
 
   const view = config ? config.screens[TODAY_SCOPE_ID].view : null;
 

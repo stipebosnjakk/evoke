@@ -7,8 +7,11 @@ import { TaskStateData } from "@/types/task.types";
 import { useAppDispatch } from "@/hooks/storeHooks";
 import {
   completeTaskAction,
+  restoreCompletedRepeatTaskAction,
   restoreCompletedTaskAction,
 } from "@/store/thunks/update.thunks";
+import { RepeatTaskCompletionAction } from "@/store/thunks/create.thunks";
+import { toIsoDate } from "@/utils/date";
 
 type CompleteTaskType = {
   task: TaskStateData;
@@ -19,18 +22,21 @@ const CompleteTask = ({ task }: CompleteTaskType) => {
 
   const [isCompleting, setIsCompleting] = useState<boolean>(false);
 
-  const isVisuallyCompleted = task.is_completed || isCompleting;
+  const completed =
+    task.is_completed || task.repeat_today_status === "completed_today";
+
+  const isCompletedOrCompleting = completed || isCompleting;
 
   const completionProgress = useRef(
-    new Animated.Value(task.is_completed ? 1 : 0),
+    new Animated.Value(completed ? 1 : 0),
   ).current;
 
   useEffect(() => {
-    completionProgress.setValue(task.is_completed ? 1 : 0);
-  }, [task.is_completed, completionProgress]);
+    completionProgress.setValue(completed ? 1 : 0);
+  }, [completed, completionProgress]);
 
   const handleComplete = () => {
-    if (task.is_completed || task.is_deleted || isCompleting) return;
+    if (isCompletedOrCompleting || task.is_deleted) return;
 
     setIsCompleting(true);
 
@@ -54,7 +60,20 @@ const CompleteTask = ({ task }: CompleteTaskType) => {
           },
         });
 
-        dispatch(completeTaskAction({ taskId: task.id }));
+        if (
+          task.repeat &&
+          task.repeat.length > 0 &&
+          task.repeat_today_status === "not_completed_today"
+        ) {
+          dispatch(
+            RepeatTaskCompletionAction({
+              taskId: task.id,
+              completionDate: toIsoDate(new Date()),
+            }),
+          );
+        } else {
+          dispatch(completeTaskAction({ taskId: task.id }));
+        }
         setIsCompleting(false);
       }
     });
@@ -62,6 +81,15 @@ const CompleteTask = ({ task }: CompleteTaskType) => {
 
   const handleRestoreCompletedTask = () => {
     Toast.hide();
+    if (task.repeat && task.repeat.length > 0) {
+      dispatch(
+        restoreCompletedRepeatTaskAction({
+          taskId: task.id,
+          completionDate: toIsoDate(new Date()),
+        }),
+      );
+      return;
+    }
     dispatch(restoreCompletedTaskAction({ taskId: task.id }));
   };
 
@@ -69,7 +97,7 @@ const CompleteTask = ({ task }: CompleteTaskType) => {
     <View style={styles.topTaskSide}>
       <Pressable
         onPress={handleComplete}
-        disabled={isVisuallyCompleted || task.is_deleted}
+        disabled={isCompletedOrCompleting || task.is_deleted}
         style={styles.completionCircle}
       >
         <Animated.View
@@ -101,7 +129,7 @@ const CompleteTask = ({ task }: CompleteTaskType) => {
       <Text
         style={[
           styles.taskTitle,
-          isVisuallyCompleted && styles.taskTitleCompleted,
+          isCompletedOrCompleting && styles.taskTitleCompleted,
         ]}
         numberOfLines={1}
         ellipsizeMode="tail"

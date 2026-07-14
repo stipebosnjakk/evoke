@@ -4,9 +4,10 @@ import Toast from "react-native-toast-message";
 
 import {
   createProjectRepo,
+  RepeatTaskCompletionRepo,
   createTaskRepo,
 } from "@/db/repositories/create.repo";
-import { CreatedTask, RejectWithValue } from "@/types/task.types";
+import { CreatedTask, IsoDate, RejectWithValue } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import {
   clearTaskState,
@@ -117,3 +118,39 @@ export const createProjectAction = createAsyncThunk<
     });
   }
 });
+
+type RepeatTaskCompletionReturn = {
+  taskId: string;
+};
+
+type RepeatTaskCompletion = {
+  taskId: string;
+  completionDate: IsoDate;
+};
+
+export const RepeatTaskCompletionAction = createAsyncThunk<
+  RepeatTaskCompletionReturn,
+  RepeatTaskCompletion,
+  { rejectValue: RejectWithValue }
+>(
+  "RepeatTaskCompletions/create",
+  async ({ taskId, completionDate }, { rejectWithValue }) => {
+    try {
+      if (!taskId) {
+        return rejectWithValue({
+          message: "Task ID is required",
+        });
+      }
+
+      await RepeatTaskCompletionRepo(taskId, completionDate);
+
+      return {
+        taskId,
+      };
+    } catch (error: unknown) {
+      return rejectWithValue({
+        message: getErrorMessage(error, "Failed to complete repeating task"),
+      });
+    }
+  },
+);
