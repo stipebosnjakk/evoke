@@ -14,12 +14,14 @@ const SelectProjectButton = () => {
     selectProjectById(state, newProjectId),
   );
 
+  const navigateToSelectProject = () => {
+    router.push(routes.form_task_project.href);
+  };
+
   return (
     <TouchableOpacity
       style={styles.projectSelector}
-      onPress={() => {
-        router.push(routes.form_task_project.href);
-      }}
+      onPress={navigateToSelectProject}
     >
       <SymbolView
         name="folder"

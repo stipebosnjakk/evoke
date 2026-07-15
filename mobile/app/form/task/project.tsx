@@ -10,6 +10,7 @@ import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import ProjectPicker from "@/components/projects/ProjectPicker";
 import { useEffect, useState } from "react";
 import { setProjectId } from "@/store/slices/newTask.slice";
+import NoProjectsView from "@/components/projects/NoProjectsView";
 
 type RenderItemType = {
   item: ProjectStateData;
@@ -64,16 +65,20 @@ const ProjectFormSheet = () => {
       <SheetHeader
         title={routes.form_task_project.title}
         onSubmit={handleSubmit}
-        submitButtonVisible={true}
+        submitButtonVisible={projects.length > 0}
         submitDisabled={isSubmitting || selectedProjectId === newProjectId}
       />
-      <FlatList
-        data={projects}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16 }}
-      />
+      {projects.length > 0 ? (
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 16 }}
+        />
+      ) : (
+        <NoProjectsView />
+      )}
     </SheetWrapper>
   );
 };

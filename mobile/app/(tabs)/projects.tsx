@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  TouchableOpacity,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView } from "expo-symbols";
@@ -19,6 +18,7 @@ import { selectProjects } from "@/store/selectors/projects.selector";
 import { PROJECTS_SCOPE_ID } from "@/constants/scopeIds";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import ErrorView from "@/components/ui/ErrorView";
+import NoProjectsView from "@/components/projects/NoProjectsView";
 
 const ProjectsScreen = () => {
   const router = useRouter();
@@ -53,23 +53,7 @@ const ProjectsScreen = () => {
   }
 
   if (status === "succeeded" && total === 0) {
-    return (
-      <ScreenWrapper>
-        <View style={styles.noProjectContainer}>
-          <Text style={styles.noProjectsTitleText}>No project yet</Text>
-          <Text style={styles.noProjectsSubtitleText}>
-            Create your first project to organize related tasks in one place.
-          </Text>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={navigateToCreateProject}
-            style={styles.primaryButton}
-          >
-            <Text style={styles.primaryButtonText}>Create Project</Text>
-          </TouchableOpacity>
-        </View>
-      </ScreenWrapper>
-    );
+    return <NoProjectsView />;
   }
 
   return (
@@ -150,39 +134,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
     flexDirection: "column",
     gap: 20,
-  },
-  noProjectContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-    gap: 14,
-  },
-  noProjectsTitleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#0F172A",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  noProjectsSubtitleText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#7B8798",
-    textAlign: "center",
-  },
-  primaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#191919",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#FFFFFF",
   },
 });
 
