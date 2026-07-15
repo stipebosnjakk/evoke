@@ -40,9 +40,14 @@ export const setStatusReducer = (
   }
 
   if (!res.data) {
+    state.task.repeat = null;
     state.task.status = null;
     state.error = null;
     return;
+  }
+
+  if (res.data.value !== "next") {
+    state.task.repeat = null;
   }
 
   state.task.status = res.data.value;
@@ -60,7 +65,7 @@ export const setRepeatReducer = (
     return;
   }
 
-  if (!res.data) {
+  if (!res.data || res.data.length === 0) {
     state.task.repeat = null;
     state.error = null;
     return;
@@ -68,6 +73,7 @@ export const setRepeatReducer = (
 
   const sortedRepeat = [...res.data].sort((a, b) => a - b);
 
+  state.task.status = "next";
   state.task.repeat = sortedRepeat;
   state.error = null;
 };
