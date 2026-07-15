@@ -86,29 +86,6 @@ export const getTaskPlacement = (task: TaskStateData): TaskScreen => {
 };
 
 /**
- * Checks if a task was completed today.
- * @param task
- * @returns
- */
-export const isCompletedTodayTask = (task: TaskStateData): boolean => {
-  if (task.is_deleted) return false;
-
-  const isRepeatingCompletedToday =
-    Boolean(task.repeat?.length) &&
-    task.repeat_today_status === "completed_today";
-
-  const completedAt = task.completed_at_utc;
-
-  const isPermanentlyCompletedToday =
-    task.is_completed === true &&
-    typeof completedAt === "number" &&
-    completedAt >= getUnixTime(startOfToday()) &&
-    completedAt < getUnixTime(addDays(startOfToday(), 1));
-
-  return isRepeatingCompletedToday || isPermanentlyCompletedToday;
-};
-
-/**
  * Returns the text for a given task screen.
  * @param screen
  * @returns

@@ -32,7 +32,7 @@ const Project = ({ project }: ProjectProps) => {
             <Text style={styles.priorityBadgeText}>{project.status}</Text>
           </View>
         </View>
-        <ProjectMenu project={project} tasksCount={12} />
+        <ProjectMenu project={project} />
       </View>
       <View style={styles.textContainer}>
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.projectName}>

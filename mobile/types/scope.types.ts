@@ -8,7 +8,6 @@ export type TodayGroupId =
   | "scope:today:overdue"
   | "scope:today:due_today"
   | "scope:today:ready"
-  | "scope:today:completed";
 
 export type UpcomingGroupId =
   | "scope:upcoming:upcoming"

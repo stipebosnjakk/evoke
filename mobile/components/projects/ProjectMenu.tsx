@@ -23,10 +23,9 @@ import { ProjectStateData } from "@/types/project.types";
 
 type ProjectMenuType = {
   project: ProjectStateData;
-  tasksCount: number;
 };
 
-const ProjectMenu = ({ project, tasksCount }: ProjectMenuType) => {
+const ProjectMenu = ({ project }: ProjectMenuType) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -97,7 +96,8 @@ const ProjectMenu = ({ project, tasksCount }: ProjectMenuType) => {
                     {project.name}
                   </Text>
                   <Text style={styles.taskCount}>
-                    {tasksCount} {tasksCount === 1 ? "task" : "tasks"}
+                    {project.tasks.length}{" "}
+                    {project.tasks.length === 1 ? "task" : "tasks"}
                   </Text>
                 </View>
               </View>
@@ -110,15 +110,17 @@ const ProjectMenu = ({ project, tasksCount }: ProjectMenuType) => {
             </View>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onPress={() => setCompleteAlertOpen(true)}>
-            <SymbolView
-              name="checkmark.circle"
-              size={23}
-              type="monochrome"
-              tintColor="#3F3F46"
-            />
-            <Text style={styles.itemText}>Mark as Completed</Text>
-          </DropdownMenuItem>
+          {project.completed_at == null && (
+            <DropdownMenuItem onPress={() => setCompleteAlertOpen(true)}>
+              <SymbolView
+                name="checkmark.circle"
+                size={23}
+                type="monochrome"
+                tintColor="#3F3F46"
+              />
+              <Text style={styles.itemText}>Mark as Completed</Text>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem>
             <SymbolView
               name="archivebox"
@@ -144,7 +146,7 @@ const ProjectMenu = ({ project, tasksCount }: ProjectMenuType) => {
         open={completeAlertOpen}
         onOpenChange={setCompleteAlertOpen}
         title="Complete this project?"
-        subtitle="This will also complete all unfinished tasks inside it."
+        subtitle="This will also complete all unfinished tasks inside it. This action cannot be undone."
         onAction={handleCompleteProject}
       />
     </>

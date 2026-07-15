@@ -12,7 +12,6 @@ import {
   UpcomingGroupId,
 } from "@/types/scope.types";
 import {
-  isCompletedTodayTask,
   isInboxTask,
   isTodayTask,
   isUpcomingTask,
@@ -23,7 +22,6 @@ import {
   SelectDataReturn,
 } from "@/types/group.types";
 import {
-  TODAY_SCOPE_COMPLETED_ID,
   TODAY_SCOPE_DUE_TODAY_ID,
   TODAY_SCOPE_OVERDUE_ID,
   TODAY_SCOPE_READY_ID,
@@ -60,19 +58,10 @@ export const selectTodayTasks = createSelector(
         title: "Ready",
         data: [],
       },
-      [TODAY_SCOPE_COMPLETED_ID]: {
-        title: "Completed",
-        data: [],
-      },
     };
 
     for (const id of ids) {
       const task = byId[id];
-
-      if (isCompletedTodayTask(task)) {
-        groupsById[TODAY_SCOPE_COMPLETED_ID].data.push(task);
-        continue;
-      }
 
       if (!isTodayTask(task)) continue;
 

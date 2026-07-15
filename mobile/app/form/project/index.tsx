@@ -13,7 +13,7 @@ import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
 import { routes } from "@/constants/routes";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { setName } from "@/store/slices/newProject.slice";
+import { clearProjectState, setName } from "@/store/slices/newProject.slice";
 import { getErrorMessage } from "@/utils/error";
 import { createProjectAction } from "@/store/thunks/create.thunks";
 import { projectColors } from "@/constants/colors";
@@ -36,14 +36,6 @@ const CreateProjectFormSheet = () => {
 
   const { mode, projectId } = useLocalSearchParams<LocalSearchParamsType>();
 
-  // TODO: clear state
-
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(clearProjectState());
-  //   };
-  // }, [dispatch]);
-
   const handleSubmitFunction = async () => {
     if (loading) return;
 
@@ -54,10 +46,14 @@ const CreateProjectFormSheet = () => {
         }
 
         await dispatch(updateProjectAction(projectId)).unwrap();
+        dispatch(clearProjectState());
+        router.back();
         return;
       }
 
       await dispatch(createProjectAction()).unwrap();
+      dispatch(clearProjectState());
+      router.back();
     } catch (error) {
       Toast.show({
         type: "error",
