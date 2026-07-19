@@ -18,7 +18,8 @@ import Alert from "./Alert";
 import {
   completeProjectAction,
   completeProjectTasksAction,
-} from "@/store/thunks/update.thunks";
+  deleteProjectAction,
+} from "@/store/thunks/mutation.thunks";
 import { ProjectStateData } from "@/types/project.types";
 
 type ProjectMenuType = {
@@ -30,6 +31,7 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
   const dispatch = useAppDispatch();
 
   const [completeAlertOpen, setCompleteAlertOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
 
   const navigateToEditProject = () => {
     dispatch(setName({ name: project.name }));
@@ -40,6 +42,8 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
       params: { mode: "edit", projectId: project.id },
     });
   };
+
+  // TODO: error handling
 
   const handleCompleteProject = async () => {
     try {
@@ -61,6 +65,15 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
       setCompleteAlertOpen(false);
     } catch (error) {
       console.error("Failed to complete project:", error);
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    try {
+      await dispatch(deleteProjectAction({ projectId: project.id })).unwrap();
+      setDeleteAlertOpen(false);
+    } catch (error) {
+      console.error("Failed to delete project:", error);
     }
   };
 
@@ -131,7 +144,10 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
             <Text style={styles.itemText}>Archive Project</Text>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">
+          <DropdownMenuItem
+            variant="destructive"
+            onPress={() => setDeleteAlertOpen(true)}
+          >
             <SymbolView
               name="trash"
               size={23}
@@ -148,6 +164,15 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
         title="Complete this project?"
         subtitle="This will also complete all unfinished tasks inside it. This action cannot be undone."
         onAction={handleCompleteProject}
+      />
+      <Alert
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        title="Delete this project?"
+        subtitle="All tasks inside this project will also be deleted. This action cannot be undone."
+        onAction={handleDeleteProject}
+        actionLabel="Delete Project"
+        buttonVariant="destructive"
       />
     </>
   );

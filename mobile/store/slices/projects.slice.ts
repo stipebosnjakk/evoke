@@ -6,10 +6,11 @@ import { clearProjectScreenErrorReducer } from "@/store/reducers/clearScreenErro
 import { addProjectsExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
   addCompleteProjectExtraReducers,
+  addDeleteProjectExtraReducers,
   addProjectTaskReorderExtraReducers,
   addTasksToProjectExtraReducers,
   addUpdateProjectExtraReducers,
-} from "@/store/extraReducers/update.extraReducer";
+} from "@/store/extraReducers/mutation.extraReducer";
 
 const projectsSlice = createSlice({
   name: "projects",
@@ -24,6 +25,7 @@ const projectsSlice = createSlice({
     addTasksToProjectExtraReducers(builder);
     addUpdateProjectExtraReducers(builder);
     addCompleteProjectExtraReducers(builder);
+    addDeleteProjectExtraReducers(builder);
   },
 });
 

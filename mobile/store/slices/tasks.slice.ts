@@ -9,10 +9,11 @@ import { clearTaskScreenErrorReducer } from "@/store/reducers/clearScreenError.r
 import { addActiveTasksExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
   addCompleteProjectTasksExtraReducers,
+  addDeleteProjectTasksExtraReducers,
   addInboxReorderExtraReducers,
   addTaskCompletionExtraReducers,
   addTasksToProjectTaskExtraReducers,
-} from "@/store/extraReducers/update.extraReducer";
+} from "@/store/extraReducers/mutation.extraReducer";
 
 const tasksSlice = createSlice({
   name: "tasks",
@@ -28,6 +29,7 @@ const tasksSlice = createSlice({
     addTasksToProjectTaskExtraReducers(builder);
     addCompleteProjectTasksExtraReducers(builder);
     addTaskComplationExtraReducers(builder);
+    addDeleteProjectTasksExtraReducers(builder);
   },
 });
 

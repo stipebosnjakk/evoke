@@ -32,7 +32,7 @@ export const fetchActiveTasks = async (): Promise<
           eq(task_completions.completion_date, today),
         ),
       )
-      .where(eq(tasks.is_deleted, false));
+      .where(eq(tasks.is_archived, false));
 
     const data: EntityObjectType<TaskStateData> = {
       ids: [],
@@ -132,6 +132,7 @@ export const fetchProjects = async (): Promise<
 
     return data;
   } catch (error) {
+    console.error(error);
     return throwDbError(error, "Failed get projects");
   }
 };

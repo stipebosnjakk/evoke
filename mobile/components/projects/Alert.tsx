@@ -18,6 +18,8 @@ type AlertType = {
   title: string;
   subtitle: string;
   onAction?: () => void;
+  actionLabel?: string;
+  buttonVariant?: "default" | "destructive";
 };
 
 const Alert = ({
@@ -26,6 +28,8 @@ const Alert = ({
   title,
   subtitle,
   onAction,
+  actionLabel = "Continue",
+  buttonVariant = "default",
 }: AlertType) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange} style={styles.root}>
@@ -38,8 +42,15 @@ const Alert = ({
           <AlertDialogCancel onPress={() => onOpenChange(false)}>
             <Text>Cancel</Text>
           </AlertDialogCancel>
-          <AlertDialogAction onPress={onAction}>
-            <Text>Continue</Text>
+          <AlertDialogAction
+            className={
+              buttonVariant === "destructive"
+                ? "bg-destructive active:bg-destructive/90"
+                : undefined
+            }
+            onPress={onAction}
+          >
+            <Text>{actionLabel}</Text>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

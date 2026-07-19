@@ -17,7 +17,7 @@ import { clearProjectState, setName } from "@/store/slices/newProject.slice";
 import { getErrorMessage } from "@/utils/error";
 import { createProjectAction } from "@/store/thunks/create.thunks";
 import { projectColors } from "@/constants/colors";
-import { updateProjectAction } from "@/store/thunks/update.thunks";
+import { updateProjectAction } from "@/store/thunks/mutation.thunks";
 
 type LocalSearchParamsType = {
   mode?: "create" | "edit";

@@ -6,11 +6,12 @@ import {
   completeProjectAction,
   completeProjectTasksAction,
   completeTaskAction,
+  deleteProjectAction,
   restoreCompletedRepeatTaskAction,
   restoreCompletedTaskAction,
   updateOrderKeysAction,
   updateProjectAction,
-} from "@/store/thunks/update.thunks";
+} from "@/store/thunks/mutation.thunks";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 
 export const addInboxReorderExtraReducers = (
@@ -264,5 +265,57 @@ export const addCompleteProjectTasksExtraReducers = (
           state.tasks.ids.push(task.id);
         }
       }
+    });
+};
+
+export const addDeleteProjectExtraReducers = (
+  builder: ActionReducerMapBuilder<ProjectsState>,
+) => {
+  builder
+    .addCase(deleteProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(deleteProjectAction.rejected, (state, action) => {
+      state.error = action.payload?.message || "Failed to delete project";
+    })
+    .addCase(deleteProjectAction.fulfilled, (state, action) => {
+      const { project } = action.payload;
+
+      state.error = null;
+
+      delete state.projects.byId[project.id];
+
+      state.projects.ids = state.projects.ids.filter(
+        (projectId) => projectId !== project.id,
+      );
+    });
+};
+
+export const addDeleteProjectTasksExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(deleteProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(deleteProjectAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to delete project tasks";
+    })
+    .addCase(deleteProjectAction.fulfilled, (state, action) => {
+      const { tasks: deletedTasks } = action.payload;
+      const deletedTaskIds = new Set(deletedTasks.map((task) => task.id));
+
+      state.status = "succeeded";
+      state.error = null;
+
+      for (const taskId of deletedTaskIds) {
+        delete state.tasks.byId[taskId];
+        delete state.taskOrder.inbox[taskId];
+      }
+
+      state.tasks.ids = state.tasks.ids.filter(
+        (taskId) => !deletedTaskIds.has(taskId),
+      );
     });
 };

@@ -6,7 +6,7 @@ import {
   getUpcomingTaskDate,
   toIsoDate,
 } from "@/utils/date";
-import { addDays, getUnixTime, startOfToday } from "date-fns";
+import { startOfToday } from "date-fns";
 
 type TaskScreen = "inbox" | "today" | "upcoming" | "none";
 
@@ -16,7 +16,7 @@ type TaskScreen = "inbox" | "today" | "upcoming" | "none";
  * @returns
  */
 export const isActiveTask = (task: TaskStateData | NewTask): boolean =>
-  !task.is_completed && !task.is_deleted;
+  !task.is_completed && !task.is_archived;
 
 /**
  * Checks if a task is in the inbox (active, and no scheduling information).

@@ -449,7 +449,7 @@ export const completeProjectTasksRepo = async (
           and(
             inArray(tasks.id, uniqueTaskIds),
             eq(tasks.project_id, projectId),
-            eq(tasks.is_deleted, false),
+            eq(tasks.is_archived, false),
           ),
         );
 
@@ -479,7 +479,7 @@ export const completeProjectTasksRepo = async (
           and(
             inArray(tasks.id, uniqueTaskIds),
             eq(tasks.project_id, projectId),
-            eq(tasks.is_deleted, false),
+            eq(tasks.is_archived, false),
             eq(tasks.is_completed, false),
           ),
         )
@@ -491,5 +491,53 @@ export const completeProjectTasksRepo = async (
     });
   } catch (error) {
     return throwDbError(error, "Failed to update project tasks");
+  }
+};
+
+export type DeleteProjectReturnType = {
+  project: Project;
+  tasks: Task[];
+};
+
+export const deleteProjectRepo = async (
+  projectId: string | null,
+): Promise<DeleteProjectReturnType> => {
+  try {
+    if (!projectId) {
+      throw new Error("Project ID is required");
+    }
+
+    return await db.transaction(async (tx) => {
+      const [existingProject] = await tx
+        .select()
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+
+      if (!existingProject) {
+        throw new Error(`Project "${projectId}" does not exist`);
+      }
+
+      const deletedTasks = await tx
+        .delete(tasks)
+        .where(eq(tasks.project_id, projectId))
+        .returning();
+
+      const [deletedProject] = await tx
+        .delete(projects)
+        .where(eq(projects.id, projectId))
+        .returning();
+
+      if (!deletedProject) {
+        throw new Error(`Failed to delete project "${projectId}"`);
+      }
+
+      return {
+        project: deletedProject,
+        tasks: deletedTasks,
+      };
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to delete project");
   }
 };

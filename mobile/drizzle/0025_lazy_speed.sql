@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` ADD `is_archived` integer DEFAULT false NOT NULL;

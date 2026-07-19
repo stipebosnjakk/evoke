@@ -9,7 +9,7 @@ import {
   completeTaskAction,
   restoreCompletedRepeatTaskAction,
   restoreCompletedTaskAction,
-} from "@/store/thunks/update.thunks";
+} from "@/store/thunks/mutation.thunks";
 import { RepeatTaskCompletionAction } from "@/store/thunks/create.thunks";
 import { toIsoDate } from "@/utils/date";
 
@@ -37,7 +37,7 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
   }, [completed, completionProgress]);
 
   const handleComplete = () => {
-    if (isCompletedOrCompleting || task.is_deleted) return;
+    if (isCompletedOrCompleting || task.is_archived) return;
 
     setIsCompleting(true);
 
@@ -101,7 +101,7 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
       ) : (
         <Pressable
           onPress={handleComplete}
-          disabled={isCompletedOrCompleting || task.is_deleted}
+          disabled={isCompletedOrCompleting || task.is_archived}
           style={styles.completionCircle}
         >
           <Animated.View

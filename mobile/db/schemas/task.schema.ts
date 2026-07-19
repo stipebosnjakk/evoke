@@ -20,11 +20,6 @@ export const tasks = t.sqliteTable("tasks", {
     .notNull()
     .default(false),
   completed_at_utc: t.integer("completed_at_utc"),
-  is_deleted: t
-    .integer("is_deleted", { mode: "boolean" })
-    .notNull()
-    .default(false),
-  deleted_at_utc: t.integer("deleted_at_utc"),
   status: t.text("status").$type<TaskStatus>(),
   project_id: t.text("project_id"),
   start_date: t.text("start_date").$type<IsoDate | null>(),
@@ -32,6 +27,10 @@ export const tasks = t.sqliteTable("tasks", {
   duration_min: t.integer("duration_min"),
   deadline: t.text("deadline").$type<IsoDate | null>(),
   repeat: t.text("repeat", { mode: "json" }).$type<Weekday[]>(),
+  is_archived: t
+    .integer("is_archived", { mode: "boolean" })
+    .notNull()
+    .default(false),
 });
 
 export type Task = InferSelectModel<typeof tasks>;

@@ -7,12 +7,14 @@ import {
   completeProjectTasksRepo,
   CompleteProjectTasksType,
   completeTaskRepo,
+  deleteProjectRepo,
+  DeleteProjectReturnType,
   restoreCompletedRepeatTaskRepo,
   restoreCompletedTaskRepo,
   updateOrderKeysRepo,
   updateProjectRepo,
   UpdateProjectReturnType,
-} from "@/db/repositories/update.repo";
+} from "@/db/repositories/mutation.repo";
 import {
   IsoDate,
   OrderTaskItem,
@@ -287,6 +289,32 @@ export const completeProjectTasksAction = createAsyncThunk<
     }
   },
 );
+
+type DeleteProjectActionType = {
+  projectId: ProjectId;
+};
+
+export const deleteProjectAction = createAsyncThunk<
+  DeleteProjectReturnType,
+  DeleteProjectActionType,
+  {
+    rejectValue: RejectWithValue;
+  }
+>("projects/deleteProject", async ({ projectId }, { rejectWithValue }) => {
+  try {
+    if (!projectId) {
+      return rejectWithValue({
+        message: "Project ID is required",
+      });
+    }
+    const data = await deleteProjectRepo(projectId);
+    return data;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to delete project"),
+    });
+  }
+});
 
 // TODO: remove
 export const resetUserConfig = () => async (dispatch: AppDispatch) => {
