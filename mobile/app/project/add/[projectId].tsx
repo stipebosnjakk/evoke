@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { selectTasksWithoutProject } from "@/store/selectors/task.selector";
 import { addTasksToProjectAction } from "@/store/thunks/mutation.thunks";
 import { TaskStateData } from "@/types/task.types";
+import NoAvailableTasksView from "@/components/task/NoAvailableTasksView";
 
 type LocalSearchParamsType = {
   projectId: string;
@@ -63,18 +64,22 @@ const AddTasksToProjectFormSheet = () => {
   return (
     <SheetWrapper>
       <SheetHeader
-        title="Add"
-        submitButtonVisible
-        submitDisabled={!selectedTaskIds.length || isSubmitting}
+        title="Add Tasks"
+        submitButtonVisible={tasks.length > 0}
+        submitDisabled={selectedTaskIds.length === 0 || isSubmitting}
         onSubmit={handleSubmit}
       />
-      <FlatList
-        data={tasks}
-        keyExtractor={(task) => task.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16 }}
-        renderItem={renderItem}
-      />
+      {tasks.length > 0 ? (
+        <FlatList
+          data={tasks}
+          keyExtractor={(task) => task.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 16 }}
+          renderItem={renderItem}
+        />
+      ) : (
+        <NoAvailableTasksView projectId={projectId} />
+      )}
     </SheetWrapper>
   );
 };
