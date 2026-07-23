@@ -20,11 +20,7 @@ import {
   getTaskScreenText,
 } from "@/utils/taskPlacement";
 import { ProjectWithOrderKey } from "@/types/project.types";
-import {
-  validateNameAndColor,
-  clearProjectState,
-} from "@/store/slices/newProject.slice";
-import { routes } from "@/constants/routes";
+import { validateNameAndColor } from "@/store/slices/newProject.slice";
 
 export const createTaskAction = createAsyncThunk<
   CreatedTask,

@@ -29,7 +29,7 @@ export const addTaskCreateExtraReducers = (
       }
 
       if (!state.tasks.ids.includes(task.id)) {
-        state.tasks.ids.push(task.id);
+        state.tasks.ids.unshift(task.id);
       }
 
       if (order_key !== null) {
@@ -58,7 +58,7 @@ export const addProjectCreateExtraReducers = (
       const { project, order_key } = action.payload;
 
       if (!state.projects.ids.includes(project.id)) {
-        state.projects.ids.push(project.id);
+        state.projects.ids.unshift(project.id);
       }
 
       if (order_key !== null) {

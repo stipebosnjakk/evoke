@@ -1,4 +1,4 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, asc } from "drizzle-orm";
 
 import { db, list_order, projects, tasks, task_completions } from "@/db";
 import { throwDbError } from "@/utils/error";
@@ -31,7 +31,8 @@ export const fetchActiveTasks = async (): Promise<
           eq(tasks.id, task_completions.task_id),
           eq(task_completions.completion_date, today),
         ),
-      );
+      )
+      .orderBy(desc(tasks.created_at));
 
     const data: EntityObjectType<TaskStateData> = {
       ids: [],
@@ -105,7 +106,7 @@ export const fetchProjects = async (): Promise<
       })
       .from(projects)
       .leftJoin(list_order, eq(projects.id, list_order.scope_id))
-      .orderBy(projects.created_at, list_order.order_key);
+      .orderBy(desc(projects.created_at), asc(list_order.order_key));
 
     const data: EntityObjectType<ProjectStateData> = {
       ids: [],
@@ -131,7 +132,6 @@ export const fetchProjects = async (): Promise<
 
     return data;
   } catch (error) {
-    console.error(error);
     return throwDbError(error, "Failed get projects");
   }
 };

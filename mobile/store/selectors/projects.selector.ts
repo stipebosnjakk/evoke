@@ -28,20 +28,20 @@ export const selectProjects = createSelector(
       },
     };
 
+    const list: ProjectStateData[] = [];
+
     ids.forEach((id) => {
       const project = byId[id];
+
+      if (!project) return;
+
+      list.push(project);
 
       if (project.status === "completed") {
         groupsById[PROJECTS_SCOPE_COMPLETED_ID].data.push(project);
       } else if (project.status === "active") {
         groupsById[PROJECTS_SCOPE_ACTIVE_ID].data.push(project);
       }
-    });
-
-    const list: ProjectStateData[] = [];
-
-    Object.values(groupsById).forEach((group) => {
-      list.push(...group.data);
     });
 
     return {
