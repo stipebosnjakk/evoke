@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
   screenContainer: {
     position: "relative",
     paddingHorizontal: 16,
-    paddingBottom: 16,
     paddingTop: 0,
   },
   createProjectContainer: {
