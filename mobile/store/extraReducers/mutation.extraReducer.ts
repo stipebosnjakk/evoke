@@ -4,7 +4,6 @@ import { ProjectsState, TasksState } from "@/types/initialState.types";
 import {
   addTasksToProjectAction,
   completeProjectAction,
-  completeProjectTasksAction,
   completeTaskAction,
   deleteProjectAction,
   restoreCompletedRepeatTaskAction,
@@ -242,14 +241,14 @@ export const addCompleteProjectTasksExtraReducers = (
   builder: ActionReducerMapBuilder<TasksState>,
 ) => {
   builder
-    .addCase(completeProjectTasksAction.pending, (state) => {
+    .addCase(completeProjectAction.pending, (state) => {
       state.error = null;
     })
-    .addCase(completeProjectTasksAction.rejected, (state, action) => {
+    .addCase(completeProjectAction.rejected, (state, action) => {
       state.error =
         action.payload?.message || "Failed to complete project tasks";
     })
-    .addCase(completeProjectTasksAction.fulfilled, (state, action) => {
+    .addCase(completeProjectAction.fulfilled, (state, action) => {
       const { tasks } = action.payload;
       state.error = null;
 

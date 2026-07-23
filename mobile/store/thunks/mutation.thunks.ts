@@ -4,8 +4,6 @@ import {
   addTasksToProjectRepo,
   completeProjectRepo,
   CompleteProjectReturnType,
-  completeProjectTasksRepo,
-  CompleteProjectTasksType,
   completeTaskRepo,
   deleteProjectRepo,
   DeleteProjectReturnType,
@@ -257,38 +255,6 @@ export const completeProjectAction = createAsyncThunk<
     });
   }
 });
-
-type CompleteProjectTasksActionType = {
-  projectId: ProjectId;
-  taskIds: string[];
-};
-
-export const completeProjectTasksAction = createAsyncThunk<
-  CompleteProjectTasksType,
-  CompleteProjectTasksActionType,
-  {
-    state: RootState;
-    rejectValue: RejectWithValue;
-  }
->(
-  "tasks/completeProjectTasks",
-  async ({ projectId, taskIds }, { rejectWithValue }) => {
-    try {
-      if (!projectId) {
-        return rejectWithValue({
-          message: "Project ID is required",
-        });
-      }
-
-      const data = await completeProjectTasksRepo(projectId, taskIds);
-      return data;
-    } catch (error) {
-      return rejectWithValue({
-        message: getErrorMessage(error, "Failed to complete tasks project"),
-      });
-    }
-  },
-);
 
 type DeleteProjectActionType = {
   projectId: ProjectId;

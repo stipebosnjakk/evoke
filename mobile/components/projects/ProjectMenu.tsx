@@ -17,7 +17,6 @@ import { routes } from "@/constants/routes";
 import Alert from "./Alert";
 import {
   completeProjectAction,
-  completeProjectTasksAction,
   deleteProjectAction,
 } from "@/store/thunks/mutation.thunks";
 import { ProjectStateData } from "@/types/project.types";
@@ -43,25 +42,9 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
     });
   };
 
-  // TODO: error handling
-
   const handleCompleteProject = async () => {
     try {
-      const taskIds = project.tasks.map((task) => task.id);
-
-      await dispatch(
-        completeProjectAction({
-          projectId: project.id,
-        }),
-      ).unwrap();
-
-      await dispatch(
-        completeProjectTasksAction({
-          projectId: project.id,
-          taskIds,
-        }),
-      ).unwrap();
-
+      await dispatch(completeProjectAction({ projectId: project.id })).unwrap();
       setCompleteAlertOpen(false);
     } catch (error) {
       console.error("Failed to complete project:", error);

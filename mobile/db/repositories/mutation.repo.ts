@@ -1,4 +1,4 @@
-import { eq, and, inArray, desc, isNotNull } from "drizzle-orm";
+import { eq, and, inArray, desc, isNotNull, ne } from "drizzle-orm";
 
 import {
   db,
@@ -355,118 +355,52 @@ export const updateProjectRepo = async (
 
 export type CompleteProjectReturnType = {
   project: Project;
-};
-
-export const completeProjectRepo = async (
-  projectId: string | null,
-): Promise<CompleteProjectReturnType> => {
-  try {
-    const now = getUnixTime(new Date());
-
-    if (!projectId) {
-      throw new Error("Project data is required");
-    }
-
-    return await db.transaction(async (tx) => {
-      const [existingProject] = await tx
-        .select()
-        .from(projects)
-        .where(eq(projects.id, projectId))
-        .limit(1);
-
-      if (!existingProject) {
-        throw new Error(`Project "${projectId}" does not exist`);
-      }
-
-      if (existingProject.status !== "completed") {
-        await tx
-          .update(projects)
-          .set({
-            status: "completed",
-            completed_at: now,
-            updated_at: now,
-          })
-          .where(eq(projects.id, projectId));
-      }
-
-      const [completedProject] = await tx
-        .select()
-        .from(projects)
-        .where(eq(projects.id, projectId))
-        .limit(1);
-
-      if (!completedProject) {
-        throw new Error(`Failed to fetch completed project "${projectId}"`);
-      }
-
-      return {
-        project: completedProject,
-      };
-    });
-  } catch (error) {
-    return throwDbError(error, "Failed to complete project");
-  }
-};
-
-export type CompleteProjectTasksType = {
   tasks: Task[];
 };
 
-export const completeProjectTasksRepo = async (
-  projectId: string | null,
-  taskIds: string[] = [],
-): Promise<CompleteProjectTasksType> => {
+export const completeProjectRepo = async (
+  projectId: string,
+): Promise<CompleteProjectReturnType> => {
+  if (!projectId.trim()) {
+    throw new Error("Project ID is required");
+  }
+
   try {
-    const now = getUnixTime(new Date());
-    const uniqueTaskIds = [...new Set(taskIds)];
+    return await db.transaction(async (tx) => {
+      const now = getUnixTime(new Date());
 
-    if (!projectId) {
-      throw new Error("Project data is required");
-    }
-
-    return db.transaction(async (tx) => {
-      const [updatedProject] = await tx
-        .select()
-        .from(projects)
+      const [completedProject] = await tx
+        .update(projects)
+        .set({
+          status: "completed",
+          completed_at: now,
+          updated_at: now,
+        })
         .where(
-          and(
-            eq(projects.id, projectId),
-            eq(projects.status, "completed"),
-            isNotNull(projects.completed_at),
-          ),
+          and(eq(projects.id, projectId), ne(projects.status, "completed")),
         )
-        .limit(1);
+        .returning();
 
-      if (!updatedProject) {
-        throw new Error(`Project "${projectId}" does not exist`);
-      }
+      if (!completedProject) {
+        const [existingProject] = await tx
+          .select({
+            id: projects.id,
+            status: projects.status,
+          })
+          .from(projects)
+          .where(eq(projects.id, projectId))
+          .limit(1);
 
-      const projectTasks = await tx
-        .select({ id: tasks.id })
-        .from(tasks)
-        .where(
-          and(
-            inArray(tasks.id, uniqueTaskIds),
-            eq(tasks.project_id, projectId),
-          ),
+        if (!existingProject) {
+          throw new Error(`Project "${projectId}" does not exist`);
+        }
+
+        throw new Error(
+          `Project "${projectId}" cannot be completed from status "${existingProject.status}"`,
         );
-
-      if (uniqueTaskIds.length === 0) {
-        return {
-          tasks: [],
-        };
       }
 
-      const projectTaskIds = new Set(projectTasks.map((task) => task.id));
-      const invalidTaskIds = uniqueTaskIds.filter(
-        (taskId) => !projectTaskIds.has(taskId),
-      );
-
-      if (invalidTaskIds.length > 0) {
-        throw new Error(`Some tasks do not belong to project "${projectId}"`);
-      }
-
-      const updatedTasks = await tx
+      const completedTasks = await tx
         .update(tasks)
         .set({
           is_completed: true,
@@ -474,20 +408,17 @@ export const completeProjectTasksRepo = async (
           updated_at: now,
         })
         .where(
-          and(
-            inArray(tasks.id, uniqueTaskIds),
-            eq(tasks.project_id, projectId),
-            eq(tasks.is_completed, false),
-          ),
+          and(eq(tasks.project_id, projectId), eq(tasks.is_completed, false)),
         )
         .returning();
 
       return {
-        tasks: updatedTasks,
+        project: completedProject,
+        tasks: completedTasks,
       };
     });
   } catch (error) {
-    return throwDbError(error, "Failed to update project tasks");
+    throwDbError(error, `Failed to complete project "${projectId}"`);
   }
 };
 
