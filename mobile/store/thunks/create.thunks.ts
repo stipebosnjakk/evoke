@@ -24,6 +24,7 @@ import {
   validateNameAndColor,
   clearProjectState,
 } from "@/store/slices/newProject.slice";
+import { routes } from "@/constants/routes";
 
 export const createTaskAction = createAsyncThunk<
   CreatedTask,

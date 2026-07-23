@@ -45,7 +45,6 @@ export const addProjectCreateExtraReducers = (
 ) => {
   builder
     .addCase(createProjectAction.pending, (state: ProjectsState, _) => {
-      state.status = "loading";
       state.error = null;
     })
     .addCase(createProjectAction.rejected, (state, action) => {

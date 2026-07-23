@@ -7,19 +7,26 @@ import { toastConfig } from "@/components/ui/ToastConfig";
 type SheetWrapperProps = {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  toastEnabled?: boolean;
 };
 
-const SheetWrapper = ({ children, style }: SheetWrapperProps) => {
+const SheetWrapper = ({
+  children,
+  style,
+  toastEnabled = true,
+}: SheetWrapperProps) => {
   return (
     <ScreenWrapper style={[styles.container, style]}>
       {children}
-      <Toast
-        position="bottom"
-        bottomOffset={12}
-        keyboardOffset={0}
-        avoidKeyboard={false}
-        config={toastConfig}
-      />
+      {toastEnabled ? (
+        <Toast
+          position="bottom"
+          bottomOffset={12}
+          keyboardOffset={0}
+          avoidKeyboard={false}
+          config={toastConfig}
+        />
+      ) : null}
     </ScreenWrapper>
   );
 };

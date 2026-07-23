@@ -9,7 +9,7 @@ import NoTasksView from "@/components/task/NoTasksView";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
 import ErrorView from "@/components/ui/ErrorView";
-import { getUpcomingTaskDate } from "@/utils/date";
+import { getUpcomingTaskDate } from "@/utils/taskPlacement";
 
 const UpcomingScreen = () => {
   const insets = useSafeAreaInsets();

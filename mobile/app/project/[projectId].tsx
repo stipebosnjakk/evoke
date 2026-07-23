@@ -9,6 +9,7 @@ import DraggableTaskList from "@/components/group/DraggableTaskList";
 import CustomButton from "@/components/ui/CustomButton";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 import NoProjectTasksView from "@/components/projects/NoProjectTaskView";
+import { routes } from "@/constants/routes";
 
 type LocalSearchParamsType = {
   projectId: string;
@@ -24,11 +25,19 @@ const ProjectTasksScreen = () => {
     selectProjectTasks(state, projectId),
   );
 
+  const handleGoBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(routes.projects.href);
+    }
+  };
+
   return (
     <ScreenWrapper>
       <HeaderWrapper>
         <View style={styles.side}>
-          <CustomButton onPress={() => router.back()}>
+          <CustomButton onPress={handleGoBack}>
             <SymbolView
               name="chevron.left"
               size={23}

@@ -37,6 +37,7 @@ import {
 import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
 import { storeData } from "@/utils/storage";
 import { ProjectTask } from "@/types/project.types";
+import { validateNameAndColor } from "@/store/slices/newProject.slice";
 
 export const restoreCompletedTaskAction = createAsyncThunk<
   { task: TaskStateData },
@@ -196,8 +197,10 @@ export const updateProjectAction = createAsyncThunk<
   }
 >(
   "projects/updateProject",
-  async (projectId, { getState, rejectWithValue }) => {
+  async (projectId, { dispatch, getState, rejectWithValue }) => {
     try {
+      await dispatch(validateNameAndColor());
+
       const state = getState();
       const { newProject } = state;
 
@@ -213,13 +216,19 @@ export const updateProjectAction = createAsyncThunk<
         });
       }
 
-      const data = await updateProjectRepo({
+      const res = await updateProjectRepo({
         id: projectId,
         name: newProject.project.name,
         color: newProject.project.color,
       });
 
-      return data;
+      if (!res.project) {
+        return rejectWithValue({
+          message: "Project was not updated properly",
+        });
+      }
+
+      return res;
     } catch (error) {
       return rejectWithValue({
         message: getErrorMessage(error, "Failed to update project"),

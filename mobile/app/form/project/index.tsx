@@ -29,22 +29,46 @@ const CreateProjectFormSheet = () => {
   const dispatch = useAppDispatch();
 
   const loading = useAppSelector((state) => state.newProject.loading);
-  const name = useAppSelector((state) => state.newProject.project.name);
-  const color = useAppSelector((state) => state.newProject.project.color);
+  const newProject = useAppSelector((state) => state.newProject.project);
 
-  const selectedColor = projectColors.find((item) => item.hex === color);
+  const selectedColor = projectColors.find(
+    (item) => item.hex === newProject.color,
+  );
 
   const { mode, projectId } = useLocalSearchParams<LocalSearchParamsType>();
+
+  const navigateToColor = () => {
+    router.push(routes.form_project_color.href);
+  };
+
+  const handleNavigation = (id?: string) => {
+    Toast.hide();
+
+    if (!id) {
+      router.dismissTo(routes.projects.href);
+      return;
+    }
+
+    router.dismissTo({
+      pathname: routes.single_project.href,
+      params: {
+        projectId: id,
+      },
+    } as any);
+  };
 
   const handleSubmitFunction = async () => {
     if (loading) return;
 
     try {
-      if (mode === "edit") {
-        await dispatch(updateProjectAction(projectId)).unwrap();
-      } else {
-        await dispatch(createProjectAction()).unwrap();
-      }
+      const result =
+        mode === "edit"
+          ? await dispatch(updateProjectAction(projectId)).unwrap()
+          : await dispatch(createProjectAction()).unwrap();
+
+      const project = result.project;
+
+      dispatch(clearProjectState());
 
       if (router.canGoBack()) {
         router.back();
@@ -52,11 +76,14 @@ const CreateProjectFormSheet = () => {
         router.replace(routes.projects.href);
       }
 
-      dispatch(clearProjectState());
-
       Toast.show({
         type: "info",
-        text1: mode === "edit" ? "Project updated" : "Project created",
+        text1: project.name,
+        text2: mode === "edit" ? "Project updated" : "Project created",
+        props: {
+          icon: "chevron.right",
+          onPress: () => handleNavigation(project.id),
+        },
       });
     } catch (error) {
       Toast.show({
@@ -70,22 +97,18 @@ const CreateProjectFormSheet = () => {
     }
   };
 
-  const navigateToColor = () => {
-    router.push(routes.form_project_color.href);
-  };
-
   return (
-    <SheetWrapper>
+    <SheetWrapper toastEnabled={false}>
       <SheetHeader
         title="Create a project"
         submitButtonVisible
-        submitDisabled={!name.trim() || loading}
+        submitDisabled={!newProject.name.trim() || loading}
         onSubmit={handleSubmitFunction}
       />
       <View style={styles.nameContainer}>
         <TextInput
           autoFocus
-          value={name}
+          value={newProject.name}
           style={styles.nameInput}
           placeholder="Name"
           placeholderTextColor="#A1A1AA"
