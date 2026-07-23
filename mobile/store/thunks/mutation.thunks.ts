@@ -187,7 +187,7 @@ export const addTasksToProjectAction = createAsyncThunk<
   },
 );
 
-type ProjectId = string | null;
+type ProjectId = string | undefined;
 
 export const updateProjectAction = createAsyncThunk<
   UpdateProjectReturnType,

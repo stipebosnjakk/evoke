@@ -41,19 +41,23 @@ const CreateProjectFormSheet = () => {
 
     try {
       if (mode === "edit") {
-        if (!projectId) {
-          throw new Error("Project ID is required");
-        }
-
         await dispatch(updateProjectAction(projectId)).unwrap();
-        dispatch(clearProjectState());
-        router.back();
-        return;
+      } else {
+        await dispatch(createProjectAction()).unwrap();
       }
 
-      await dispatch(createProjectAction()).unwrap();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace(routes.projects.href);
+      }
+
       dispatch(clearProjectState());
-      router.back();
+
+      Toast.show({
+        type: "info",
+        text1: mode === "edit" ? "Project updated" : "Project created",
+      });
     } catch (error) {
       Toast.show({
         type: "error",

@@ -103,14 +103,6 @@ export const createProjectAction = createAsyncThunk<
       });
     }
 
-    Toast.show({
-      type: "info",
-      text1: res.project.name || "Project created",
-      text2: "Project created successfully",
-    });
-
-    dispatch(clearProjectState());
-
     return res;
   } catch (error: unknown) {
     return rejectWithValue({

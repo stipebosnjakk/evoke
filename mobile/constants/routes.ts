@@ -23,7 +23,7 @@ export const routes = {
   },
   projects: {
     title: "Projects",
-    href: "/project",
+    href: "/projects",
     route: "projects",
   },
   form_project: {
