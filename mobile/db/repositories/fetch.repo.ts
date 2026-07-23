@@ -31,8 +31,7 @@ export const fetchActiveTasks = async (): Promise<
           eq(tasks.id, task_completions.task_id),
           eq(task_completions.completion_date, today),
         ),
-      )
-      .where(eq(tasks.is_archived, false));
+      );
 
     const data: EntityObjectType<TaskStateData> = {
       ids: [],

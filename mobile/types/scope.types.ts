@@ -7,7 +7,7 @@ export type ScopeScreenId =
 export type TodayGroupId =
   | "scope:today:overdue"
   | "scope:today:due_today"
-  | "scope:today:ready"
+  | "scope:today:ready";
 
 export type UpcomingGroupId =
   | "scope:upcoming:upcoming"
@@ -16,7 +16,6 @@ export type UpcomingGroupId =
 
 export type ProjectsGroupId =
   | "scope:projects:active"
-  | "scope:projects:archived"
   | "scope:projects:completed";
 
 export type ScopeGroupId = TodayGroupId | UpcomingGroupId | ProjectsGroupId;

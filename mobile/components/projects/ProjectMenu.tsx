@@ -123,7 +123,7 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
             </View>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {project.completed_at == null && (
+          {project.status !== "completed" && (
             <DropdownMenuItem onPress={() => setCompleteAlertOpen(true)}>
               <SymbolView
                 name="checkmark.circle"
@@ -134,15 +134,6 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
               <Text style={styles.itemText}>Mark as Completed</Text>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem>
-            <SymbolView
-              name="archivebox"
-              size={23}
-              type="monochrome"
-              tintColor="#3F3F46"
-            />
-            <Text style={styles.itemText}>Archive Project</Text>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"

@@ -37,7 +37,7 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
   }, [completed, completionProgress]);
 
   const handleComplete = () => {
-    if (isCompletedOrCompleting || task.is_archived) return;
+    if (isCompletedOrCompleting) return;
 
     setIsCompleting(true);
 
@@ -101,7 +101,7 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
       ) : (
         <Pressable
           onPress={handleComplete}
-          disabled={isCompletedOrCompleting || task.is_archived}
+          disabled={isCompletedOrCompleting}
           style={styles.completionCircle}
         >
           <Animated.View

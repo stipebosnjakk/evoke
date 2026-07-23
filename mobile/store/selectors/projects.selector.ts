@@ -5,7 +5,6 @@ import { ProjectsGroupId } from "@/types/scope.types";
 import { GroupByIdType, SelectDataReturn } from "@/types/group.types";
 import {
   PROJECTS_SCOPE_ACTIVE_ID,
-  PROJECTS_SCOPE_ARCHIVED_ID,
   PROJECTS_SCOPE_COMPLETED_ID,
 } from "@/constants/scopeIds";
 import { ProjectStateData } from "@/types/project.types";
@@ -23,10 +22,6 @@ export const selectProjects = createSelector(
         title: "Active",
         data: [],
       },
-      [PROJECTS_SCOPE_ARCHIVED_ID]: {
-        title: "Archived",
-        data: [],
-      },
       [PROJECTS_SCOPE_COMPLETED_ID]: {
         title: "Completed",
         data: [],
@@ -36,11 +31,9 @@ export const selectProjects = createSelector(
     ids.forEach((id) => {
       const project = byId[id];
 
-      if (project.archived_at) {
-        groupsById[PROJECTS_SCOPE_ARCHIVED_ID].data.push(project);
-      } else if (project.completed_at) {
+      if (project.status === "completed") {
         groupsById[PROJECTS_SCOPE_COMPLETED_ID].data.push(project);
-      } else {
+      } else if (project.status === "active") {
         groupsById[PROJECTS_SCOPE_ACTIVE_ID].data.push(project);
       }
     });

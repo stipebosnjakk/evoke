@@ -11,12 +11,12 @@ import { startOfToday } from "date-fns";
 type TaskScreen = "inbox" | "today" | "upcoming" | "none";
 
 /**
- * Checks if a task is active (not completed and not deleted).
+ * Checks if a task is active (not completed).
  * @param task
  * @returns
  */
 export const isActiveTask = (task: TaskStateData | NewTask): boolean =>
-  !task.is_completed && !task.is_archived;
+  !task.is_completed;
 
 /**
  * Checks if a task is in the inbox (active, and no scheduling information).

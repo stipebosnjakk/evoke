@@ -1,6 +1,6 @@
 import { Project } from "@/db";
 
-export type ProjectStatus = "active" | "completed" | "archived";
+export type ProjectStatus = "active" | "completed";
 
 export type ProjectWithOrderKey = {
   project: ProjectStateData;

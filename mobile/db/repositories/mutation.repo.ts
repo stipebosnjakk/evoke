@@ -384,7 +384,6 @@ export const completeProjectRepo = async (
           .set({
             status: "completed",
             completed_at: now,
-            archived_at: null,
             updated_at: now,
           })
           .where(eq(projects.id, projectId));
@@ -449,7 +448,6 @@ export const completeProjectTasksRepo = async (
           and(
             inArray(tasks.id, uniqueTaskIds),
             eq(tasks.project_id, projectId),
-            eq(tasks.is_archived, false),
           ),
         );
 
@@ -479,7 +477,6 @@ export const completeProjectTasksRepo = async (
           and(
             inArray(tasks.id, uniqueTaskIds),
             eq(tasks.project_id, projectId),
-            eq(tasks.is_archived, false),
             eq(tasks.is_completed, false),
           ),
         )
