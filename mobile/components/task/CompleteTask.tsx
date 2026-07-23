@@ -56,7 +56,7 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
           text1: "Undo",
           text2: "Completed",
           props: {
-            icon: "xmark",
+            showCloseButton: true,
             onPress: handleRestoreCompletedTask,
           },
         });

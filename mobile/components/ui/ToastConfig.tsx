@@ -69,6 +69,8 @@ type TaskInfoToastCardProps = {
   buttonText?: string;
   onPress?: () => void;
   icon?: string;
+  showCloseButton?: boolean;
+  onIconPress?: () => void;
 };
 
 const TaskInfoToastCard = ({
@@ -76,6 +78,8 @@ const TaskInfoToastCard = ({
   text2,
   onPress,
   icon,
+  showCloseButton = false,
+  onIconPress,
 }: TaskInfoToastCardProps) => {
   const handleClose = (event: GestureResponderEvent) => {
     event.stopPropagation();
@@ -98,14 +102,25 @@ const TaskInfoToastCard = ({
           {text1}
         </Text>
       </View>
-      <Pressable onPress={handleClose} hitSlop={10}>
-        <SymbolView
-          name={icon as any}
-          size={14}
-          type="monochrome"
-          tintColor="#111827"
-        />
-      </Pressable>
+      {showCloseButton ? (
+        <Pressable onPress={handleClose} hitSlop={10}>
+          <SymbolView
+            name="xmark"
+            size={14}
+            type="monochrome"
+            tintColor="#111827"
+          />
+        </Pressable>
+      ) : icon ? (
+        <Pressable onPress={onIconPress ?? onPress} hitSlop={10}>
+          <SymbolView
+            name={icon as any}
+            size={14}
+            type="monochrome"
+            tintColor="#111827"
+          />
+        </Pressable>
+      ) : null}
     </Pressable>
   );
 };
@@ -133,6 +148,8 @@ export const toastConfig: ToastConfig = {
       buttonText={props.buttonText}
       onPress={props.onPress}
       icon={props.icon}
+      showCloseButton={props.showCloseButton}
+      onIconPress={props.onIconPress}
     />
   ),
 };
