@@ -1,12 +1,12 @@
 import { routes } from "@/constants/routes";
 import { NewTask } from "@/db";
-import { TaskStateData } from "@/types/task.types";
+import { IsoDate, TaskStateData } from "@/types/task.types";
 import {
+  getNextRepeatDate,
   getRepeatWeekdayIndex,
-  getUpcomingTaskDate,
   toIsoDate,
 } from "@/utils/date";
-import { startOfToday } from "date-fns";
+import { parseISO, startOfToday } from "date-fns";
 
 type TaskScreen = "inbox" | "today" | "upcoming" | "none";
 
@@ -123,4 +123,44 @@ export const getTaskScreenHref = (screen: TaskScreen): string => {
     default:
       return routes.inbox.href;
   }
+};
+
+/**
+ * Finds the next day the task should show in Upcoming.
+ *
+ * @param task The task to check
+ * @returns The next date, or null
+ */
+export const getUpcomingTaskDate = (task: TaskStateData): IsoDate | null => {
+  const todayDate = startOfToday();
+  const today = toIsoDate(todayDate);
+
+  if (!isActiveTask(task) || isInboxTask(task)) return null;
+  if (task.status !== "next") return null;
+
+  if (task.repeat?.length) {
+    const fromDate =
+      task.start_date && task.start_date > today
+        ? parseISO(task.start_date)
+        : todayDate;
+
+    const calculatingFromToday = toIsoDate(fromDate) === today;
+
+    const includeFromDate =
+      !calculatingFromToday || task.repeat_today_status !== "completed_today";
+
+    const nextRepeatDate = getNextRepeatDate(
+      task.repeat,
+      fromDate,
+      includeFromDate,
+    );
+
+    return nextRepeatDate && nextRepeatDate > today ? nextRepeatDate : null;
+  }
+
+  if (task.start_date) {
+    return task.start_date > today ? task.start_date : null;
+  }
+
+  return task.deadline && task.deadline > today ? task.deadline : null;
 };
