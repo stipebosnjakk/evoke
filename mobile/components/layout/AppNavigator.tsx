@@ -105,6 +105,13 @@ const AppNavigator = () => {
                 contentStyle: { backgroundColor: "white" },
               }}
             />
+            <Stack.Screen
+              name={routes.search.route}
+              options={{
+                presentation: "card",
+                contentStyle: { backgroundColor: "white" },
+              }}
+            />
             {createSheetRoutes.map((item) => (
               <Stack.Screen
                 key={item.route}

@@ -86,6 +86,11 @@ export const routes = {
     href: "/project/add/[projectId]",
     route: "project/add/[projectId]",
   },
+  search: {
+    title: "Search",
+    href: "/search",
+    route: "search",
+  },
 } as const;
 
 export const createSheetRoutes = [

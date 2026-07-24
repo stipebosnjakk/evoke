@@ -5,9 +5,11 @@ import { getErrorMessage } from "@/utils/error";
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 import { OrderObject, EntityObjectType } from "@/types/initialState.types";
 import {
-  fetchActiveTasks,
-  fetchProjects,
-  fetchScopeOrder,
+  fetchActiveTasksRepo,
+  fetchProjectsRepo,
+  fetchScopeOrderRepo,
+  SearchResults,
+  searchTasksAndProjectsRepo,
 } from "@/db/repositories/fetch.repo";
 import { ProjectStateData } from "@/types/project.types";
 
@@ -23,8 +25,8 @@ export const getActiveTasksAction = createAsyncThunk<
 >("tasks/fetchActiveTasks", async (_, { rejectWithValue }) => {
   try {
     const [tasks, inboxOrder] = await Promise.all([
-      fetchActiveTasks(),
-      fetchScopeOrder(INBOX_SCOPE_ID),
+      fetchActiveTasksRepo(),
+      fetchScopeOrderRepo(INBOX_SCOPE_ID),
     ]);
     return { tasks, inboxOrder };
   } catch (error: unknown) {
@@ -44,11 +46,26 @@ export const getProjectsAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("projects/fetchProjects", async (_, { rejectWithValue }) => {
   try {
-    const projects = await fetchProjects();
+    const projects = await fetchProjectsRepo();
     return { projects };
   } catch (error: unknown) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to get projects"),
+    });
+  }
+});
+
+export const searchTasksAndProjectsAction = createAsyncThunk<
+  SearchResults,
+  string,
+  { rejectValue: RejectWithValue }
+>("search/searchTasksAndProjects", async (searchQuery, { rejectWithValue }) => {
+  try {
+    const search = await searchTasksAndProjectsRepo(searchQuery);
+    return search;
+  } catch (error: unknown) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to search tasks and projects"),
     });
   }
 });
