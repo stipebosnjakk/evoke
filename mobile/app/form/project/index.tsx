@@ -12,27 +12,33 @@ import Toast from "react-native-toast-message";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
 import { routes } from "@/constants/routes";
-import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { clearProjectState, setName } from "@/store/slices/newProject.slice";
 import { getErrorMessage } from "@/utils/error";
-import { createProjectAction } from "@/store/thunks/create.thunks";
 import { projectColors } from "@/constants/colors";
-import { updateProjectAction } from "@/store/thunks/mutation.thunks";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import {
+  createProjectAction,
+  updateProjectAction,
+} from "@/store/thunks/project/project.crud.thunks";
+import {
+  clearProjectState,
+  setName,
+  validateNameAndColor,
+} from "@/store/slices/formProject.slice";
 
 type LocalSearchParamsType = {
   mode?: "create" | "edit";
   projectId?: string;
 };
 
-const CreateProjectFormSheet = () => {
+const FormProjectFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const loading = useAppSelector((state) => state.newProject.loading);
-  const newProject = useAppSelector((state) => state.newProject.project);
+  const loading = useAppSelector((state) => state.formProject.loading);
+  const formProject = useAppSelector((state) => state.formProject.project);
 
   const selectedColor = projectColors.find(
-    (item) => item.hex === newProject.color,
+    (item) => item.hex === formProject.color,
   );
 
   const { mode, projectId } = useLocalSearchParams<LocalSearchParamsType>();
@@ -61,6 +67,8 @@ const CreateProjectFormSheet = () => {
     if (loading) return;
 
     try {
+      await dispatch(validateNameAndColor());
+
       const result =
         mode === "edit"
           ? await dispatch(updateProjectAction(projectId)).unwrap()
@@ -102,13 +110,13 @@ const CreateProjectFormSheet = () => {
       <SheetHeader
         title="Create a project"
         submitButtonVisible
-        submitDisabled={!newProject.name.trim() || loading}
+        submitDisabled={!formProject.name.trim() || loading}
         onSubmit={handleSubmitFunction}
       />
       <View style={styles.nameContainer}>
         <TextInput
           autoFocus
-          value={newProject.name}
+          value={formProject.name}
           style={styles.nameInput}
           placeholder="Name"
           placeholderTextColor="#A1A1AA"
@@ -219,4 +227,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateProjectFormSheet;
+export default FormProjectFormSheet;

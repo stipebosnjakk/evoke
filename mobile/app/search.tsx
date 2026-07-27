@@ -18,9 +18,9 @@ import CustomButton from "@/components/ui/CustomButton";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import { routes } from "@/constants/routes";
-import type { SearchResults } from "@/db/repositories/fetch.repo";
+import type { SearchResults } from "@/db/repositories/search.repo";
 import { useAppDispatch } from "@/hooks/storeHooks";
-import { searchTasksAndProjectsAction } from "@/store/thunks/fetch.thunks";
+import { searchTasksAndProjectsAction } from "@/store/thunks/search.thunks";
 import Task from "@/components/task/Task";
 
 const EMPTY_RESULTS: SearchResults = {
@@ -210,8 +210,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   backButton: {
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 22,
+    backgroundColor: "#F2F2F2",
   },
   searchBar: {
     flex: 1,

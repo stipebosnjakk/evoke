@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { initialState } from "@/store/initialStates/newTask.initialState";
+import { initialState } from "@/store/initialStates/formTask.initialState";
 import {
   setDeadlineReducer,
   setDescriptionReducer,
@@ -14,10 +14,11 @@ import {
   clearTaskStateReducer,
   clearCreateTaskErrorReducer,
   setProjectIdReducer,
-} from "@/store/reducers/createTask.reducer";
+  editTaskReducer,
+} from "@/store/reducers/formTask.reducer";
 
-const newTaskSlice = createSlice({
-  name: "newTask",
+const formTaskSlice = createSlice({
+  name: "formTask",
   initialState,
   reducers: {
     setTitle: setTitleReducer,
@@ -32,6 +33,7 @@ const newTaskSlice = createSlice({
     sendErrorMessage: sendErrorMessageReducer,
     clearTaskState: clearTaskStateReducer,
     clearCreateTaskError: clearCreateTaskErrorReducer,
+    editTask: editTaskReducer,
   },
 });
 
@@ -48,6 +50,7 @@ export const {
   sendErrorMessage,
   clearTaskState,
   clearCreateTaskError,
-} = newTaskSlice.actions;
+  editTask,
+} = formTaskSlice.actions;
 
-export default newTaskSlice.reducer;
+export default formTaskSlice.reducer;

@@ -1,18 +1,17 @@
 import { useEffect } from "react";
+
 import { useAppDispatch, useAppSelector } from "./storeHooks";
+import { fetchActiveTasksAction } from "@/store/thunks/task/task.fetch.thunks";
+import { fetchProjectsAction } from "@/store/thunks/project/project.fetch.thunks";
 import { deleteAllTasksAction } from "@/store/thunks/test.thunks";
-import {
-  getActiveTasksAction,
-  getProjectsAction,
-} from "@/store/thunks/fetch.thunks";
 
 export const useLoadInitialData = () => {
   const dispatch = useAppDispatch();
   const status = useAppSelector((state) => state.tasks.status);
   useEffect(() => {
     if (status === "idle") {
-      dispatch(getActiveTasksAction({ refresh: false }));
-      dispatch(getProjectsAction());
+      dispatch(fetchActiveTasksAction({ refresh: false }));
+      dispatch(fetchProjectsAction());
       // TODO: remove
       // dispatch(deleteAllTasksAction())
     }

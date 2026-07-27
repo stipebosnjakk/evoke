@@ -9,7 +9,7 @@ import {
   setUserConfigReducer,
   updateIsOpenGroupReducer,
   updateScreenViewReducer,
-} from "@/store/reducers/createUserConfig.reducer";
+} from "@/store/reducers/formUserConfig.reducer";
 
 const configSlice = createSlice({
   name: "user",

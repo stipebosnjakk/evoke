@@ -91,9 +91,14 @@ export const routes = {
     href: "/search",
     route: "search",
   },
+  single_task: {
+    title: "Task",
+    href: "/task/[taskId]",
+    route: "task/[taskId]",
+  },
 } as const;
 
-export const createSheetRoutes = [
+export const formSheetRoutes = [
   routes.form_task,
   routes.form_task_date,
   routes.form_task_deadline,

@@ -7,12 +7,12 @@ import Toast from "react-native-toast-message";
 
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import { toastConfig } from "@/components/ui/ToastConfig";
-import { createSheetRoutes, routes } from "@/constants/routes";
+import { formSheetRoutes, routes } from "@/constants/routes";
 import { useLoadInitialData } from "@/hooks/useLoadInitialData";
 import { useLoadUserConfig } from "@/hooks/useLoadUserConfig";
 import { useAppSelector } from "@/hooks/storeHooks";
 
-const createSheetOptions = {
+const formSheetOptions = {
   presentation: "formSheet",
   sheetAllowedDetents: "fitToContents",
   sheetInitialDetentIndex: 0,
@@ -112,11 +112,18 @@ const AppNavigator = () => {
                 contentStyle: { backgroundColor: "white" },
               }}
             />
-            {createSheetRoutes.map((item) => (
+            <Stack.Screen
+              name={routes.single_task.route}
+              options={{
+                presentation: "modal",
+                contentStyle: { backgroundColor: "white" },
+              }}
+            />
+            {formSheetRoutes.map((item) => (
               <Stack.Screen
                 key={item.route}
                 name={item.route}
-                options={createSheetOptions}
+                options={formSheetOptions}
               />
             ))}
           </Stack>

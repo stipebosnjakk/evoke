@@ -31,9 +31,9 @@ const DateInput = ({
   type,
 }: DateInputType) => {
   const startDateValue = useAppSelector(
-    (state) => state.newTask.task.start_date,
+    (state) => state.formTask.task.start_date,
   );
-  const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
+  const deadlineValue = useAppSelector((state) => state.formTask.task.deadline);
 
   const [dateInput, setDateInput] = useState<string>(
     dateValue ? formatIsoDate(dateValue) : "",

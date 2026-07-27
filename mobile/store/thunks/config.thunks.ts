@@ -2,18 +2,17 @@ import { AppDispatch, RootState } from "@/store/store";
 import { getErrorMessage } from "@/utils/error";
 import {
   updateGroupOrder,
-  setUserConfig,
   setUserConfigError,
   updateIsOpenGroup,
   updateScreenView,
 } from "@/store/slices/config.slice";
 import { storeData } from "@/utils/storage";
-import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
+import { USER_CONFIG } from "@/constants/config";
 import {
   UpdateGroupOrderPayload,
   UpdateIsOpenGroupType,
   UpdateScreenViewType,
-} from "@/store/reducers/createUserConfig.reducer";
+} from "@/store/reducers/formUserConfig.reducer";
 
 export const updateGroupOrderAction =
   (payload: UpdateGroupOrderPayload) =>
@@ -59,8 +58,4 @@ export const updateScreenViewAction =
       dispatch(setUserConfigError(message));
     }
   };
-// TODO: remove
-export const resetUserConfig = () => async (dispatch: AppDispatch) => {
-  await storeData(USER_CONFIG, JSON.stringify(defaultUserConfig));
-  dispatch(setUserConfig(defaultUserConfig));
-};
+

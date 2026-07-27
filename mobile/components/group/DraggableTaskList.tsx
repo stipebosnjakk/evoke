@@ -5,7 +5,7 @@ import DraggableFlatList, {
   DragEndParams,
 } from "react-native-draggable-flatlist";
 
-import { updateOrderKeysAction } from "@/store/thunks/mutation.thunks";
+import { updateOrderKeysAction } from "@/store/thunks/task/task.order.thunks";
 import {
   calculateNewOrderKey,
   checkForRebalance,

@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import { SymbolView } from "expo-symbols";
+import { useRouter } from "expo-router";
 
 import { TaskStateData } from "@/types/task.types";
 import CompleteTask from "./CompleteTask";
 import TaskMeta from "./TaskMeta";
+import { routes } from "@/constants/routes";
 
 type TaskGroupType = {
   task: TaskStateData;
@@ -13,6 +21,8 @@ type TaskGroupType = {
 };
 
 const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
+  const router = useRouter();
+
   const [isDragging, setIsDragging] = useState(false);
 
   const handleOnLongPress = () => {
@@ -21,8 +31,18 @@ const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
     onDrag();
   };
 
+  const navigateToTask = () => {
+    router.push({
+      pathname: routes.single_task.href,
+      params: { taskId: task.id },
+    });
+  };
+
   return (
-    <View style={[styles.taskContainer, isDragging && { opacity: 0.4 }]}>
+    <Pressable
+      style={[styles.taskContainer, isDragging && { opacity: 0.4 }]}
+      onPress={navigateToTask}
+    >
       <View style={styles.taskHeader}>
         <CompleteTask task={task} isPreview={isPreview} />
         {onDrag && (
@@ -61,7 +81,7 @@ const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
           <TaskMeta task={task} />
         </View>
       )}
-    </View>
+    </Pressable>
   );
 };
 

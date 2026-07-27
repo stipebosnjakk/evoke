@@ -88,7 +88,7 @@ const TaskMeta = ({ task }: TaskMetaType) => {
     });
   }
 
-  if (task.repeat) {
+  if (task.repeat?.length) {
     meta.push({
       id: "repeat",
       icon: "repeat",

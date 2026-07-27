@@ -6,14 +6,17 @@ import {
   ScrollView,
   TextInput,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCalendars, useLocales } from "expo-localization";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
 
 import Chip from "@/components/ui/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
-import { createTaskAction } from "@/store/thunks/create.thunks";
+import {
+  createTaskAction,
+  updateTaskAction,
+} from "@/store/thunks/task/task.crud.thunks";
 import { getErrorMessage } from "@/utils/error";
 import { routes } from "@/constants/routes";
 import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
@@ -23,29 +26,43 @@ import {
   clearTaskState,
   setDescription,
   setTitle,
-} from "@/store/slices/newTask.slice";
+  validateTextInputs,
+} from "@/store/slices/formTask.slice";
 import SelectProjectButton from "@/components/features/SelectProjectButton";
+import {
+  getTaskPlacement,
+  getTaskScreenHref,
+  getTaskScreenText,
+} from "@/utils/taskPlacement";
+import { TaskScreen } from "@/types/scope.types";
 
-const CreateTaskFormSheet = () => {
+type LocalSearchParamsType = {
+  mode?: "create" | "edit";
+  taskId?: string;
+};
+
+const TaskFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const locales = useLocales();
   const calendars = useCalendars();
 
-  const loading = useAppSelector((state) => state.newTask.loading);
-  const title = useAppSelector((state) => state.newTask.inputs.title);
+  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+
+  const loading = useAppSelector((state) => state.formTask.loading);
+  const title = useAppSelector((state) => state.formTask.inputs.title);
   const description = useAppSelector(
-    (state) => state.newTask.inputs.description,
+    (state) => state.formTask.inputs.description,
   );
-  const startDate = useAppSelector((state) => state.newTask.task.start_date);
-  const deadline = useAppSelector((state) => state.newTask.task.deadline);
-  const statusValue = useAppSelector((state) => state.newTask.task.status);
-  const repeatValue = useAppSelector((state) => state.newTask.task.repeat);
+  const startDate = useAppSelector((state) => state.formTask.task.start_date);
+  const deadline = useAppSelector((state) => state.formTask.task.deadline);
+  const statusValue = useAppSelector((state) => state.formTask.task.status);
+  const repeatValue = useAppSelector((state) => state.formTask.task.repeat);
   const startTimeMin = useAppSelector(
-    (state) => state.newTask.task.start_time_min,
+    (state) => state.formTask.task.start_time_min,
   );
   const durationMin = useAppSelector(
-    (state) => state.newTask.task.duration_min,
+    (state) => state.formTask.task.duration_min,
   );
 
   const status = STATUS_OPTIONS.find((s) => s.value === statusValue);
@@ -70,10 +87,68 @@ const CreateTaskFormSheet = () => {
     };
   }, [dispatch]);
 
+  const handleUpdateNavigation = (id?: string) => {
+    Toast.hide();
+
+    if (!id) {
+      router.dismissTo(routes.today.href);
+      return;
+    }
+
+    router.dismissTo({
+      pathname: routes.single_task.href,
+      params: {
+        taskId: id,
+      },
+    } as any);
+  };
+
+  const handleCreateNavigation = (placement: TaskScreen) => {
+    const href = getTaskScreenHref(placement);
+
+    Toast.hide();
+    router.dismissTo(href as any);
+  };
+
   const onSubmit = async () => {
     if (loading) return;
     try {
-      await dispatch(createTaskAction()).unwrap();
+      let results;
+
+      await dispatch(validateTextInputs());
+
+      if (mode === "edit") {
+        if (!taskId) {
+          throw new Error("Task ID is required");
+        }
+
+        results = await dispatch(updateTaskAction({ taskId })).unwrap();
+
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(routes.today.href);
+        }
+      } else {
+        results = await dispatch(createTaskAction()).unwrap();
+      }
+
+      const placement = getTaskPlacement(results.task);
+
+      Toast.show({
+        type: "info",
+        text1: results.task.title!,
+        text2: mode === "edit" ? "Task updated" : getTaskScreenText(placement),
+        props: {
+          icon: "chevron.right",
+          onPress: () =>
+            mode === "edit"
+              ? handleUpdateNavigation(taskId)
+              : handleCreateNavigation(placement),
+        },
+      });
+
+      dispatch(clearTaskState());
     } catch (error: unknown) {
       Toast.show({
         type: "error",
@@ -173,13 +248,23 @@ const CreateTaskFormSheet = () => {
               { opacity: !title || loading ? 0.6 : 1 },
             ]}
           >
-            <SymbolView
-              name="plus"
-              weight="medium"
-              size={18}
-              type="monochrome"
-              tintColor="white"
-            />
+            {mode === "edit" ? (
+              <SymbolView
+                name="pencil.line"
+                weight="medium"
+                size={18}
+                type="monochrome"
+                tintColor="white"
+              />
+            ) : (
+              <SymbolView
+                name="plus"
+                weight="medium"
+                size={18}
+                type="monochrome"
+                tintColor="white"
+              />
+            )}
           </Pressable>
         </View>
       </View>
@@ -253,4 +338,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateTaskFormSheet;
+export default TaskFormSheet;

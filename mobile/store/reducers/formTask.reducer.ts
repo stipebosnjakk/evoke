@@ -1,7 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 
-import { NewTaskInitialState } from "@/types/initialState.types";
-import { IsoDate, TaskStatusOption, Weekday } from "@/types/task.types";
+import { FormTaskInitialState } from "@/types/initialState.types";
+import {
+  IsoDate,
+  TaskStateData,
+  TaskStatusOption,
+  Weekday,
+} from "@/types/task.types";
 import {
   validateTaskDeadline,
   validateTaskDescription,
@@ -11,25 +16,25 @@ import {
   validateTaskTime,
   validateTaskTitle,
 } from "@/utils/validate";
-import { initialState } from "@/store/initialStates/newTask.initialState";
+import { initialState } from "@/store/initialStates/formTask.initialState";
 import { toIsoDate } from "@/utils/date";
 
 export const setTitleReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ title: string | null }>,
 ) => {
   state.inputs.title = action.payload.title;
 };
 
 export const setDescriptionReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ description: string | null }>,
 ) => {
   state.inputs.description = action.payload.description;
 };
 
 export const setStatusReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ status: TaskStatusOption | null }>,
 ) => {
   const res = validateTaskStatus(action.payload.status);
@@ -55,7 +60,7 @@ export const setStatusReducer = (
 };
 
 export const setRepeatReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ repeat: Weekday[] | null }>,
 ) => {
   const res = validateTaskRepeat(action.payload.repeat);
@@ -79,7 +84,7 @@ export const setRepeatReducer = (
 };
 
 export const setStartDateReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ start_date: IsoDate | null }>,
 ) => {
   const res = validateTaskStartDate(
@@ -105,7 +110,7 @@ export const setStartDateReducer = (
 };
 
 export const setDeadlineReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ deadline: IsoDate | null }>,
 ) => {
   const res = validateTaskDeadline(
@@ -123,7 +128,7 @@ export const setDeadlineReducer = (
 };
 
 export const setTimeReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{
     start_time_min: number | null;
     duration_min: number | null;
@@ -149,7 +154,7 @@ export const setTimeReducer = (
   state.error = null;
 };
 
-export const validateTextInputsReducer = (state: NewTaskInitialState) => {
+export const validateTextInputsReducer = (state: FormTaskInitialState) => {
   const titleRes = validateTaskTitle(state.inputs.title);
 
   if (!titleRes.ok) {
@@ -170,7 +175,7 @@ export const validateTextInputsReducer = (state: NewTaskInitialState) => {
 };
 
 export const sendErrorMessageReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ message: string | null }>,
 ) => {
   if (action.payload.message) {
@@ -182,13 +187,39 @@ export const sendErrorMessageReducer = (
 };
 
 export const setProjectIdReducer = (
-  state: NewTaskInitialState,
+  state: FormTaskInitialState,
   action: PayloadAction<{ projectId: string | null | undefined }>,
 ) => {
   state.task.project_id = action.payload.projectId;
 };
 
-export const clearCreateTaskErrorReducer = (state: NewTaskInitialState) => {
+export const clearCreateTaskErrorReducer = (state: FormTaskInitialState) => {
+  state.error = null;
+};
+
+export const editTaskReducer = (
+  state: FormTaskInitialState,
+  action: PayloadAction<{ task: TaskStateData }>,
+) => {
+  const task = action.payload.task;
+
+  state.task = {
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    project_id: task.project_id,
+    start_date: task.start_date,
+    start_time_min: task.start_time_min,
+    duration_min: task.duration_min,
+    deadline: task.deadline,
+    repeat: task.repeat,
+  };
+
+  state.inputs = {
+    title: task.title,
+    description: task.description,
+  };
+
   state.error = null;
 };
 

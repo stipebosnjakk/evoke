@@ -9,7 +9,7 @@ import SheetHeader from "@/components/custom/SheetHeader";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import ProjectPicker from "@/components/projects/ProjectPicker";
 import { useEffect, useState } from "react";
-import { setProjectId } from "@/store/slices/newTask.slice";
+import { setProjectId } from "@/store/slices/formTask.slice";
 import NoProjectsView from "@/components/projects/NoProjectsView";
 
 type RenderItemType = {
@@ -21,7 +21,7 @@ const ProjectFormSheet = () => {
   const dispatch = useAppDispatch();
 
   const projects = useAppSelector((state) => selectProjects(state).list);
-  const newProjectId = useAppSelector((state) => state.newTask.task.project_id);
+  const newProjectId = useAppSelector((state) => state.formTask.task.project_id);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<

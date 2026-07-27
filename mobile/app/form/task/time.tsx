@@ -8,7 +8,7 @@ import { useCalendars } from "expo-localization";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Toast from "react-native-toast-message";
 
-import { setTime as setTimeSlice } from "@/store/slices/newTask.slice";
+import { setTime as setTimeSlice } from "@/store/slices/formTask.slice";
 import {
   getDurationMin,
   getDurationFromDurationMin,
@@ -28,10 +28,10 @@ const TimeFormSheet = () => {
   const timeFormat = is24Hour ? "HH:mm" : "h:mm a";
 
   const startTimeMin = useAppSelector(
-    (state) => state.newTask.task.start_time_min,
+    (state) => state.formTask.task.start_time_min,
   );
   const durationMin = useAppSelector(
-    (state) => state.newTask.task.duration_min,
+    (state) => state.formTask.task.duration_min,
   );
 
   const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);

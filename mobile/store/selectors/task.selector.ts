@@ -230,3 +230,8 @@ export const selectTasksWithoutProject = createSelector(
       );
   },
 );
+
+export const selectTaskById = (
+  state: RootState,
+  taskId: string,
+): TaskStateData | undefined => selectTasksById(state)[taskId];

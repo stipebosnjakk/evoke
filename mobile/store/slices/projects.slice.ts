@@ -1,16 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { initialState } from "@/store/initialStates/projects.initialState";
-import { addProjectCreateExtraReducers } from "@/store/extraReducers/create.extraReducers";
 import { clearProjectScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
-import { addProjectsExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
   addCompleteProjectExtraReducers,
+  addCreateProjectExtraReducers,
+  addCreateProjectTaskExtraReducers,
   addDeleteProjectExtraReducers,
-  addProjectTaskReorderExtraReducers,
+  addDeleteProjectTaskExtraReducers,
+  addFetchProjectsExtraReducers,
+  addRemoveTaskFromProjectExtraReducers,
   addTasksToProjectExtraReducers,
   addUpdateProjectExtraReducers,
-} from "@/store/extraReducers/mutation.extraReducer";
+  addUpdateProjectTaskExtraReducers,
+  addUpdateProjectTaskOrderExtraReducers,
+} from "@/store/extraReducers/project";
 
 const projectsSlice = createSlice({
   name: "projects",
@@ -19,13 +23,17 @@ const projectsSlice = createSlice({
     clearProjectScreenError: clearProjectScreenErrorReducer,
   },
   extraReducers: (builder) => {
-    addProjectsExtraReducers(builder);
-    addProjectCreateExtraReducers(builder);
-    addProjectTaskReorderExtraReducers(builder);
-    addTasksToProjectExtraReducers(builder);
+    addCreateProjectExtraReducers(builder);
     addUpdateProjectExtraReducers(builder);
-    addCompleteProjectExtraReducers(builder);
     addDeleteProjectExtraReducers(builder);
+    addFetchProjectsExtraReducers(builder);
+    addCompleteProjectExtraReducers(builder);
+    addTasksToProjectExtraReducers(builder);
+    addRemoveTaskFromProjectExtraReducers(builder);
+    addCreateProjectTaskExtraReducers(builder);
+    addDeleteProjectTaskExtraReducers(builder);
+    addUpdateProjectTaskExtraReducers(builder);
+    addUpdateProjectTaskOrderExtraReducers(builder);
   },
 });
 

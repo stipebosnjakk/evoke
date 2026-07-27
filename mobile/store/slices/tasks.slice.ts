@@ -1,19 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { initialState } from "@/store/initialStates/tasks.initialState";
-import {
-  addTaskComplationExtraReducers,
-  addTaskCreateExtraReducers,
-} from "@/store/extraReducers/create.extraReducers";
 import { clearTaskScreenErrorReducer } from "@/store/reducers/clearScreenError.reducer";
-import { addActiveTasksExtraReducers } from "@/store/extraReducers/fetch.extraReducer";
 import {
   addCompleteProjectTasksExtraReducers,
+  addCompleteRepeatTaskExtraReducers,
+  addCompleteTaskExtraReducers,
+  addCreateTaskExtraReducers,
   addDeleteProjectTasksExtraReducers,
-  addInboxReorderExtraReducers,
-  addTaskCompletionExtraReducers,
-  addTasksToProjectTaskExtraReducers,
-} from "@/store/extraReducers/mutation.extraReducer";
+  addDeleteTaskExtraReducers,
+  addFetchActiveTasksExtraReducers,
+  addRemoveTaskFromProjectExtraReducers,
+  addRestoreRepeatTaskExtraReducers,
+  addRestoreTaskExtraReducers,
+  addTasksToProjectExtraReducers,
+  addUpdateInboxOrderExtraReducers,
+  addUpdateTaskExtraReducers,
+} from "@/store/extraReducers/task";
 
 const tasksSlice = createSlice({
   name: "tasks",
@@ -22,14 +25,19 @@ const tasksSlice = createSlice({
     clearTaskScreenError: clearTaskScreenErrorReducer,
   },
   extraReducers: (builder) => {
-    addActiveTasksExtraReducers(builder);
-    addInboxReorderExtraReducers(builder);
-    addTaskCreateExtraReducers(builder);
-    addTaskCompletionExtraReducers(builder);
-    addTasksToProjectTaskExtraReducers(builder);
+    addCreateTaskExtraReducers(builder);
+    addUpdateTaskExtraReducers(builder);
+    addDeleteTaskExtraReducers(builder);
+    addFetchActiveTasksExtraReducers(builder);
+    addCompleteTaskExtraReducers(builder);
+    addRestoreTaskExtraReducers(builder);
+    addCompleteRepeatTaskExtraReducers(builder);
+    addRestoreRepeatTaskExtraReducers(builder);
+    addTasksToProjectExtraReducers(builder);
     addCompleteProjectTasksExtraReducers(builder);
-    addTaskComplationExtraReducers(builder);
     addDeleteProjectTasksExtraReducers(builder);
+    addRemoveTaskFromProjectExtraReducers(builder);
+    addUpdateInboxOrderExtraReducers(builder);
   },
 });
 

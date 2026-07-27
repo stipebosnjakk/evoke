@@ -9,7 +9,7 @@ import { selectProjectById } from "@/store/selectors/projects.selector";
 const SelectProjectButton = () => {
   const router = useRouter();
 
-  const newProjectId = useAppSelector((state) => state.newTask.task.project_id);
+  const newProjectId = useAppSelector((state) => state.formTask.task.project_id);
   const project = useAppSelector((state) =>
     selectProjectById(state, newProjectId),
   );

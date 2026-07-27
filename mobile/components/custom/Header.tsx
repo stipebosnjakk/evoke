@@ -62,10 +62,14 @@ const Header = () => {
     router.push(routes.form_task.href);
   };
 
+  const navigateToSearch = () => {
+    router.push(routes.search.href);
+  };
+
   return (
     <HeaderWrapper>
       <View style={styles.left}>
-        <CustomButton onPress={() => {}}>
+        <CustomButton onPress={navigateToSearch}>
           <SymbolView
             name="magnifyingglass"
             size={23}

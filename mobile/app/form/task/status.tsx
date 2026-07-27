@@ -6,7 +6,7 @@ import Toast from "react-native-toast-message";
 
 import { STATUS_OPTIONS } from "@/constants/status";
 import { TaskStatusOption } from "@/types/task.types";
-import { setStatus } from "@/store/slices/newTask.slice";
+import { setStatus } from "@/store/slices/formTask.slice";
 import { useAppSelector } from "@/hooks/storeHooks";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskStatus } from "@/utils/validate";
@@ -17,7 +17,7 @@ const StatusFormSheet = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const statusValue = useAppSelector((state) => state.newTask.task.status);
+  const statusValue = useAppSelector((state) => state.formTask.task.status);
 
   const handleSubmitStatus = (optionValue: TaskStatusOption) => {
     if (statusValue === optionValue.value) {

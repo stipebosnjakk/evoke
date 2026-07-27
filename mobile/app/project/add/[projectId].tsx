@@ -7,7 +7,7 @@ import SheetHeader from "@/components/custom/SheetHeader";
 import TaskPicker from "@/components/task/TaskPicker";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { selectTasksWithoutProject } from "@/store/selectors/task.selector";
-import { addTasksToProjectAction } from "@/store/thunks/mutation.thunks";
+import { addTasksToProjectAction } from "@/store/thunks/project/project.tasks.thunks";
 import { TaskStateData } from "@/types/task.types";
 import NoAvailableTasksView from "@/components/task/NoAvailableTasksView";
 

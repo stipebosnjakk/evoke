@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 
 import { routes } from "@/constants/routes";
 import { useAppDispatch } from "@/hooks/storeHooks";
-import { setProjectId } from "@/store/slices/newTask.slice";
+import { setProjectId } from "@/store/slices/formTask.slice";
 
 type NoAvailableTasksViewProps = {
   projectId: string;

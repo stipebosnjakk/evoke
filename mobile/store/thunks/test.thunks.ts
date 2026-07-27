@@ -1,11 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import * as SQLite from "expo-sqlite";
 
-import { tasks } from "@/db/schemas/task.schema";
-import { db, expo } from "@/db/client";
+import { expo } from "@/db/client";
 import { RejectWithValue } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
-import { list_order, projects } from "@/db";
+import { AppDispatch } from "@/store/store";
+import { defaultUserConfig, USER_CONFIG } from "@/constants/config";
+import { setUserConfig } from "@/store/slices/config.slice";
+import { storeData } from "@/utils/storage";
 
 export const deleteAllTasksAction = createAsyncThunk<
   void,
@@ -21,3 +23,8 @@ export const deleteAllTasksAction = createAsyncThunk<
     });
   }
 });
+
+export const resetUserConfig = () => async (dispatch: AppDispatch) => {
+  await storeData(USER_CONFIG, JSON.stringify(defaultUserConfig));
+  dispatch(setUserConfig(defaultUserConfig));
+};

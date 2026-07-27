@@ -16,7 +16,7 @@ import { IsoDate } from "@/types/task.types";
 import { minDate } from "@/utils/date";
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
-import { setDeadline } from "@/store/slices/newTask.slice";
+import { setDeadline } from "@/store/slices/formTask.slice";
 import Shortcuts from "@/components/features/Shortcuts";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskDeadline } from "@/utils/validate";
@@ -27,9 +27,9 @@ const DeadlineFormSheet = () => {
   const dispatch = useDispatch();
   const inputRef = useRef<TextInput>(null);
 
-  const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
+  const deadlineValue = useAppSelector((state) => state.formTask.task.deadline);
   const startDateValue = useAppSelector(
-    (state) => state.newTask.task.start_date,
+    (state) => state.formTask.task.start_date,
   );
 
   const minDeadlineDate = minDate("deadline", startDateValue ?? null);

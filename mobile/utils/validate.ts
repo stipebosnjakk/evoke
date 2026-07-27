@@ -61,7 +61,8 @@ export const validateTaskRepeat = (
     };
   }
 
-  const isValidDay = (day: any) => day >= 0 && day <= 6;
+  const isValidDay = (day: unknown): day is Weekday =>
+    Number.isInteger(day) && typeof day === "number" && day >= 0 && day <= 6;
 
   if (!data.every(isValidDay)) {
     return {

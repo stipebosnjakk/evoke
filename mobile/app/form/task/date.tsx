@@ -14,7 +14,7 @@ import Toast from "react-native-toast-message";
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
 import Shortcuts from "@/components/features/Shortcuts";
-import { setStartDate, setTime } from "@/store/slices/newTask.slice";
+import { setStartDate, setTime } from "@/store/slices/formTask.slice";
 import { IsoDate } from "@/types/task.types";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { SymbolView } from "expo-symbols";
@@ -32,14 +32,14 @@ const DateFormSheet = () => {
   const inputRef = useRef<TextInput>(null);
 
   const startTimeMin = useAppSelector(
-    (state) => state.newTask.task.start_time_min,
+    (state) => state.formTask.task.start_time_min,
   );
   const durationMin = useAppSelector(
-    (state) => state.newTask.task.duration_min,
+    (state) => state.formTask.task.duration_min,
   );
-  const deadlineValue = useAppSelector((state) => state.newTask.task.deadline);
+  const deadlineValue = useAppSelector((state) => state.formTask.task.deadline);
   const startDateValue = useAppSelector(
-    (state) => state.newTask.task.start_date,
+    (state) => state.formTask.task.start_date,
   );
 
   const locale = locales[0]?.languageTag ?? "en-US";

@@ -1,5 +1,6 @@
 import { routes } from "@/constants/routes";
-import { NewTask } from "@/db";
+import { FormTask } from "@/db";
+import { TaskScreen } from "@/types/scope.types";
 import { IsoDate, TaskStateData } from "@/types/task.types";
 import {
   getNextRepeatDate,
@@ -8,14 +9,12 @@ import {
 } from "@/utils/date";
 import { parseISO, startOfToday } from "date-fns";
 
-type TaskScreen = "inbox" | "today" | "upcoming" | "none";
-
 /**
  * Checks if a task is active (not completed).
  * @param task
  * @returns
  */
-export const isActiveTask = (task: TaskStateData | NewTask): boolean =>
+export const isActiveTask = (task: TaskStateData | FormTask): boolean =>
   !task.is_completed;
 
 /**
@@ -23,7 +22,7 @@ export const isActiveTask = (task: TaskStateData | NewTask): boolean =>
  * @param task
  * @returns
  */
-export const isInboxTask = (task: TaskStateData | NewTask): boolean =>
+export const isInboxTask = (task: TaskStateData | FormTask): boolean =>
   isActiveTask(task) &&
   !task.start_date &&
   !task.deadline &&

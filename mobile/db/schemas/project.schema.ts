@@ -21,4 +21,4 @@ export const projects = t.sqliteTable("projects", {
 });
 
 export type Project = InferSelectModel<typeof projects>;
-export type NewProject = InferInsertModel<typeof projects>;
+export type FormProject = InferInsertModel<typeof projects>;

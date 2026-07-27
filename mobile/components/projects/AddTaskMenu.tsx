@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Text } from "@/components/ui/text";
 import { routes } from "@/constants/routes";
-import { setProjectId } from "@/store/slices/newTask.slice";
+import { setProjectId } from "@/store/slices/formTask.slice";
 
 type AddTaskMenuType = {
   projectId: string;

@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 
 import { routes } from "@/constants/routes";
-import { setProjectId } from "@/store/slices/newTask.slice";
+import { setProjectId } from "@/store/slices/formTask.slice";
 
 type NoProjectTasksViewType = {
   projectId: string;

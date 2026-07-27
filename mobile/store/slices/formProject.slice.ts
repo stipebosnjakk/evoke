@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { initialState } from "@/store/initialStates/newProject.initialState";
+import { initialState } from "@/store/initialStates/formProject.initialState";
 import {
   clearProjectStateReducer,
   setColorReducer,
   setNameReducer,
   validateNameAndColorReducer,
-} from "@/store/reducers/createProject.reducer";
+} from "@/store/reducers/formProject.reducer";
 
-const newProjectSlice = createSlice({
-  name: "newProject",
+const formProjectSlice = createSlice({
+  name: "formProject",
   initialState,
   reducers: {
     setName: setNameReducer,
@@ -20,6 +20,6 @@ const newProjectSlice = createSlice({
 });
 
 export const { setName, setColor, validateNameAndColor, clearProjectState } =
-  newProjectSlice.actions;
+  formProjectSlice.actions;
 
-export default newProjectSlice.reducer;
+export default formProjectSlice.reducer;

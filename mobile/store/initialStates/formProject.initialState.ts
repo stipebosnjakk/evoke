@@ -1,7 +1,7 @@
 import { defaultProjectColor } from "@/constants/colors";
-import { NewProjectInitialState } from "@/types/initialState.types";
+import { FormProjectInitialState } from "@/types/initialState.types";
 
-export const initialState: NewProjectInitialState = {
+export const initialState: FormProjectInitialState = {
   loading: false,
   error: null,
   project: {

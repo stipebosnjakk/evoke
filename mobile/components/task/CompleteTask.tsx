@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Animated, Pressable } from "react-native";
+import { View, StyleSheet, Animated, Pressable } from "react-native";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
 
@@ -9,19 +9,34 @@ import {
   completeTaskAction,
   restoreCompletedRepeatTaskAction,
   restoreCompletedTaskAction,
-} from "@/store/thunks/mutation.thunks";
-import { RepeatTaskCompletionAction } from "@/store/thunks/create.thunks";
+  repeatTaskCompletionAction,
+} from "@/store/thunks/task/task.completion.thunks";
 import { toIsoDate } from "@/utils/date";
+import TaskTitle from "@/components/task/TaskTitle";
 
 type CompleteTaskType = {
   task: TaskStateData;
   isPreview?: boolean;
+  size?: number;
+  fontSize?: number;
+  multiline?: boolean;
+  color?: string;
 };
 
-const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
+const DEFAULT_CIRCLE_SIZE = 18;
+const DEFAULT_FONT_SIZE = 16;
+
+const CompleteTask = ({
+  task,
+  isPreview,
+  size = DEFAULT_CIRCLE_SIZE,
+  fontSize = DEFAULT_FONT_SIZE,
+  multiline = false,
+  color,
+}: CompleteTaskType) => {
   const dispatch = useAppDispatch();
 
-  const [isCompleting, setIsCompleting] = useState<boolean>(false);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const completed =
     task.is_completed || task.repeat_today_status === "completed_today";
@@ -31,6 +46,16 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
   const completionProgress = useRef(
     new Animated.Value(completed ? 1 : 0),
   ).current;
+
+  const scale = size / DEFAULT_CIRCLE_SIZE;
+
+  const circleRadius = size / 2;
+  const checkmarkSize = Math.max(8, Math.round(10 * scale));
+  const borderWidth = Math.max(1, 1.2 * scale);
+  const contentGap = Math.max(8, Math.round(12 * scale));
+  const lineHeight = Math.round(fontSize * 1.3);
+  const circleTopOffset = Math.max(0, (lineHeight - size) / 2);
+  const previewIconSize = Math.max(12, Math.round(size * 0.83));
 
   useEffect(() => {
     completionProgress.setValue(completed ? 1 : 0);
@@ -49,66 +74,105 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
       }),
       Animated.delay(700),
     ]).start(({ finished }) => {
-      if (finished) {
-        Toast.show({
-          position: "top",
-          type: "info",
-          text1: "Undo",
-          text2: "Completed",
-          props: {
-            showCloseButton: true,
-            onPress: handleRestoreCompletedTask,
-          },
-        });
-
-        if (
-          task.repeat &&
-          task.repeat.length > 0 &&
-          task.repeat_today_status === "not_completed_today"
-        ) {
-          dispatch(
-            RepeatTaskCompletionAction({
-              taskId: task.id,
-              completionDate: toIsoDate(new Date()),
-            }),
-          );
-        } else {
-          dispatch(completeTaskAction({ taskId: task.id }));
-        }
+      if (!finished) {
         setIsCompleting(false);
+        return;
       }
+
+      Toast.show({
+        position: "top",
+        type: "info",
+        text1: "Undo",
+        text2: "Completed",
+        props: {
+          showCloseButton: true,
+          onPress: handleRestoreCompletedTask,
+        },
+      });
+
+      if (
+        task.repeat?.length &&
+        task.repeat_today_status === "not_completed_today"
+      ) {
+        dispatch(
+          repeatTaskCompletionAction({
+            taskId: task.id,
+            completionDate: toIsoDate(new Date()),
+          }),
+        );
+      } else {
+        dispatch(
+          completeTaskAction({
+            taskId: task.id,
+          }),
+        );
+      }
+
+      setIsCompleting(false);
     });
   };
 
   const handleRestoreCompletedTask = () => {
     Toast.hide();
-    if (task.repeat && task.repeat.length > 0) {
+
+    if (task.repeat?.length) {
       dispatch(
         restoreCompletedRepeatTaskAction({
           taskId: task.id,
           completionDate: toIsoDate(new Date()),
         }),
       );
+
       return;
     }
-    dispatch(restoreCompletedTaskAction({ taskId: task.id }));
+
+    dispatch(
+      restoreCompletedTaskAction({
+        taskId: task.id,
+      }),
+    );
   };
 
   return (
-    <View style={styles.topTaskSide}>
+    <View
+      style={[
+        styles.topTaskSide,
+        {
+          gap: contentGap,
+          alignItems: multiline ? "flex-start" : "center",
+        },
+      ]}
+    >
       {isPreview ? (
-        <SymbolView name="clock" size={15} tintColor="#A0A09A" />
+        <SymbolView
+          name="clock"
+          size={previewIconSize}
+          tintColor={color ?? "#A0A09A"}
+          style={{ marginTop: multiline ? circleTopOffset : 0 }}
+        />
       ) : (
         <Pressable
           onPress={handleComplete}
           disabled={isCompletedOrCompleting}
-          style={styles.completionCircle}
+          hitSlop={8}
+          style={[
+            styles.completionCircle,
+            {
+              width: size,
+              height: size,
+              borderRadius: circleRadius,
+              borderWidth,
+              marginTop: multiline ? circleTopOffset : 0,
+              borderColor: color ?? "#E6E2DC",
+            },
+          ]}
         >
           <Animated.View
             pointerEvents="none"
             style={[
               styles.completionCircleFill,
               {
+                borderRadius: circleRadius,
                 opacity: completionProgress,
               },
             ]}
@@ -124,42 +188,31 @@ const CompleteTask = ({ task, isPreview }: CompleteTaskType) => {
           >
             <SymbolView
               name="checkmark"
-              size={10}
+              size={checkmarkSize}
               weight="bold"
               tintColor="#FFFFFF"
             />
           </Animated.View>
         </Pressable>
       )}
-      <Text
-        style={[
-          styles.taskTitle,
-          isCompletedOrCompleting && styles.taskTitleCompleted,
-        ]}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {task.title}
-      </Text>
+      <TaskTitle
+        fontSize={fontSize}
+        title={task.title!}
+        lineHeight={lineHeight}
+        multiline={multiline}
+        isCompletedOrCompleting={isCompletedOrCompleting}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   topTaskSide: {
-    flex: 1,
     minWidth: 0,
     flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
   },
   completionCircle: {
     flexShrink: 0,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1.2,
-    borderColor: "#E6E2DC",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
@@ -168,25 +221,12 @@ const styles = StyleSheet.create({
   completionCircleFill: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "#2F2F2D",
-    borderRadius: 9,
   },
   completionCheck: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
   },
-  taskTitle: {
-    flex: 1,
-    minWidth: 0,
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: "600",
-    color: "#1F1F1D",
-  },
-  taskTitleCompleted: {
-    color: "#8C8C87",
-    textDecorationLine: "line-through",
-    textDecorationColor: "#8C8C87",
-  },
 });
+
 export default CompleteTask;

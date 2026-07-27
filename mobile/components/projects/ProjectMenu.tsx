@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
 
+import Alert from "@/components/custom/Alert";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,13 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppDispatch } from "@/hooks/storeHooks";
 import { Text } from "@/components/ui/text";
-import { setColor, setName } from "@/store/slices/newProject.slice";
+import { setColor, setName } from "@/store/slices/formProject.slice";
 import { routes } from "@/constants/routes";
-import Alert from "./Alert";
-import {
-  completeProjectAction,
-  deleteProjectAction,
-} from "@/store/thunks/mutation.thunks";
+import { completeProjectAction } from "@/store/thunks/project/project.completion.thunks";
+import { deleteProjectAction } from "@/store/thunks/project/project.crud.thunks";
 import { ProjectStateData } from "@/types/project.types";
 
 type ProjectMenuType = {

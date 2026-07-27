@@ -1,24 +1,24 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 
-import { NewProjectInitialState } from "@/types/initialState.types";
+import { FormProjectInitialState } from "@/types/initialState.types";
 import { validateProjectColor, validateProjectName } from "@/utils/validate";
-import { initialState } from "@/store/initialStates/newProject.initialState";
+import { initialState } from "@/store/initialStates/formProject.initialState";
 
 export const setNameReducer = (
-  state: NewProjectInitialState,
+  state: FormProjectInitialState,
   action: PayloadAction<{ name: string }>,
 ) => {
   state.project.name = action.payload.name;
 };
 
 export const setColorReducer = (
-  state: NewProjectInitialState,
+  state: FormProjectInitialState,
   action: PayloadAction<{ color: string }>,
 ) => {
   state.project.color = action.payload.color;
 };
 
-export const validateNameAndColorReducer = (state: NewProjectInitialState) => {
+export const validateNameAndColorReducer = (state: FormProjectInitialState) => {
   const validateName = validateProjectName(state.project.name);
 
   if (!validateName.ok) {

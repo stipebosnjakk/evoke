@@ -41,7 +41,11 @@ const SheetHeader = ({
       <Text style={styles.title} numberOfLines={1}>
         {title}
       </Text>
-      <View style={styles.headerSide}>
+      <View
+        style={
+          submitButtonVisible ? styles.headerSide : styles.headerPlaceholder
+        }
+      >
         {submitButtonVisible && (
           <TouchableOpacity
             onPress={onSubmit}
@@ -76,6 +80,8 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 22,
+    backgroundColor: "#F2F2F2",
   },
   title: {
     flex: 1,
@@ -83,6 +89,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#111827",
     textAlign: "center",
+  },
+  headerPlaceholder: {
+    width: 44,
   },
 });
 

@@ -1,4 +1,4 @@
-import type { NewTask, NewProject } from "@/db";
+import type { FormTask, FormProject } from "@/db";
 import { ProjectColor, ProjectStateData } from "@/types/project.types";
 import { UserConfig } from "@/types/config.types";
 import { TaskStateData } from "./task.types";
@@ -31,29 +31,29 @@ export type ProjectsState = ScreenInfo & {
   };
 };
 
-export type NewTaskInitialState = {
+export type FormTaskInitialState = {
   loading: boolean;
   error: string | null;
   inputs: {
     title: string | null;
     description: string | null;
   };
-  task: NewTask;
+  task: FormTask;
 };
 
 export type UserState = ScreenInfo & {
   config: UserConfig | null;
 };
 
-export type NewProjectStateFields = {
+export type FormProjectStateFields = {
   name: string | null;
   color: ProjectColor;
 };
 
-export type NewProjectInitialState = {
+export type FormProjectInitialState = {
   loading: boolean;
   error: string | null;
-  project: NewProject;
+  project: FormProject;
 };
 
 export type ValidationResult<T> =

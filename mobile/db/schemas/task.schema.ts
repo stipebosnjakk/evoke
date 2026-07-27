@@ -30,4 +30,4 @@ export const tasks = t.sqliteTable("tasks", {
 });
 
 export type Task = InferSelectModel<typeof tasks>;
-export type NewTask = InferInsertModel<typeof tasks>;
+export type FormTask = InferInsertModel<typeof tasks>;

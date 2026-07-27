@@ -5,14 +5,14 @@ import { projectColors } from "@/constants/colors";
 import { SymbolView } from "expo-symbols";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import SheetHeader from "@/components/custom/SheetHeader";
-import { setColor } from "@/store/slices/newProject.slice";
+import { setColor } from "@/store/slices/formProject.slice";
 import { useAppSelector } from "@/hooks/storeHooks";
 
 const ColorFormSheet = () => {
   const dispatch = useDispatch();
 
   const selectedColor = useAppSelector(
-    (state) => state.newProject.project.color,
+    (state) => state.formProject.project.color,
   );
 
   return (

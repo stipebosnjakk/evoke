@@ -1,6 +1,6 @@
-import { NewTaskInitialState } from "@/types/initialState.types";
+import { FormTaskInitialState } from "@/types/initialState.types";
 
-export const initialState: NewTaskInitialState = {
+export const initialState: FormTaskInitialState = {
   loading: false,
   error: null,
   inputs: {

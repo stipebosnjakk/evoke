@@ -19,3 +19,5 @@ export type ProjectsGroupId =
   | "scope:projects:completed";
 
 export type ScopeGroupId = TodayGroupId | UpcomingGroupId | ProjectsGroupId;
+
+export type TaskScreen = "inbox" | "today" | "upcoming" | "none";

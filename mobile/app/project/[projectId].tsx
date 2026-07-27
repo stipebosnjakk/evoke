@@ -51,7 +51,7 @@ const ProjectTasksScreen = () => {
             {name}
           </Text>
         </View>
-        <View style={styles.side} />
+        <View style={styles.sidePlaceholder} />
       </HeaderWrapper>
       {!data.length && status === "succeeded" ? (
         <NoProjectTasksView projectId={projectId} projectName={name} />
@@ -68,8 +68,15 @@ const ProjectTasksScreen = () => {
 
 const styles = StyleSheet.create({
   side: {
-    width: 72,
-    alignItems: "flex-start",
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+    backgroundColor: "#F2F2F2",
+  },
+  sidePlaceholder: {
+    width: 44,
   },
   center: {
     flex: 1,
