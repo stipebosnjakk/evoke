@@ -4,10 +4,14 @@ import { ValidationResult } from "@/types/initialState.types";
 import { IsoDate, TaskStatusOptionsArray, Weekday } from "@/types/task.types";
 import { isValidIsoDate } from "@/utils/date";
 
-export const validateTaskStatus = (
-  data: TaskStatusOptionsArray | null,
-): ValidationResult<TaskStatusOptionsArray | null> => {
-  if (!data) {
+type ValidateTaskStatusArgs = {
+  status: unknown;
+};
+
+export const validateTaskStatus = ({
+  status,
+}: ValidateTaskStatusArgs): ValidationResult<TaskStatusOptionsArray | null> => {
+  if (status === null || status === undefined) {
     return {
       ok: true,
       data: null,
@@ -15,11 +19,19 @@ export const validateTaskStatus = (
     };
   }
 
-  const isStatusValid = STATUS_OPTIONS.some(
-    (status) => status.value === data.value,
+  if (typeof status !== "object" || !("value" in status)) {
+    return {
+      ok: false,
+      data: null,
+      message: "Status is not valid",
+    };
+  }
+
+  const validStatus = STATUS_OPTIONS.find(
+    (option) => option.value === status.value,
   );
 
-  if (!isStatusValid) {
+  if (!validStatus) {
     return {
       ok: false,
       data: null,
@@ -29,15 +41,19 @@ export const validateTaskStatus = (
 
   return {
     ok: true,
-    data,
+    data: validStatus,
     message: "Status saved successfully",
   };
 };
 
-export const validateTaskRepeat = (
-  data: unknown,
-): ValidationResult<Weekday[] | null> => {
-  if (data === null || data === undefined) {
+type ValidateTaskRepeatArgs = {
+  repeatDays: unknown;
+};
+
+export const validateTaskRepeat = ({
+  repeatDays,
+}: ValidateTaskRepeatArgs): ValidationResult<Weekday[] | null> => {
+  if (repeatDays === null || repeatDays === undefined) {
     return {
       ok: true,
       data: null,
@@ -45,7 +61,7 @@ export const validateTaskRepeat = (
     };
   }
 
-  if (!Array.isArray(data)) {
+  if (!Array.isArray(repeatDays)) {
     return {
       ok: false,
       data: null,
@@ -53,7 +69,7 @@ export const validateTaskRepeat = (
     };
   }
 
-  if (data.length === 0) {
+  if (repeatDays.length === 0) {
     return {
       ok: true,
       data: null,
@@ -62,9 +78,9 @@ export const validateTaskRepeat = (
   }
 
   const isValidDay = (day: unknown): day is Weekday =>
-    Number.isInteger(day) && typeof day === "number" && day >= 0 && day <= 6;
+    typeof day === "number" && Number.isInteger(day) && day >= 0 && day <= 6;
 
-  if (!data.every(isValidDay)) {
+  if (!repeatDays.every(isValidDay)) {
     return {
       ok: false,
       data: null,
@@ -72,9 +88,7 @@ export const validateTaskRepeat = (
     };
   }
 
-  const noDuplicates = [...new Set(data)];
-
-  if (noDuplicates.length !== data.length) {
+  if (new Set(repeatDays).size !== repeatDays.length) {
     return {
       ok: false,
       data: null,
@@ -84,15 +98,19 @@ export const validateTaskRepeat = (
 
   return {
     ok: true,
-    data,
+    data: repeatDays,
     message: "Repeat option saved successfully",
   };
 };
 
-export const validateTaskTitle = (
-  data: string | null,
-): ValidationResult<string> => {
-  if (!data) {
+type ValidateTaskTitleArgs = {
+  title: unknown;
+};
+
+export const validateTaskTitle = ({
+  title,
+}: ValidateTaskTitleArgs): ValidationResult<string> => {
+  if (typeof title !== "string") {
     return {
       ok: false,
       data: null,
@@ -100,9 +118,9 @@ export const validateTaskTitle = (
     };
   }
 
-  const title = data.trim();
+  const trimmedTitle = title.trim();
 
-  if (!title) {
+  if (!trimmedTitle) {
     return {
       ok: false,
       data: null,
@@ -110,7 +128,7 @@ export const validateTaskTitle = (
     };
   }
 
-  if (title.length > 255) {
+  if (trimmedTitle.length > 255) {
     return {
       ok: false,
       data: null,
@@ -120,17 +138,19 @@ export const validateTaskTitle = (
 
   return {
     ok: true,
-    data: title,
+    data: trimmedTitle,
     message: "Title saved successfully",
   };
 };
 
-export const validateTaskDescription = (
-  data: string | null,
-): ValidationResult<string | null> => {
-  const description = data?.trim();
+type ValidateTaskDescriptionArgs = {
+  description: unknown;
+};
 
-  if (!description) {
+export const validateTaskDescription = ({
+  description,
+}: ValidateTaskDescriptionArgs): ValidationResult<string | null> => {
+  if (description === null || description === undefined) {
     return {
       ok: true,
       data: null,
@@ -138,7 +158,25 @@ export const validateTaskDescription = (
     };
   }
 
-  if (description.length > 2000) {
+  if (typeof description !== "string") {
+    return {
+      ok: false,
+      data: null,
+      message: "Description is not valid",
+    };
+  }
+
+  const trimmedDescription = description.trim();
+
+  if (!trimmedDescription) {
+    return {
+      ok: true,
+      data: null,
+      message: "Description cleared successfully",
+    };
+  }
+
+  if (trimmedDescription.length > 2000) {
     return {
       ok: false,
       data: null,
@@ -148,17 +186,37 @@ export const validateTaskDescription = (
 
   return {
     ok: true,
-    data: description,
+    data: trimmedDescription,
     message: "Description saved successfully",
   };
 };
 
-export const validateTaskStartDate = (
-  data: IsoDate | null,
-  deadline?: IsoDate | null,
-): ValidationResult<IsoDate | null> => {
-  const startDate = data?.trim() || null;
-  const taskDeadline = deadline?.trim() || null;
+type ValidateTaskStartDateArgs = {
+  start_date: unknown;
+  deadline: unknown;
+};
+
+export const validateTaskStartDate = ({
+  start_date,
+  deadline,
+}: ValidateTaskStartDateArgs): ValidationResult<IsoDate | null> => {
+  if (start_date === null || start_date === undefined || start_date === "") {
+    return {
+      ok: true,
+      data: null,
+      message: "Start date cleared successfully",
+    };
+  }
+
+  if (typeof start_date !== "string") {
+    return {
+      ok: false,
+      data: null,
+      message: "Start date must be a valid date in YYYY-MM-DD format",
+    };
+  }
+
+  const startDate = start_date.trim();
 
   if (!startDate) {
     return {
@@ -176,8 +234,8 @@ export const validateTaskStartDate = (
     };
   }
 
-  if (taskDeadline) {
-    if (!isValidIsoDate(taskDeadline)) {
+  if (deadline !== null && deadline !== undefined && deadline !== "") {
+    if (typeof deadline !== "string") {
       return {
         ok: false,
         data: null,
@@ -185,13 +243,24 @@ export const validateTaskStartDate = (
       };
     }
 
-    // TODO: check if this is working
-    if (startDate > taskDeadline) {
-      return {
-        ok: false,
-        data: null,
-        message: "Start date cannot be after deadline",
-      };
+    const taskDeadline = deadline.trim();
+
+    if (taskDeadline) {
+      if (!isValidIsoDate(taskDeadline)) {
+        return {
+          ok: false,
+          data: null,
+          message: "Deadline is not valid",
+        };
+      }
+
+      if (startDate > taskDeadline) {
+        return {
+          ok: false,
+          data: null,
+          message: "Start date cannot be after deadline",
+        };
+      }
     }
   }
 
@@ -202,14 +271,16 @@ export const validateTaskStartDate = (
   };
 };
 
-export const validateTaskDeadline = (
-  data: IsoDate | null,
-  startDate?: IsoDate | null,
-): ValidationResult<IsoDate | null> => {
-  const deadline = data?.trim() || null;
-  const taskStartDate = startDate?.trim() || null;
+type ValidateTaskDeadlineArgs = {
+  deadline: unknown;
+  startDate?: unknown;
+};
 
-  if (!deadline) {
+export const validateTaskDeadline = ({
+  deadline,
+  startDate,
+}: ValidateTaskDeadlineArgs): ValidationResult<IsoDate | null> => {
+  if (deadline === null || deadline === undefined || deadline === "") {
     return {
       ok: true,
       data: null,
@@ -217,7 +288,7 @@ export const validateTaskDeadline = (
     };
   }
 
-  if (!isValidIsoDate(deadline)) {
+  if (typeof deadline !== "string") {
     return {
       ok: false,
       data: null,
@@ -225,8 +296,26 @@ export const validateTaskDeadline = (
     };
   }
 
-  if (taskStartDate) {
-    if (!isValidIsoDate(taskStartDate)) {
+  const trimmedDeadline = deadline.trim();
+
+  if (!trimmedDeadline) {
+    return {
+      ok: true,
+      data: null,
+      message: "Deadline cleared successfully",
+    };
+  }
+
+  if (!isValidIsoDate(trimmedDeadline)) {
+    return {
+      ok: false,
+      data: null,
+      message: "Deadline must be a valid date in YYYY-MM-DD format",
+    };
+  }
+
+  if (startDate !== null && startDate !== undefined && startDate !== "") {
+    if (typeof startDate !== "string") {
       return {
         ok: false,
         data: null,
@@ -234,35 +323,57 @@ export const validateTaskDeadline = (
       };
     }
 
-    if (deadline < taskStartDate) {
-      return {
-        ok: false,
-        data: null,
-        message: "Deadline cannot be before start date",
-      };
+    const taskStartDate = startDate.trim();
+
+    if (taskStartDate) {
+      if (!isValidIsoDate(taskStartDate)) {
+        return {
+          ok: false,
+          data: null,
+          message: "Start date is not valid",
+        };
+      }
+
+      if (trimmedDeadline < taskStartDate) {
+        return {
+          ok: false,
+          data: null,
+          message: "Deadline cannot be before start date",
+        };
+      }
     }
   }
 
   return {
     ok: true,
-    data: deadline as IsoDate,
+    data: trimmedDeadline as IsoDate,
     message: "Deadline saved successfully",
   };
 };
 
-export const validateTaskTime = (
-  start_time_min: number | null,
-  duration_min: number | null,
-): ValidationResult<{
+type ValidatedTaskTime = {
   start_time_min: number | null;
   duration_min: number | null;
-} | null> => {
+};
+
+type ValidateTaskTimeArgs = {
+  start_time_min: unknown;
+  duration_min: unknown;
+};
+
+export const validateTaskTime = ({
+  start_time_min,
+  duration_min,
+}: ValidateTaskTimeArgs): ValidationResult<ValidatedTaskTime> => {
   const minStart = 0;
   const maxStart = 1439;
+  const maxDuration = 1439;
+
+  // A duration of 0 is treated as no duration.
   const normalizedDuration = duration_min === 0 ? null : duration_min;
 
-  if (start_time_min === null) {
-    if (normalizedDuration !== null) {
+  if (start_time_min === null || start_time_min === undefined) {
+    if (normalizedDuration !== null && normalizedDuration !== undefined) {
       return {
         ok: false,
         data: null,
@@ -280,7 +391,7 @@ export const validateTaskTime = (
     };
   }
 
-  if (!Number.isInteger(start_time_min)) {
+  if (typeof start_time_min !== "number" || !Number.isInteger(start_time_min)) {
     return {
       ok: false,
       data: null,
@@ -296,7 +407,7 @@ export const validateTaskTime = (
     };
   }
 
-  if (normalizedDuration === null) {
+  if (normalizedDuration === null || normalizedDuration === undefined) {
     return {
       ok: true,
       data: {
@@ -307,7 +418,10 @@ export const validateTaskTime = (
     };
   }
 
-  if (!Number.isInteger(normalizedDuration)) {
+  if (
+    typeof normalizedDuration !== "number" ||
+    !Number.isInteger(normalizedDuration)
+  ) {
     return {
       ok: false,
       data: null,
@@ -323,7 +437,7 @@ export const validateTaskTime = (
     };
   }
 
-  if (normalizedDuration > 1439) {
+  if (normalizedDuration > maxDuration) {
     return {
       ok: false,
       data: null,
@@ -341,10 +455,14 @@ export const validateTaskTime = (
   };
 };
 
-export const validateProjectName = (
-  data: string | null,
-): ValidationResult<string> => {
-  if (!data) {
+type ValidateProjectNameArgs = {
+  name: unknown;
+};
+
+export const validateProjectName = ({
+  name,
+}: ValidateProjectNameArgs): ValidationResult<string> => {
+  if (typeof name !== "string") {
     return {
       ok: false,
       data: null,
@@ -352,9 +470,9 @@ export const validateProjectName = (
     };
   }
 
-  const name = data.trim();
+  const trimmedName = name.trim();
 
-  if (!name) {
+  if (!trimmedName) {
     return {
       ok: false,
       data: null,
@@ -362,25 +480,29 @@ export const validateProjectName = (
     };
   }
 
-  if (name.length > 250) {
+  if (trimmedName.length > 250) {
     return {
       ok: false,
       data: null,
-      message: "Project name must be 255 characters or less",
+      message: "Project name must be 250 characters or less",
     };
   }
 
   return {
     ok: true,
-    data: name,
+    data: trimmedName,
     message: "Project name saved successfully",
   };
 };
 
-export const validateProjectColor = (
-  data: string | null,
-): ValidationResult<string> => {
-  if (!data) {
+type ValidateProjectColorArgs = {
+  color: unknown;
+};
+
+export const validateProjectColor = ({
+  color,
+}: ValidateProjectColorArgs): ValidationResult<string> => {
+  if (typeof color !== "string" || !color) {
     return {
       ok: false,
       data: null,
@@ -388,9 +510,9 @@ export const validateProjectColor = (
     };
   }
 
-  const color = projectColors.find((item) => item.hex === data);
+  const validColor = projectColors.find((item) => item.hex === color);
 
-  if (!color) {
+  if (!validColor) {
     return {
       ok: false,
       data: null,
@@ -400,7 +522,7 @@ export const validateProjectColor = (
 
   return {
     ok: true,
-    data: color.hex,
+    data: validColor.hex,
     message: "Project color saved successfully",
   };
 };

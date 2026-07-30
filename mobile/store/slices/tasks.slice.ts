@@ -15,7 +15,13 @@ import {
   addRestoreTaskExtraReducers,
   addTasksToProjectExtraReducers,
   addUpdateInboxOrderExtraReducers,
+  addUpdateTaskDeadlineExtraReducers,
   addUpdateTaskExtraReducers,
+  addUpdateTaskInputsExtraReducers,
+  addUpdateTaskProjectExtraReducers,
+  addUpdateTaskRepeatDaysExtraReducers,
+  addUpdateTaskStartDateExtraReducers,
+  addUpdateTaskStatusExtraReducers,
 } from "@/store/extraReducers/task";
 
 const tasksSlice = createSlice({
@@ -38,6 +44,12 @@ const tasksSlice = createSlice({
     addDeleteProjectTasksExtraReducers(builder);
     addRemoveTaskFromProjectExtraReducers(builder);
     addUpdateInboxOrderExtraReducers(builder);
+    addUpdateTaskInputsExtraReducers(builder);
+    addUpdateTaskStatusExtraReducers(builder);
+    addUpdateTaskProjectExtraReducers(builder);
+    addUpdateTaskStartDateExtraReducers(builder);
+    addUpdateTaskDeadlineExtraReducers(builder);
+    addUpdateTaskRepeatDaysExtraReducers(builder);
   },
 });
 

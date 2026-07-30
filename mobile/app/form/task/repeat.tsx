@@ -1,66 +1,151 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
-import { useAppSelector } from "@/hooks/storeHooks";
-import { REPEAT_OPTIONS } from "@/constants/repeat";
-import { Weekday } from "@/types/task.types";
-import { setRepeat } from "@/store/slices/formTask.slice";
-import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskRepeat } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
+
+import { REPEAT_OPTIONS } from "@/constants/repeat";
+import { routes } from "@/constants/routes";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { selectTaskById } from "@/store/selectors/task.selector";
+import { setRepeat } from "@/store/slices/formTask.slice";
+import { updateTaskRepeatDaysAction } from "@/store/thunks/task/task.crud.thunks";
+import { ModeType } from "@/types/initialState.types";
+import { Weekday } from "@/types/task.types";
+import { getErrorMessage } from "@/utils/error";
+import { validateTaskRepeat } from "@/utils/validate";
+
+type LocalSearchParamsType = {
+  mode?: ModeType;
+  taskId?: string;
+};
+
+const EMPTY_REPEAT: Weekday[] = [];
 
 const RepeatFormSheet = () => {
-  const dispatch = useDispatch();
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const repeatValue = useAppSelector((state) => state.formTask.task.repeat);
+  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
-  const [selected, setSelected] = useState<Weekday[]>(repeatValue ?? []);
+  const formRepeat = useAppSelector((state) => state.formTask.task.repeat);
 
-  const handleSubmitRepeat = () => {
-    const res = validateTaskRepeat(selected);
-    if (!res.ok) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Repeat Option",
-        text2: res.message,
-      });
-      setSelected([]);
+  const task = useAppSelector((state) =>
+    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+  );
+
+  const repeat =
+    mode === "edit"
+      ? (task?.repeat ?? EMPTY_REPEAT)
+      : (formRepeat ?? EMPTY_REPEAT);
+
+  const [selected, setSelected] = useState<Weekday[]>(repeat);
+
+  useEffect(() => {
+    setSelected(repeat);
+  }, [repeat, mode, taskId]);
+
+  const handleCloseSheet = () => {
+    if (router.canGoBack()) {
+      router.back();
       return;
     }
 
-    dispatch(setRepeat({ repeat: selected }));
-    router.back();
+    router.replace(routes.today.href);
+  };
+
+  const handleSaveRepeat = async (repeatDays: Weekday[]) => {
+    if (mode === "edit") {
+      if (!taskId) {
+        throw new Error("Task ID is missing");
+      }
+
+      if (!task) {
+        throw new Error(`Task "${taskId}" is missing from state`);
+      }
+
+      await dispatch(
+        updateTaskRepeatDaysAction({
+          taskId,
+          repeat: repeatDays,
+        }),
+      ).unwrap();
+
+      return;
+    }
+
+    dispatch(
+      setRepeat({
+        repeat: repeatDays,
+      }),
+    );
   };
 
   const handleSelectOption = (optionValue: Weekday) => {
-    if (selected?.includes(optionValue)) {
-      setSelected(selected.filter((s) => s !== optionValue));
+    setSelected((current) =>
+      current.includes(optionValue)
+        ? current.filter((day) => day !== optionValue)
+        : [...current, optionValue],
+    );
+  };
+
+  const handleSubmitRepeat = async () => {
+    const validation = validateTaskRepeat({ repeatDays: selected });
+
+    if (!validation.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Repeat Option",
+        text2: validation.message,
+      });
+
       return;
     }
-    setSelected((prev) => (prev ? [...prev, optionValue] : [optionValue]));
+
+    try {
+      await handleSaveRepeat(selected);
+      handleCloseSheet();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to Save Repeat",
+        text2: getErrorMessage(error, "Failed to update task repeat days"),
+      });
+    }
   };
 
-  const handleGoBack = () => {
-    setSelected([]);
-    router.back();
+  const handleNoRepeat = async () => {
+    try {
+      await handleSaveRepeat([]);
+      setSelected([]);
+
+      handleCloseSheet();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to Clear Repeat",
+        text2: getErrorMessage(error, "Failed to clear task repeat days"),
+      });
+    }
   };
 
-  const repeatValueLength = repeatValue?.length ?? 0;
-  const submitDisabled = selected.length === 0 && repeatValueLength === 0;
+  const repeatIsUnchanged =
+    selected.length === repeat.length &&
+    selected.every((day) => repeat.includes(day));
 
   return (
     <SheetWrapper>
       <SheetHeader
         title="Repeat"
-        onClose={handleGoBack}
+        onClose={handleCloseSheet}
         onSubmit={handleSubmitRepeat}
-        submitButtonVisible={true}
-        submitDisabled={submitDisabled}
+        submitButtonVisible
+        submitDisabled={
+          (mode === "edit" && (!taskId || !task)) || repeatIsUnchanged
+        }
       />
       <View style={styles.wrapper}>
         <View style={styles.card}>
@@ -92,6 +177,20 @@ const RepeatFormSheet = () => {
           })}
         </View>
       </View>
+      {repeat.length > 0 && (
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleNoRepeat}>
+            <SymbolView
+              name="minus.circle"
+              weight="medium"
+              size={22}
+              type="monochrome"
+              tintColor="rgb(67, 67, 67)"
+            />
+            <Text style={styles.buttonText}>No Repeat</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SheetWrapper>
   );
 };
@@ -116,6 +215,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "black",
     padding: 14,
+  },
+  buttonsContainer: {
+    borderTopColor: "#efefef",
+    borderTopWidth: 1,
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 20,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "rgb(67, 67, 67)",
+    fontWeight: "500",
   },
 });
 

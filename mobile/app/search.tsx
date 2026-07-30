@@ -94,16 +94,14 @@ const SearchScreen = () => {
     <ScreenWrapper>
       <HeaderWrapper>
         <View style={styles.header}>
-          <View style={styles.backButton}>
-            <CustomButton onPress={handleGoBack}>
-              <SymbolView
-                name="chevron.left"
-                size={22}
-                type="monochrome"
-                tintColor="#111827"
-              />
-            </CustomButton>
-          </View>
+          <CustomButton style={styles.backButton} onPress={handleGoBack}>
+            <SymbolView
+              name="chevron.left"
+              size={22}
+              type="monochrome"
+              tintColor="#111827"
+            />
+          </CustomButton>
           <View style={styles.searchBar}>
             <SymbolView
               name="magnifyingglass"

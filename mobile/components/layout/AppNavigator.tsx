@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
@@ -39,6 +39,14 @@ const AppNavigator = () => {
     projectsStatus === "idle" ||
     projectsStatus === "loading";
 
+  const [hasFinishedInitialLoad, setHasFinishedInitialLoad] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      setHasFinishedInitialLoad(true);
+    }
+  }, [loading]);
+
   useEffect(() => {
     if (userError) {
       Toast.show({
@@ -67,7 +75,7 @@ const AppNavigator = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {loading ? (
+      {!hasFinishedInitialLoad ? (
         <ScreenWrapper
           style={{ justifyContent: "center", alignItems: "center" }}
         >

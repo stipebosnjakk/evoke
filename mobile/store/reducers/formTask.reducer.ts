@@ -37,7 +37,7 @@ export const setStatusReducer = (
   state: FormTaskInitialState,
   action: PayloadAction<{ status: TaskStatusOption | null }>,
 ) => {
-  const res = validateTaskStatus(action.payload.status);
+  const res = validateTaskStatus({ status: action.payload.status });
 
   if (!res.ok) {
     state.error = res.message;
@@ -63,7 +63,7 @@ export const setRepeatReducer = (
   state: FormTaskInitialState,
   action: PayloadAction<{ repeat: Weekday[] | null }>,
 ) => {
-  const res = validateTaskRepeat(action.payload.repeat);
+  const res = validateTaskRepeat({ repeatDays: action.payload.repeat });
 
   if (!res.ok) {
     state.error = res.message;
@@ -87,10 +87,10 @@ export const setStartDateReducer = (
   state: FormTaskInitialState,
   action: PayloadAction<{ start_date: IsoDate | null }>,
 ) => {
-  const res = validateTaskStartDate(
-    action.payload.start_date,
-    state.task.deadline,
-  );
+  const res = validateTaskStartDate({
+    start_date: action.payload.start_date,
+    deadline: state.task.deadline ?? null,
+  });
 
   if (!res.ok) {
     state.error = res.message;
@@ -113,10 +113,10 @@ export const setDeadlineReducer = (
   state: FormTaskInitialState,
   action: PayloadAction<{ deadline: IsoDate | null }>,
 ) => {
-  const res = validateTaskDeadline(
-    action.payload.deadline,
-    state.task.start_date,
-  );
+  const res = validateTaskDeadline({
+    deadline: action.payload.deadline,
+    startDate: state.task.start_date,
+  });
 
   if (!res.ok) {
     state.error = res.message;
@@ -134,10 +134,9 @@ export const setTimeReducer = (
     duration_min: number | null;
   }>,
 ) => {
-  const res = validateTaskTime(
-    action.payload.start_time_min,
-    action.payload.duration_min,
-  );
+  const { start_time_min, duration_min } = action.payload;
+
+  const res = validateTaskTime({ start_time_min, duration_min });
 
   if (!res.ok || !res.data) {
     state.error = res.message;
@@ -155,23 +154,22 @@ export const setTimeReducer = (
 };
 
 export const validateTextInputsReducer = (state: FormTaskInitialState) => {
-  const titleRes = validateTaskTitle(state.inputs.title);
+  const titleRes = validateTaskTitle({ title: state.inputs.title });
 
   if (!titleRes.ok) {
-    state.error = titleRes.message;
-    return;
+    throw new Error(titleRes.message);
   }
 
-  const descriptionRes = validateTaskDescription(state.inputs.description);
+  const descriptionRes = validateTaskDescription({
+    description: state.inputs.description,
+  });
 
   if (!descriptionRes.ok) {
-    state.error = descriptionRes.message;
-    return;
+    throw new Error(descriptionRes.message);
   }
 
   state.task.title = titleRes.data;
   state.task.description = descriptionRes.data;
-  state.error = null;
 };
 
 export const sendErrorMessageReducer = (

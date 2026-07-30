@@ -7,6 +7,7 @@ import {
   type StyleProp,
   Pressable,
   GestureResponderEvent,
+  useWindowDimensions,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { SymbolView } from "expo-symbols";
@@ -81,46 +82,59 @@ const TaskInfoToastCard = ({
   showCloseButton = false,
   onIconPress,
 }: TaskInfoToastCardProps) => {
+  const { width: screenWidth } = useWindowDimensions();
+
   const handleClose = (event: GestureResponderEvent) => {
     event.stopPropagation();
     Toast.hide();
   };
 
   return (
-    <Pressable style={styles.toastInfoContainer} onPress={onPress}>
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "flex-start",
-          flex: 1,
-        }}
-      >
-        <Text style={styles.toastMetadataText} numberOfLines={1}>
-          {text2}
-        </Text>
-        <Text style={styles.toastTitleText} numberOfLines={1}>
-          {text1}
-        </Text>
+    <Pressable
+      style={[styles.toastInfoContainer, { maxWidth: screenWidth * 0.95 }]}
+      onPress={onPress}
+    >
+      <View style={styles.toastInfoTextContainer}>
+        {!!text2 && (
+          <Text
+            style={styles.toastMetadataText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {text2}
+          </Text>
+        )}
+        {!!text1 && (
+          <Text
+            style={styles.toastTitleText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {text1}
+          </Text>
+        )}
       </View>
-      {showCloseButton ? (
-        <Pressable onPress={handleClose} hitSlop={10}>
-          <SymbolView
-            name="xmark"
-            size={14}
-            type="monochrome"
-            tintColor="#111827"
-          />
-        </Pressable>
-      ) : icon ? (
-        <Pressable onPress={onIconPress ?? onPress} hitSlop={10}>
-          <SymbolView
-            name={icon as any}
-            size={14}
-            type="monochrome"
-            tintColor="#111827"
-          />
-        </Pressable>
-      ) : null}
+      <View style={styles.toastInfoAction}>
+        {showCloseButton ? (
+          <Pressable onPress={handleClose} hitSlop={10}>
+            <SymbolView
+              name="xmark"
+              size={14}
+              type="monochrome"
+              tintColor="#111827"
+            />
+          </Pressable>
+        ) : icon ? (
+          <Pressable onPress={onIconPress ?? onPress} hitSlop={10}>
+            <SymbolView
+              name={icon as any}
+              size={14}
+              type="monochrome"
+              tintColor="#111827"
+            />
+          </Pressable>
+        ) : null}
+      </View>
     </Pressable>
   );
 };
@@ -154,6 +168,51 @@ export const toastConfig: ToastConfig = {
   ),
 };
 const styles = StyleSheet.create({
+  toastInfoContainer: {
+    minWidth: 200,
+    alignSelf: "center",
+    maxWidth: "95%",
+    height: 50,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#efefef",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 2,
+  },
+  toastInfoTextContainer: {
+    flexShrink: 1,
+    minWidth: 0,
+    justifyContent: "center",
+    alignItems: "flex-start",
+  },
+  toastInfoAction: {
+    flexShrink: 0,
+    marginLeft: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  toastMetadataText: {
+    flexShrink: 1,
+    maxWidth: "100%",
+    fontSize: 12,
+    color: "#70747d",
+  },
+  toastTitleText: {
+    flexShrink: 1,
+    maxWidth: "100%",
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#111827",
+  },
   toastOuterContainer: {
     width: "100%",
     paddingHorizontal: 14,
@@ -188,38 +247,10 @@ const styles = StyleSheet.create({
   toastTextContainer: {
     flex: 1,
   },
-  toastTitleText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111827",
-  },
   toastSubtitleText: {
     marginTop: 2,
     fontSize: 12,
     fontWeight: "600",
-    color: "#70747d",
-  },
-  toastInfoContainer: {
-    minWidth: 200,
-    height: 50,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 20,
-    backgroundColor: "#efefef",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    elevation: 2,
-  },
-  toastMetadataText: {
-    fontSize: 12,
     color: "#70747d",
   },
 });

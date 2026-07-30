@@ -71,7 +71,7 @@ const TimeFormSheet = () => {
     const start_time_min = getStartTimeMin(time);
     const duration_min = getDurationMin(durationHours, durationMinutes);
 
-    const res = validateTaskTime(start_time_min, duration_min);
+    const res = validateTaskTime({ start_time_min, duration_min });
 
     if (!res.ok) {
       Toast.show({

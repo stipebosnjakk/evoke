@@ -67,3 +67,5 @@ export type ValidationResult<T> =
       data: null;
       message: string;
     };
+
+export type ModeType = "create" | "edit"

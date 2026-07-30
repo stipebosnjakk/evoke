@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import { RootState } from "@/store/store";
-import { CreatedTask, RejectWithValue } from "@/types/task.types";
+import { CreatedTask, RejectWithValue, TaskStatus } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
 import {
   createTaskRepo,
@@ -9,6 +9,21 @@ import {
   updateTaskRepo,
   DeleteTaskReturnType,
   deleteTaskRepo,
+  UpdateTaskInputsReturnType,
+  updateTaskInputsRepo,
+  UpdateTaskStatusReturnType,
+  updateTaskStatusRepo,
+  UpdateTaskProjectReturnType,
+  updateTaskProjectRepo,
+  UpdateTaskStartDateArgsType,
+  TaskStartDateReturnType,
+  updateTaskStartDateRepo,
+  UpdateTaskDeadlineReturnType,
+  UpdateTaskDeadlineArgsType,
+  updateTaskDeadlineRepo,
+  UpdateTaskRepeatDaysReturnType,
+  UpdateTaskRepeatDays,
+  updateTaskRepeatDaysRepo,
 } from "@/db/repositories/task/task.crud.repo";
 
 export const createTaskAction = createAsyncThunk<
@@ -93,6 +108,117 @@ export const deleteTaskAction = createAsyncThunk<
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to delete task"),
+    });
+  }
+});
+
+export type UpdateTaskInputsAction = {
+  taskId: string;
+  title: string | null;
+  description: string | null;
+};
+
+export const updateTaskInputsAction = createAsyncThunk<
+  UpdateTaskInputsReturnType,
+  UpdateTaskInputsAction,
+  { rejectValue: RejectWithValue }
+>("tasks/updateInputs", async (taskInfo, { rejectWithValue }) => {
+  try {
+    const data = await updateTaskInputsRepo(taskInfo);
+    return data;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task inputs"),
+    });
+  }
+});
+
+export type UpdateTaskStatusAction = {
+  taskId: string;
+  status: TaskStatus | null;
+};
+
+export const updateTaskStatusAction = createAsyncThunk<
+  UpdateTaskStatusReturnType,
+  UpdateTaskStatusAction,
+  { rejectValue: RejectWithValue }
+>("tasks/updateStatus", async (taskInfo, { rejectWithValue }) => {
+  try {
+    const data = await updateTaskStatusRepo(taskInfo);
+    return data;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task status"),
+    });
+  }
+});
+
+export type UpdateTaskProjectAction = {
+  taskId: string;
+  projectId: string | null;
+};
+
+export const updateTaskProjectAction = createAsyncThunk<
+  UpdateTaskProjectReturnType,
+  UpdateTaskProjectAction,
+  { rejectValue: RejectWithValue }
+>("tasks/updateProject", async (taskInfo, { rejectWithValue }) => {
+  try {
+    if (!taskInfo.taskId.trim()) {
+      return rejectWithValue({
+        message: "Task ID is required",
+      });
+    }
+
+    return await updateTaskProjectRepo(taskInfo);
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task project"),
+    });
+  }
+});
+
+export const updateTaskStartDateAction = createAsyncThunk<
+  TaskStartDateReturnType,
+  UpdateTaskStartDateArgsType,
+  { rejectValue: RejectWithValue }
+>("tasks/updateStartDate", async (data, { rejectWithValue }) => {
+  try {
+    const res = await updateTaskStartDateRepo(data);
+    return res;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task start date"),
+    });
+  }
+});
+
+export const updateTaskDeadlineAction = createAsyncThunk<
+  UpdateTaskDeadlineReturnType,
+  UpdateTaskDeadlineArgsType,
+  { rejectValue: RejectWithValue }
+>("tasks/updateDeadline", async (data, { rejectWithValue }) => {
+  try {
+    const res = await updateTaskDeadlineRepo(data);
+    return res;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task deadline"),
+    });
+  }
+});
+
+export const updateTaskRepeatDaysAction = createAsyncThunk<
+  UpdateTaskRepeatDaysReturnType,
+  UpdateTaskRepeatDays,
+  { rejectValue: RejectWithValue }
+>("tasks/updateRepeatDays", async (data, { rejectWithValue }) => {
+  try {
+    const res = await updateTaskRepeatDaysRepo(data);
+    return res;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task repeat days"),
     });
   }
 });

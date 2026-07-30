@@ -19,14 +19,14 @@ export const setColorReducer = (
 };
 
 export const validateNameAndColorReducer = (state: FormProjectInitialState) => {
-  const validateName = validateProjectName(state.project.name);
+  const validateName = validateProjectName({ name: state.project.name });
 
   if (!validateName.ok) {
     state.error = validateName.message;
     return;
   }
 
-  const validateColor = validateProjectColor(state.project.color);
+  const validateColor = validateProjectColor({ color: state.project.color });
 
   if (!validateColor.ok) {
     state.error = validateColor.message;

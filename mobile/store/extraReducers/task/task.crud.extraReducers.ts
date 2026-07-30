@@ -5,6 +5,12 @@ import {
   createTaskAction,
   deleteTaskAction,
   updateTaskAction,
+  updateTaskDeadlineAction,
+  updateTaskInputsAction,
+  updateTaskProjectAction,
+  updateTaskRepeatDaysAction,
+  updateTaskStartDateAction,
+  updateTaskStatusAction,
 } from "@/store/thunks/task/task.crud.thunks";
 
 export const addCreateTaskExtraReducers = (
@@ -92,5 +98,185 @@ export const addDeleteTaskExtraReducers = (
       delete state.taskOrder.inbox[task.id];
 
       state.tasks.ids = state.tasks.ids.filter((taskId) => taskId !== task.id);
+    });
+};
+
+export const addUpdateTaskInputsExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskInputsAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateTaskInputsAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to update task inputs";
+    })
+    .addCase(updateTaskInputsAction.fulfilled, (state, action) => {
+      const { task } = action.payload;
+      const existingTask = state.tasks.byId[task.id];
+
+      if (!existingTask) {
+        state.status = "failed";
+        state.error = `Task "${task.id}" is missing from state`;
+        return;
+      }
+
+      state.status = "succeeded";
+      state.error = null;
+
+      state.tasks.byId[task.id] = {
+        ...existingTask,
+        ...task,
+      };
+    });
+};
+
+export const addUpdateTaskStatusExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskStatusAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateTaskStatusAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to update task status";
+    })
+    .addCase(updateTaskStatusAction.fulfilled, (state, action) => {
+      const { task } = action.payload;
+      const existingTask = state.tasks.byId[task.id];
+
+      if (!existingTask) {
+        state.status = "failed";
+        state.error = `Task "${task.id}" is missing from state`;
+        return;
+      }
+
+      state.status = "succeeded";
+      state.error = null;
+
+      state.tasks.byId[task.id] = {
+        ...existingTask,
+        ...task,
+      };
+    });
+};
+
+export const addUpdateTaskProjectExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskProjectAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateTaskProjectAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message || "Failed to update task project";
+    })
+    .addCase(updateTaskProjectAction.fulfilled, (state, action) => {
+      const { task } = action.payload;
+
+      state.status = "succeeded";
+      state.error = null;
+
+      state.tasks.byId[task.id] = task;
+
+      if (!state.tasks.ids.includes(task.id)) {
+        state.tasks.ids.push(task.id);
+      }
+    });
+};
+
+export const addUpdateTaskStartDateExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskStartDateAction.pending, (state) => {
+      state.status = "loading";
+      state.error = null;
+    })
+    .addCase(updateTaskStartDateAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error =
+        action.payload?.message ?? "Failed to update task start date";
+    })
+    .addCase(updateTaskStartDateAction.fulfilled, (state, action) => {
+      const data = action.payload;
+      const task = state.tasks.byId[data.taskId];
+
+      if (!task) {
+        state.status = "failed";
+        state.error = `Task "${data.taskId}" is missing from state`;
+        return;
+      }
+
+      state.tasks.byId[data.taskId] = {
+        ...task,
+        ...data,
+      };
+
+      state.status = "succeeded";
+      state.error = null;
+    });
+};
+
+export const addUpdateTaskDeadlineExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskDeadlineAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateTaskDeadlineAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message ?? "Failed to update task deadline";
+    })
+    .addCase(updateTaskDeadlineAction.fulfilled, (state, action) => {
+      const { taskId, deadline, updated_at } = action.payload;
+      const task = state.tasks.byId[taskId];
+
+      if (!task) {
+        state.status = "failed";
+        state.error = `Task "${taskId}" is missing from state`;
+        return;
+      }
+
+      task.deadline = deadline;
+      task.updated_at = updated_at;
+
+      state.status = "succeeded";
+      state.error = null;
+    });
+};
+
+export const addUpdateTaskRepeatDaysExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskRepeatDaysAction.pending, (state) => {
+      state.status = "loading";
+      state.error = null;
+    })
+    .addCase(updateTaskRepeatDaysAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error =
+        action.payload?.message ?? "Failed to update task repeat days";
+    })
+    .addCase(updateTaskRepeatDaysAction.fulfilled, (state, action) => {
+      const { taskId, repeat, updated_at } = action.payload;
+      const task = state.tasks.byId[taskId];
+
+      if (!task) {
+        state.status = "failed";
+        state.error = `Task "${taskId}" is missing from state`;
+        return;
+      }
+
+      task.repeat = repeat;
+      task.updated_at = updated_at;
+
+      state.status = "succeeded";
+      state.error = null;
     });
 };

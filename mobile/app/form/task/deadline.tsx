@@ -1,121 +1,205 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  View,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { useDispatch } from "react-redux";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
 
-import { useAppSelector } from "@/hooks/storeHooks";
-import { IsoDate } from "@/types/task.types";
-import { minDate } from "@/utils/date";
 import CalendarView from "@/components/features/CalendarView";
 import DateInput from "@/components/features/DateInput";
-import { setDeadline } from "@/store/slices/formTask.slice";
 import Shortcuts from "@/components/features/Shortcuts";
-import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskDeadline } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
+
+import { routes } from "@/constants/routes";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { selectTaskById } from "@/store/selectors/task.selector";
+import { setDeadline } from "@/store/slices/formTask.slice";
+import { updateTaskDeadlineAction } from "@/store/thunks/task/task.crud.thunks";
+import { IsoDate } from "@/types/task.types";
+import { minDate } from "@/utils/date";
+import { getErrorMessage } from "@/utils/error";
+import { validateTaskDeadline } from "@/utils/validate";
+import { ModeType } from "@/types/initialState.types";
+
+type LocalSearchParamsType = {
+  mode?: ModeType;
+  taskId?: string;
+};
 
 const DeadlineFormSheet = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+
   const inputRef = useRef<TextInput>(null);
 
-  const deadlineValue = useAppSelector((state) => state.formTask.task.deadline);
-  const startDateValue = useAppSelector(
+  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+
+  const formDeadline = useAppSelector((state) => state.formTask.task.deadline);
+
+  const formStartDate = useAppSelector(
     (state) => state.formTask.task.start_date,
   );
 
-  const minDeadlineDate = minDate("deadline", startDateValue ?? null);
-
-  const [isDateInputOpen, setIsDateInputOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<IsoDate | null>(
-    deadlineValue || null,
+  const task = useAppSelector((state) =>
+    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
   );
 
-  const handleNewDeadlineSelect = async (date: IsoDate | null) => {
-    const res = validateTaskDeadline(date, startDateValue);
-    if (!res.ok) {
+  const deadline =
+    mode === "edit" ? (task?.deadline ?? null) : (formDeadline ?? null);
+
+  const startDate =
+    mode === "edit" ? (task?.start_date ?? null) : (formStartDate ?? null);
+
+  const [isDateInputOpen, setIsDateInputOpen] = useState(false);
+  const [selected, setSelected] = useState<IsoDate | null>(deadline);
+
+  useEffect(() => {
+    setSelected(deadline);
+  }, [deadline, mode, taskId]);
+
+  const minDeadlineDate = minDate("deadline", startDate);
+
+  const handleCloseSheet = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace(routes.today.href);
+  };
+
+  const handleSaveDeadline = async (date: IsoDate | null) => {
+    if (mode === "edit") {
+      if (!taskId) {
+        throw new Error("Task ID is missing");
+      }
+
+      if (!task) {
+        throw new Error(`Task "${taskId}" is missing from state`);
+      }
+
+      await dispatch(
+        updateTaskDeadlineAction({
+          taskId,
+          deadline: date,
+        }),
+      ).unwrap();
+
+      return;
+    }
+
+    dispatch(
+      setDeadline({
+        deadline: date,
+      }),
+    );
+  };
+
+  const handleNewDeadlineSelect = (date: IsoDate | null) => {
+    const validation = validateTaskDeadline({
+      deadline: date,
+      startDate,
+    });
+
+    if (!validation.ok) {
       Toast.show({
         type: "error",
         text1: "Invalid Deadline",
-        text2: res.message,
+        text2: validation.message,
       });
-      setSelected(null);
+
       return;
     }
 
-    dispatch(setDeadline({ deadline: date }));
-    router.back();
+    setSelected(validation.data);
   };
 
-  const handleSubmitDeadline = () => {
+  const handleSubmitDeadline = async () => {
     if (isDateInputOpen) {
       inputRef.current?.blur();
       setIsDateInputOpen(false);
     }
 
-    if (!selected) return;
+    try {
+      await handleSaveDeadline(selected);
 
-    handleNewDeadlineSelect(selected);
+      handleCloseSheet();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to Save Deadline",
+        text2: getErrorMessage(error, "Failed to update task deadline"),
+      });
+    }
+  };
+
+  const handleNoDeadline = async () => {
+    try {
+      await handleSaveDeadline(null);
+      setSelected(null);
+
+      handleCloseSheet();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to Clear Deadline",
+        text2: getErrorMessage(error, "Failed to clear task deadline"),
+      });
+    }
   };
 
   const handleGoBack = () => {
-    setSelected(null);
     if (isDateInputOpen) {
       inputRef.current?.blur();
       setIsDateInputOpen(false);
       return;
     }
-    router.back();
-  };
 
-  const handleNoDeadline = () => {
-    dispatch(setDeadline({ deadline: null }));
-    setSelected(null);
-    router.back();
+    handleCloseSheet();
   };
 
   return (
     <SheetWrapper>
       <SheetHeader
         title="Deadline"
-        onSubmit={handleSubmitDeadline}
         onClose={handleGoBack}
-        submitButtonVisible={true}
-        submitDisabled={isDateInputOpen || !selected}
+        onSubmit={handleSubmitDeadline}
+        submitButtonVisible
+        submitDisabled={
+          (mode === "edit" && (!taskId || !task)) || selected === deadline
+        }
       />
       <DateInput
         type="deadline"
         inputRef={inputRef}
         isOpen={isDateInputOpen}
         setIsOpen={setIsDateInputOpen}
-        dateValue={selected || deadlineValue}
+        dateValue={selected}
         handleNewDateSelect={handleNewDeadlineSelect}
       />
       {!isDateInputOpen && (
         <>
-          <View>
+          <View style={styles.calendarContainer}>
             <Shortcuts
               type="deadline"
-              selectedStartDate={startDateValue || null}
-              selectedDeadline={deadlineValue || null}
+              selectedStartDate={startDate}
+              selectedDeadline={selected}
               handleNewDateSelect={handleNewDeadlineSelect}
             />
             <CalendarView
               minDate={minDeadlineDate}
               selected={selected}
-              setSelected={setSelected}
+              setSelected={handleNewDeadlineSelect}
             />
           </View>
-          {deadlineValue && (
-            <View style={styles.buttonsContainer}>
+          <View style={styles.buttonsContainer}>
+            {selected !== null && (
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleNoDeadline}
@@ -129,8 +213,8 @@ const DeadlineFormSheet = () => {
                 />
                 <Text style={styles.buttonText}>No Deadline</Text>
               </TouchableOpacity>
-            </View>
-          )}
+            )}
+          </View>
         </>
       )}
     </SheetWrapper>
@@ -152,6 +236,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "rgb(67, 67, 67)",
     fontWeight: "500",
+  },
+  calendarContainer: {
+    paddingBottom: 10,
   },
 });
 

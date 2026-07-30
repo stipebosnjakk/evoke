@@ -35,9 +35,10 @@ import {
   getTaskScreenText,
 } from "@/utils/taskPlacement";
 import { TaskScreen } from "@/types/scope.types";
+import { ModeType } from "@/types/initialState.types";
 
 type LocalSearchParamsType = {
-  mode?: "create" | "edit";
+  mode?: ModeType;
   taskId?: string;
 };
 
@@ -116,6 +117,8 @@ const TaskFormSheet = () => {
       let results;
 
       await dispatch(validateTextInputs());
+
+      // TODO: toast is not showing for update task
 
       if (mode === "edit") {
         if (!taskId) {
@@ -203,7 +206,10 @@ const TaskFormSheet = () => {
                 icon={status ? status.icon : "tag"}
                 label={status ? status.label : "Status"}
                 onPress={() => {
-                  router.push(routes.form_task_status.href);
+                  router.push({
+                    pathname: routes.form_task_status.href,
+                    params: { mode: "create", taskId: undefined },
+                  });
                 }}
               />
               <Chip

@@ -96,6 +96,11 @@ export const routes = {
     href: "/task/[taskId]",
     route: "task/[taskId]",
   },
+  form_task_inputs: {
+    title: "Title and Description",
+    href: "/task/edit/[taskId]",
+    route: "task/edit/[taskId]",
+  },
 } as const;
 
 export const formSheetRoutes = [
@@ -107,4 +112,5 @@ export const formSheetRoutes = [
   routes.form_task_time,
   routes.form_project,
   routes.form_project_color,
+  routes.form_task_inputs,
 ] as const;

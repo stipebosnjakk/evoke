@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
@@ -14,56 +14,64 @@ const SheetHeader = ({
   title,
   onSubmit,
   onClose,
-  submitDisabled,
+  submitDisabled = false,
   submitButtonVisible = false,
 }: SheetHeaderProps) => {
   const router = useRouter();
+
   const handleClose = () => {
     if (onClose) {
       onClose();
       return;
     }
+
     router.back();
   };
+
+  const isSubmitDisabled = submitDisabled || !onSubmit;
+
   return (
     <View style={styles.headerContainer}>
-      <View style={styles.headerSide}>
-        <TouchableOpacity onPress={handleClose}>
+      <TouchableOpacity
+        style={styles.headerSide}
+        onPress={handleClose}
+        accessibilityRole="button"
+        accessibilityLabel="Close"
+      >
+        <SymbolView
+          name="xmark"
+          weight="medium"
+          size={20}
+          type="monochrome"
+          tintColor="rgb(67, 67, 67)"
+        />
+      </TouchableOpacity>
+      <Text style={styles.title} numberOfLines={1}>
+        {title}
+      </Text>
+      {submitButtonVisible ? (
+        <TouchableOpacity
+          onPress={onSubmit}
+          disabled={isSubmitDisabled}
+          style={[
+            styles.headerSide,
+            isSubmitDisabled && styles.submitButtonDisabled,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Save"
+          accessibilityState={{ disabled: isSubmitDisabled }}
+        >
           <SymbolView
-            name="xmark"
+            name="checkmark"
             weight="medium"
             size={20}
             type="monochrome"
             tintColor="rgb(67, 67, 67)"
           />
         </TouchableOpacity>
-      </View>
-      <Text style={styles.title} numberOfLines={1}>
-        {title}
-      </Text>
-      <View
-        style={
-          submitButtonVisible ? styles.headerSide : styles.headerPlaceholder
-        }
-      >
-        {submitButtonVisible && (
-          <TouchableOpacity
-            onPress={onSubmit}
-            disabled={submitDisabled || !onSubmit}
-            style={{
-              opacity: submitDisabled || !onSubmit ? 0.5 : 1,
-            }}
-          >
-            <SymbolView
-              name="checkmark"
-              weight="medium"
-              size={20}
-              type="monochrome"
-              tintColor="rgb(67, 67, 67)"
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      ) : (
+        <View style={styles.headerPlaceholder} />
+      )}
     </View>
   );
 };
@@ -83,6 +91,9 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: "#F2F2F2",
   },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
   title: {
     flex: 1,
     fontSize: 16,
@@ -92,6 +103,7 @@ const styles = StyleSheet.create({
   },
   headerPlaceholder: {
     width: 44,
+    height: 44,
   },
 });
 

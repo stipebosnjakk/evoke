@@ -1,45 +1,128 @@
+import { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
 import { SymbolView } from "expo-symbols";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import { STATUS_OPTIONS } from "@/constants/status";
 import { TaskStatusOption } from "@/types/task.types";
 import { setStatus } from "@/store/slices/formTask.slice";
-import { useAppSelector } from "@/hooks/storeHooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskStatus } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
 import Info from "@/components/ui/Info";
+import { updateTaskStatusAction } from "@/store/thunks/task/task.crud.thunks";
+import { getErrorMessage } from "@/utils/error";
+import { selectTaskById } from "@/store/selectors/task.selector";
+import { ModeType } from "@/types/initialState.types";
+
+type LocalSearchParamsType = {
+  mode?: ModeType;
+  taskId?: string;
+};
 
 const StatusFormSheet = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const statusValue = useAppSelector((state) => state.formTask.task.status);
+  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
-  const handleSubmitStatus = (optionValue: TaskStatusOption) => {
-    if (statusValue === optionValue.value) {
-      dispatch(setStatus({ status: null }));
-      router.back();
-      return;
+  const formRepeat = useAppSelector((state) => state.formTask.task.repeat);
+  const formStatus = useAppSelector((state) => state.formTask.task.status);
+
+  const task = useAppSelector((state) =>
+    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+  );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const selectedStatus = mode === "edit" ? task?.status : formStatus;
+
+  const handleCreateStatus = (option: TaskStatusOption) => {
+    const nextOption = formStatus === option.value ? null : option;
+
+    const result = validateTaskStatus({ status: nextOption });
+
+    if (!result.ok) {
+      throw new Error(result.message || "Invalid task status");
     }
 
-    const res = validateTaskStatus(optionValue);
-
-    if (!res.ok) {
+    if (formRepeat?.length && result?.data?.value !== "next") {
       Toast.show({
-        type: "error",
-        text1: "Invalid Status",
-        text2: res.message,
+        type: "info",
+        text1: "A repeating task must have the Next status",
       });
       return;
     }
 
-    dispatch(setStatus({ status: optionValue }));
+    dispatch(
+      setStatus({
+        status: result.data,
+      }),
+    );
+
     router.back();
   };
+
+  const handleEditStatus = async (option: TaskStatusOption) => {
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    const nextOption = task?.status === option.value ? null : option;
+
+    const result = validateTaskStatus({ status: nextOption });
+
+    if (!result.ok) {
+      throw new Error(result.message || "Invalid task status");
+    }
+
+    if (task?.repeat?.length && result.data?.value !== "next") {
+      Toast.show({
+        type: "info",
+        text1: "A repeating task must have the Next status",
+      });
+      return;
+    }
+
+    await dispatch(
+      updateTaskStatusAction({
+        taskId,
+        status: result.data?.value ?? null,
+      }),
+    ).unwrap();
+
+    router.back();
+  };
+
+  const handleSubmitStatus = async (option: TaskStatusOption) => {
+    if (isSubmitting) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      if (mode === "edit") {
+        await handleEditStatus(option);
+        return;
+      }
+
+      handleCreateStatus(option);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(error, "Failed to save task status"),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (mode === "edit" && (!taskId || !task)) {
+    return null;
+  }
 
   return (
     <SheetWrapper>
@@ -47,46 +130,45 @@ const StatusFormSheet = () => {
       <View style={styles.wrapper}>
         <View>
           {STATUS_OPTIONS.map((item, index) => {
-            const isSelected = statusValue === item.value;
+            const isSelected = selectedStatus === item.value;
             const isLast = index === STATUS_OPTIONS.length - 1;
 
             return (
               <TouchableOpacity
-                key={index}
+                key={item.value}
                 onPress={() => handleSubmitStatus(item)}
-                style={styles.optionsButton}
+                disabled={isSubmitting}
+                activeOpacity={0.7}
+                style={[
+                  styles.optionsButton,
+                  isSubmitting && styles.disabledButton,
+                ]}
               >
+                <SymbolView
+                  name={item.icon as any}
+                  weight="medium"
+                  size={20}
+                  type="monochrome"
+                  tintColor="rgb(67, 67, 67)"
+                />
                 <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 10,
-                  }}
+                  style={[
+                    styles.borderContainer,
+                    {
+                      borderBottomWidth: isLast ? 0 : 1,
+                    },
+                  ]}
                 >
-                  <SymbolView
-                    name={item.icon as any}
-                    weight="medium"
-                    size={20}
-                    type="monochrome"
-                    tintColor="rgb(67, 67, 67)"
-                  />
-                  <View
-                    style={[
-                      styles.borderContainer,
-                      { flex: 1, borderBottomWidth: isLast ? 0 : 1 },
-                    ]}
-                  >
-                    <Text style={styles.labels}>{item.label}</Text>
-                    {isSelected && (
-                      <SymbolView
-                        name="checkmark"
-                        weight="medium"
-                        size={20}
-                        type="monochrome"
-                        tintColor="rgb(67, 67, 67)"
-                      />
-                    )}
-                  </View>
+                  <Text style={styles.labels}>{item.label}</Text>
+                  {isSelected && (
+                    <SymbolView
+                      name="checkmark"
+                      weight="medium"
+                      size={20}
+                      type="monochrome"
+                      tintColor="rgb(67, 67, 67)"
+                    />
+                  )}
                 </View>
               </TouchableOpacity>
             );
@@ -105,10 +187,14 @@ const styles = StyleSheet.create({
   optionsButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 14,
+    gap: 10,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   borderContainer: {
+    flex: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
     flexDirection: "row",
     alignItems: "center",
