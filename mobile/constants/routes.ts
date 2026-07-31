@@ -56,6 +56,11 @@ export const routes = {
     href: "/form/task/time",
     route: "form/task/time",
   },
+  form_task_duration: {
+    title: "Duration",
+    href: "/form/task/duration",
+    route: "form/task/duration",
+  },
   form_task_repeat: {
     title: "Repeat",
     href: "/form/task/repeat",
@@ -110,6 +115,7 @@ export const formSheetRoutes = [
   routes.form_task_status,
   routes.form_task_repeat,
   routes.form_task_time,
+  routes.form_task_duration,
   routes.form_project,
   routes.form_project_color,
   routes.form_task_inputs,

@@ -1,193 +1,205 @@
-import { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
-import { format } from "date-fns";
-import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
-import { useDispatch } from "react-redux";
-import { useCalendars } from "expo-localization";
+import { useEffect, useState } from "react";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCalendars, useLocales } from "expo-localization";
+import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
 
-import { setTime as setTimeSlice } from "@/store/slices/formTask.slice";
-import {
-  getDurationMin,
-  getDurationFromDurationMin,
-  getHoursAndMinutesFromMin,
-  getStartTimeMin,
-} from "@/utils/date";
-import { useAppSelector } from "@/hooks/storeHooks";
-import SheetWrapper from "@/components/wrappers/SheetWrapper";
-import { validateTaskTime } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
+import SheetWrapper from "@/components/wrappers/SheetWrapper";
+
+import { routes } from "@/constants/routes";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { selectTaskById } from "@/store/selectors/task.selector";
+import { setTime } from "@/store/slices/formTask.slice";
+import { updateTaskTimeAction } from "@/store/thunks/task/task.crud.thunks";
+import { ModeType } from "@/types/initialState.types";
+import {
+  formatTimeFromMin,
+  getStartTimeMin,
+  getTimePickerDate,
+} from "@/utils/date";
+import { getErrorMessage } from "@/utils/error";
+import { validateTaskTime } from "@/utils/validate";
+
+type LocalSearchParamsType = {
+  mode?: ModeType;
+  taskId?: string;
+};
 
 const TimeFormSheet = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const calendars = useCalendars();
-  const is24Hour = calendars[0]?.uses24hourClock ?? false;
-  const timeFormat = is24Hour ? "HH:mm" : "h:mm a";
+  const dispatch = useAppDispatch();
 
-  const startTimeMin = useAppSelector(
+  const locales = useLocales();
+  const calendars = useCalendars();
+
+  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+
+  const formStartTimeMin = useAppSelector(
     (state) => state.formTask.task.start_time_min,
   );
-  const durationMin = useAppSelector(
-    (state) => state.formTask.task.duration_min,
+
+  const task = useAppSelector((state) =>
+    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
   );
 
-  const startTime = getHoursAndMinutesFromMin(startTimeMin ?? null);
-  const duration = getDurationFromDurationMin(durationMin ?? null);
+  const startTimeMin =
+    mode === "edit"
+      ? (task?.start_time_min ?? null)
+      : (formStartTimeMin ?? null);
 
-  const [time, setTime] = useState(
-    startTime
-      ? new Date(0, 0, 0, startTime.hours, startTime.minutes)
-      : new Date(),
-  );
-  const [durationHours, setDurationHours] = useState<number>(
-    duration?.hours ?? 0,
-  );
-  const [durationMinutes, setDurationMinutes] = useState<number>(
-    duration?.minutes ?? 0,
+  const [selected, setSelected] = useState<Date>(() =>
+    getTimePickerDate(startTimeMin),
   );
 
-  const durationLabel = useMemo(() => {
-    return `${durationHours}:${String(durationMinutes).padStart(2, "0")}`;
-  }, [durationHours, durationMinutes]);
+  useEffect(() => {
+    setSelected(getTimePickerDate(startTimeMin));
+  }, [startTimeMin, mode, taskId]);
 
-  const endTime = useMemo(() => {
-    const totalMinutes = durationHours * 60 + durationMinutes;
-    return new Date(time.getTime() + totalMinutes * 60 * 1000);
-  }, [time, durationHours, durationMinutes]);
+  const locale = locales[0]?.languageTag ?? "en-US";
+  const is24Hour = calendars[0]?.uses24hourClock ?? false;
 
-  const minuteOptions = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => i * 5);
-  }, []);
+  const selectedTimeMin = getStartTimeMin(selected);
+  const selectedTimeLabel = formatTimeFromMin(
+    selectedTimeMin,
+    locale,
+    is24Hour,
+  );
 
-  const handleTimeChange = (_: unknown, selectedTime?: Date) => {
-    if (!selectedTime) return;
-    setTime(selectedTime);
-  };
-
-  const handleSubmitTime = () => {
-    const start_time_min = getStartTimeMin(time);
-    const duration_min = getDurationMin(durationHours, durationMinutes);
-
-    const res = validateTaskTime({ start_time_min, duration_min });
-
-    if (!res.ok) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Time",
-        text2: res.message,
-      });
+  const handleCloseSheet = () => {
+    if (router.canGoBack()) {
+      router.back();
       return;
     }
 
-    dispatch(setTimeSlice({ start_time_min, duration_min }));
-
-    router.back();
+    router.replace(routes.today.href);
   };
 
-  const handleRemoveTime = () => {
-    dispatch(setTimeSlice({ start_time_min: null, duration_min: null }));
-    router.back();
+  const handleSaveStartTime = async (value: number | null) => {
+    if (mode === "edit") {
+      if (!taskId) {
+        throw new Error("Task ID is missing");
+      }
+
+      if (!task) {
+        throw new Error(`Task "${taskId}" is missing from state`);
+      }
+
+      await dispatch(
+        updateTaskTimeAction({
+          taskId,
+          start_time_min: value,
+        }),
+      ).unwrap();
+
+      return;
+    }
+
+    dispatch(
+      setTime({
+        start_time_min: value,
+      }),
+    );
+  };
+
+  const handleTimeChange = (_: unknown, selectedTime?: Date) => {
+    if (!selectedTime) {
+      return;
+    }
+
+    setSelected(selectedTime);
+  };
+
+  const handleSubmitTime = async () => {
+    const validation = validateTaskTime({ start_time_min: selectedTimeMin });
+
+    if (!validation.ok) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Time",
+        text2: validation.message,
+      });
+
+      return;
+    }
+
+    try {
+      await handleSaveStartTime(validation.data);
+      handleCloseSheet();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to Save Time",
+        text2: getErrorMessage(error, "Failed to update task start time"),
+      });
+    }
+  };
+
+  const handleNoTime = async () => {
+    try {
+      await handleSaveStartTime(null);
+      handleCloseSheet();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to Clear Time",
+        text2: getErrorMessage(error, "Failed to clear task start time"),
+      });
+    }
   };
 
   return (
     <SheetWrapper>
       <SheetHeader
         title="Time"
+        onClose={handleCloseSheet}
         onSubmit={handleSubmitTime}
-        submitButtonVisible={true}
-        submitDisabled={false}
+        submitButtonVisible
+        submitDisabled={
+          (mode === "edit" && (!taskId || !task)) ||
+          selectedTimeMin === startTimeMin
+        }
       />
-      <View
-        style={[styles.row, { paddingVertical: 20, paddingHorizontal: 16 }]}
-      >
-        <Text style={styles.label}>Time</Text>
-        {durationHours > 0 || durationMinutes > 0 ? (
-          <View style={styles.badgeRow}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{format(time, timeFormat)}</Text>
-            </View>
-            <Text>-</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {format(endTime, timeFormat)}
-              </Text>
-            </View>
-          </View>
-        ) : (
+      <View style={styles.pickerContainer}>
+        <View style={styles.pickerHeader}>
+          <Text style={styles.label}>Time</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{format(time, timeFormat)}</Text>
+            <Text style={styles.badgeText}>{selectedTimeLabel}</Text>
           </View>
-        )}
+        </View>
+        <View style={styles.pickerWrap}>
+          <DateTimePicker
+            value={selected}
+            mode="time"
+            display="spinner"
+            minuteInterval={5}
+            onChange={handleTimeChange}
+            themeVariant="light"
+            textColor="#111111"
+            style={styles.picker}
+          />
+        </View>
       </View>
-      <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <View style={[styles.row, { paddingBottom: 8 }]}>
-            <Text style={styles.label}>Time</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{format(time, timeFormat)}</Text>
-            </View>
-          </View>
-          <View style={styles.pickerWrap}>
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display="spinner"
-              onChange={handleTimeChange}
-              themeVariant="light"
-              textColor="#111111"
-              style={styles.picker}
+      {startTimeMin !== null && (
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleNoTime}>
+            <SymbolView
+              name="minus.circle"
+              weight="medium"
+              size={22}
+              type="monochrome"
+              tintColor="rgb(67, 67, 67)"
             />
-          </View>
-        </View>
-        <View style={styles.card}>
-          <View style={[styles.row, { paddingBottom: 8 }]}>
-            <Text style={styles.label}>Duration</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{durationLabel}</Text>
-            </View>
-          </View>
-          <View style={styles.durationPickers}>
-            <Picker
-              selectedValue={durationHours}
-              onValueChange={setDurationHours}
-              style={styles.wheel}
-              itemStyle={styles.item}
-            >
-              {Array.from({ length: 24 }, (_, i) => (
-                <Picker.Item
-                  key={i}
-                  label={`${i} h`}
-                  value={i}
-                  color="#111111"
-                />
-              ))}
-            </Picker>
-            <Picker
-              selectedValue={durationMinutes}
-              onValueChange={setDurationMinutes}
-              style={styles.wheel}
-              itemStyle={styles.item}
-            >
-              {minuteOptions.map((minute) => (
-                <Picker.Item
-                  key={minute}
-                  label={`${minute} m`}
-                  value={minute}
-                  color="#111111"
-                />
-              ))}
-            </Picker>
-          </View>
-        </View>
-      </View>
-      {startTimeMin && (
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={handleRemoveTime}>
-            <Text style={styles.buttonText}>Remove</Text>
-          </Pressable>
+            <Text style={styles.buttonText}>No Time</Text>
+          </TouchableOpacity>
         </View>
       )}
     </SheetWrapper>
@@ -195,33 +207,37 @@ const TimeFormSheet = () => {
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    padding: 20,
-    gap: 20,
-  },
-  card: {
-    backgroundColor: "#F3F3F3",
-    borderRadius: 24,
+  pickerContainer: {
+    margin: 20,
     paddingHorizontal: 14,
     paddingTop: 12,
     paddingBottom: 10,
+    backgroundColor: "#F3F3F3",
+    borderRadius: 24,
   },
-  row: {
+  pickerHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#E3E3E3",
+  },
+  pickerWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 8,
+    height: 160,
+    overflow: "hidden",
+  },
+  picker: {
+    width: Platform.OS === "ios" ? 320 : "100%",
+    height: 160,
   },
   label: {
     fontSize: 18,
     color: "#111111",
     fontWeight: "400",
-  },
-  badgeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
   },
   badge: {
     backgroundColor: "#efefef",
@@ -236,49 +252,20 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "rgb(67, 67, 67)",
   },
-  pickerWrap: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 8,
-    height: 160,
-    overflow: "hidden",
-  },
-  picker: {
-    width: Platform.OS === "ios" ? 320 : "100%",
-    height: 160,
-  },
-  durationPickers: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 180,
-  },
-  wheel: {
-    flex: 1,
-  },
-  item: {
-    fontSize: 20,
-  },
-  buttonContainer: {
-    paddingHorizontal: 20,
-    marginTop: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   button: {
-    backgroundColor: "#F3F3F3",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    width: 200,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+    padding: 20,
+  },
+  buttonsContainer: {
+    borderTopColor: "#efefef",
+    borderTopWidth: 1,
   },
   buttonText: {
     fontSize: 16,
+    color: "rgb(67, 67, 67)",
     fontWeight: "500",
-    color: "#DC2626",
   },
 });
 

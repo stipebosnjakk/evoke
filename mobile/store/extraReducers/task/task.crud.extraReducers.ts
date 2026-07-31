@@ -6,11 +6,13 @@ import {
   deleteTaskAction,
   updateTaskAction,
   updateTaskDeadlineAction,
+  updateTaskDurationAction,
   updateTaskInputsAction,
   updateTaskProjectAction,
   updateTaskRepeatDaysAction,
   updateTaskStartDateAction,
   updateTaskStatusAction,
+  updateTaskTimeAction,
 } from "@/store/thunks/task/task.crud.thunks";
 
 export const addCreateTaskExtraReducers = (
@@ -193,7 +195,6 @@ export const addUpdateTaskStartDateExtraReducers = (
 ) => {
   builder
     .addCase(updateTaskStartDateAction.pending, (state) => {
-      state.status = "loading";
       state.error = null;
     })
     .addCase(updateTaskStartDateAction.rejected, (state, action) => {
@@ -202,19 +203,25 @@ export const addUpdateTaskStartDateExtraReducers = (
         action.payload?.message ?? "Failed to update task start date";
     })
     .addCase(updateTaskStartDateAction.fulfilled, (state, action) => {
-      const data = action.payload;
-      const task = state.tasks.byId[data.taskId];
+      const { taskId, start_date, start_time_min, updated_at } = action.payload;
 
-      if (!task) {
+      if (!taskId) {
         state.status = "failed";
-        state.error = `Task "${data.taskId}" is missing from state`;
+        state.error = "Task ID is required";
         return;
       }
 
-      state.tasks.byId[data.taskId] = {
-        ...task,
-        ...data,
-      };
+      const task = state.tasks.byId[taskId];
+
+      if (!task) {
+        state.status = "failed";
+        state.error = `Task "${taskId}" is missing from state`;
+        return;
+      }
+
+      task.start_date = start_date;
+      task.start_time_min = start_time_min;
+      task.updated_at = updated_at;
 
       state.status = "succeeded";
       state.error = null;
@@ -255,7 +262,6 @@ export const addUpdateTaskRepeatDaysExtraReducers = (
 ) => {
   builder
     .addCase(updateTaskRepeatDaysAction.pending, (state) => {
-      state.status = "loading";
       state.error = null;
     })
     .addCase(updateTaskRepeatDaysAction.rejected, (state, action) => {
@@ -265,6 +271,13 @@ export const addUpdateTaskRepeatDaysExtraReducers = (
     })
     .addCase(updateTaskRepeatDaysAction.fulfilled, (state, action) => {
       const { taskId, repeat, updated_at } = action.payload;
+
+      if (!taskId) {
+        state.status = "failed";
+        state.error = "Task ID is required";
+        return;
+      }
+
       const task = state.tasks.byId[taskId];
 
       if (!task) {
@@ -274,6 +287,78 @@ export const addUpdateTaskRepeatDaysExtraReducers = (
       }
 
       task.repeat = repeat;
+      task.updated_at = updated_at;
+
+      state.status = "succeeded";
+      state.error = null;
+    });
+};
+
+export const addUpdateTaskTimeExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskTimeAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateTaskTimeAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message ?? "Failed to update task time";
+    })
+    .addCase(updateTaskTimeAction.fulfilled, (state, action) => {
+      const { taskId, start_time_min, updated_at } = action.payload;
+
+      if (!taskId) {
+        state.status = "failed";
+        state.error = "Task ID is required";
+        return;
+      }
+
+      const task = state.tasks.byId[taskId];
+
+      if (!task) {
+        state.status = "failed";
+        state.error = `Task "${taskId}" is missing from state`;
+        return;
+      }
+
+      task.start_time_min = start_time_min;
+      task.updated_at = updated_at;
+
+      state.status = "succeeded";
+      state.error = null;
+    });
+};
+
+export const addUpdateTaskDurationExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(updateTaskDurationAction.pending, (state) => {
+      state.error = null;
+    })
+    .addCase(updateTaskDurationAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message ?? "Failed to update task duration";
+    })
+    .addCase(updateTaskDurationAction.fulfilled, (state, action) => {
+      const { taskId, duration_min, updated_at } = action.payload;
+
+      if (!taskId) {
+        state.status = "failed";
+        state.error = "Task ID is required";
+        return;
+      }
+
+      const task = state.tasks.byId[taskId];
+
+      if (!task) {
+        state.status = "failed";
+        state.error = `Task "${taskId}" is missing from state`;
+        return;
+      }
+
+      task.duration_min = duration_min;
       task.updated_at = updated_at;
 
       state.status = "succeeded";

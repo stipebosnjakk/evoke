@@ -16,12 +16,14 @@ import {
   addTasksToProjectExtraReducers,
   addUpdateInboxOrderExtraReducers,
   addUpdateTaskDeadlineExtraReducers,
+  addUpdateTaskDurationExtraReducers,
   addUpdateTaskExtraReducers,
   addUpdateTaskInputsExtraReducers,
   addUpdateTaskProjectExtraReducers,
   addUpdateTaskRepeatDaysExtraReducers,
   addUpdateTaskStartDateExtraReducers,
   addUpdateTaskStatusExtraReducers,
+  addUpdateTaskTimeExtraReducers,
 } from "@/store/extraReducers/task";
 
 const tasksSlice = createSlice({
@@ -50,6 +52,8 @@ const tasksSlice = createSlice({
     addUpdateTaskStartDateExtraReducers(builder);
     addUpdateTaskDeadlineExtraReducers(builder);
     addUpdateTaskRepeatDaysExtraReducers(builder);
+    addUpdateTaskTimeExtraReducers(builder);
+    addUpdateTaskDurationExtraReducers(builder);
   },
 });
 

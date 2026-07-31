@@ -8,7 +8,7 @@ import { STATUS_OPTIONS } from "@/constants/status";
 import {
   formatTimeFromMin,
   getDateLabel,
-  getDurationFromDurationMin,
+  getDurationLabel,
   toIsoDate,
 } from "@/utils/date";
 
@@ -30,7 +30,6 @@ const TaskMeta = ({ task }: TaskMetaType) => {
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
 
   const time = formatTimeFromMin(task.start_time_min, locale, is24Hour);
-  const duration = getDurationFromDurationMin(task.duration_min);
   const taskStatus =
     STATUS_OPTIONS.find((option) => option.value === task.status) ?? null;
 
@@ -64,14 +63,8 @@ const TaskMeta = ({ task }: TaskMetaType) => {
     });
   }
 
-  if (duration) {
-    const { hours, minutes } = duration;
-    const label =
-      hours && minutes
-        ? `${hours}h ${minutes}m`
-        : hours
-          ? `${hours}h`
-          : `${minutes}m`;
+  if (task.duration_min) {
+    const label = getDurationLabel(task.duration_min);
 
     meta.push({
       id: "duration",

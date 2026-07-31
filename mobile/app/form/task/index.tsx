@@ -19,8 +19,14 @@ import {
 } from "@/store/thunks/task/task.crud.thunks";
 import { getErrorMessage } from "@/utils/error";
 import { routes } from "@/constants/routes";
-import { formatTimeFromMin, getDateLabel, getRepeatLabel } from "@/utils/date";
+import {
+  formatTimeFromMin,
+  getDateLabel,
+  getDurationLabel,
+  getRepeatLabel,
+} from "@/utils/date";
 import { STATUS_OPTIONS } from "@/constants/status";
+import { selectTaskById } from "@/store/selectors/task.selector";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import {
   clearTaskState,
@@ -55,32 +61,53 @@ const TaskFormSheet = () => {
   const description = useAppSelector(
     (state) => state.formTask.inputs.description,
   );
-  const startDate = useAppSelector((state) => state.formTask.task.start_date);
-  const deadline = useAppSelector((state) => state.formTask.task.deadline);
-  const statusValue = useAppSelector((state) => state.formTask.task.status);
-  const repeatValue = useAppSelector((state) => state.formTask.task.repeat);
-  const startTimeMin = useAppSelector(
+
+  const formStartDate = useAppSelector(
+    (state) => state.formTask.task.start_date,
+  );
+  const formDeadline = useAppSelector((state) => state.formTask.task.deadline);
+  const formStatusValue = useAppSelector((state) => state.formTask.task.status);
+  const formRepeatValue = useAppSelector((state) => state.formTask.task.repeat);
+  const formStartTimeMin = useAppSelector(
     (state) => state.formTask.task.start_time_min,
   );
-  const durationMin = useAppSelector(
+  const formDurationMin = useAppSelector(
     (state) => state.formTask.task.duration_min,
   );
+
+  const task = useAppSelector((state) =>
+    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+  );
+
+  const startDate =
+    mode === "edit" ? (task?.start_date ?? null) : (formStartDate ?? null);
+
+  const deadline =
+    mode === "edit" ? (task?.deadline ?? null) : (formDeadline ?? null);
+
+  const statusValue =
+    mode === "edit" ? (task?.status ?? null) : (formStatusValue ?? null);
+
+  const repeatValue =
+    mode === "edit" ? (task?.repeat ?? null) : (formRepeatValue ?? null);
+
+  const startTimeMin =
+    mode === "edit"
+      ? (task?.start_time_min ?? null)
+      : (formStartTimeMin ?? null);
+
+  const durationMin =
+    mode === "edit" ? (task?.duration_min ?? null) : (formDurationMin ?? null);
 
   const status = STATUS_OPTIONS.find((s) => s.value === statusValue);
   const locale = locales[0]?.languageTag ?? "en-US";
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
 
-  const startTimeLabel = formatTimeFromMin(
-    startTimeMin ?? null,
-    locale,
-    is24Hour,
-  );
-
-  const totalDurationMin =
-    startTimeMin != null && durationMin != null
-      ? startTimeMin + durationMin
-      : null;
-  const durationLabel = formatTimeFromMin(totalDurationMin, locale, is24Hour);
+  const startTimeLabel = formatTimeFromMin(startTimeMin, locale, is24Hour);
+  const startDateLabel = startDate
+    ? [getDateLabel(startDate), startTimeLabel].filter(Boolean).join(" ")
+    : "Date";
+  const durationLabel = getDurationLabel(durationMin);
 
   useEffect(() => {
     return () => {
@@ -109,6 +136,20 @@ const TaskFormSheet = () => {
 
     Toast.hide();
     router.dismissTo(href as any);
+  };
+
+  const handleOpenTaskForm = (pathname: string) => {
+    router.push({
+      pathname,
+      params: taskId
+        ? {
+            mode,
+            taskId,
+          }
+        : {
+            mode,
+          },
+    } as any);
   };
 
   const onSubmit = async () => {
@@ -205,41 +246,31 @@ const TaskFormSheet = () => {
               <Chip
                 icon={status ? status.icon : "tag"}
                 label={status ? status.label : "Status"}
-                onPress={() => {
-                  router.push({
-                    pathname: routes.form_task_status.href,
-                    params: { mode: "create", taskId: undefined },
-                  });
-                }}
+                onPress={() => handleOpenTaskForm(routes.form_task_status.href)}
               />
               <Chip
                 icon="calendar"
-                label={
-                  startDate
-                    ? startTimeLabel
-                      ? durationLabel
-                        ? `${getDateLabel(startDate)} ${startTimeLabel} - ${durationLabel}`
-                        : `${getDateLabel(startDate)} ${startTimeLabel}`
-                      : `${getDateLabel(startDate)}`
-                    : "Date"
-                }
-                onPress={() => {
-                  router.push(routes.form_task_date.href);
-                }}
+                label={startDateLabel}
+                onPress={() => handleOpenTaskForm(routes.form_task_date.href)}
               />
               <Chip
                 icon="calendar.badge.clock"
                 label={deadline ? getDateLabel(deadline) : "Deadline"}
-                onPress={() => {
-                  router.push(routes.form_task_deadline.href);
-                }}
+                onPress={() =>
+                  handleOpenTaskForm(routes.form_task_deadline.href)
+                }
+              />
+              <Chip
+                icon="timer"
+                label={durationLabel ?? "Duration"}
+                onPress={() =>
+                  handleOpenTaskForm(routes.form_task_duration.href)
+                }
               />
               <Chip
                 icon="repeat"
                 label={getRepeatLabel(repeatValue)}
-                onPress={() => {
-                  router.push(routes.form_task_repeat.href);
-                }}
+                onPress={() => handleOpenTaskForm(routes.form_task_repeat.href)}
               />
             </View>
           </ScrollView>

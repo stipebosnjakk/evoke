@@ -26,8 +26,10 @@ import {
 import { STATUS_OPTIONS } from "@/constants/status";
 import {
   validateTaskDeadline,
+  validateTaskDuration,
   validateTaskRepeat,
   validateTaskStartDate,
+  validateTaskTime,
 } from "@/utils/validate";
 import { findTaskById } from "./helper.task.repo";
 
@@ -688,7 +690,6 @@ export type UpdateTaskStartDateArgsType = {
 export type UpdateTaskStartDateType = {
   start_date: IsoDate | null;
   start_time_min: number | null;
-  duration_min: number | null;
   updated_at: number;
 };
 
@@ -721,7 +722,6 @@ export const updateTaskStartDateRepo = async ({
           updateData = {
             start_date: null,
             start_time_min: null,
-            duration_min: null,
             updated_at: now,
           };
         } else {
@@ -737,7 +737,6 @@ export const updateTaskStartDateRepo = async ({
           updateData = {
             start_date: validation.data,
             start_time_min: task.start_time_min,
-            duration_min: task.duration_min,
             updated_at: now,
           };
         }
@@ -808,8 +807,8 @@ export const updateTaskDeadlineRepo = async ({
 };
 
 export type UpdateTaskRepeatDays = {
-  taskId: string;
-  repeat: Weekday[];
+  taskId: string | null;
+  repeat: Weekday[] | null;
 };
 
 export type UpdateTaskRepeatDaysReturnType = UpdateTaskRepeatDays & {
@@ -841,7 +840,7 @@ export const updateTaskRepeatDaysRepo = async ({
       const now = getUnixTime(new Date());
 
       const update = {
-        repeat,
+        repeat: validation.data,
         updated_at: now,
       };
 
@@ -854,5 +853,107 @@ export const updateTaskRepeatDaysRepo = async ({
     });
   } catch (error) {
     return throwDbError(error, "Failed to update repeat days");
+  }
+};
+
+export type UpdateTaskTimeArgs = {
+  taskId: string | null;
+  start_time_min: number | null;
+};
+
+export type UpdateTaskTimeReturnType = UpdateTaskTimeArgs & {
+  updated_at: number;
+};
+
+export const updateTaskTimeRepo = async ({
+  taskId,
+  start_time_min,
+}: UpdateTaskTimeArgs): Promise<UpdateTaskTimeReturnType> => {
+  try {
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    return await db.transaction(async (tx) => {
+      const task = await findTaskById({ taskId, tx });
+
+      if (!task) {
+        throw new Error(`Task "${taskId}" does not exist`);
+      }
+
+      const validation = validateTaskTime({ start_time_min });
+
+      if (!validation.ok) {
+        throw new Error(validation.message);
+      }
+
+      const now = getUnixTime(new Date());
+
+      const update = {
+        start_time_min: validation.data,
+        updated_at: now,
+      };
+
+      await tx.update(tasks).set(update).where(eq(tasks.id, taskId));
+
+      return {
+        ...update,
+        taskId,
+      };
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to update time");
+  }
+};
+
+export type UpdateTaskDurationArgs = {
+  taskId: string;
+  duration_min: number | null;
+};
+
+export type UpdateTaskDurationReturnType = {
+  taskId: string;
+  duration_min: number | null;
+  updated_at: number;
+};
+
+export const updateTaskDurationRepo = async ({
+  taskId,
+  duration_min,
+}: UpdateTaskDurationArgs): Promise<UpdateTaskDurationReturnType> => {
+  try {
+    if (!taskId) {
+      throw new Error("Task ID is required");
+    }
+
+    return await db.transaction(async (tx) => {
+      const task = await findTaskById({ taskId, tx });
+
+      if (!task) {
+        throw new Error(`Task "${taskId}" does not exist`);
+      }
+
+      const validation = validateTaskDuration({ duration_min });
+
+      if (!validation.ok) {
+        throw new Error(validation.message);
+      }
+
+      const now = getUnixTime(new Date());
+
+      const update = {
+        duration_min: validation.data,
+        updated_at: now,
+      };
+
+      await tx.update(tasks).set(update).where(eq(tasks.id, taskId));
+
+      return {
+        ...update,
+        taskId,
+      };
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to update duration");
   }
 };

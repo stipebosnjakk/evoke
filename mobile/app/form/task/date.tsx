@@ -54,10 +54,6 @@ const DateFormSheet = () => {
     (state) => state.formTask.task.start_time_min,
   );
 
-  const formDurationMin = useAppSelector(
-    (state) => state.formTask.task.duration_min,
-  );
-
   const task = useAppSelector((state) =>
     mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
   );
@@ -73,9 +69,6 @@ const DateFormSheet = () => {
       ? (task?.start_time_min ?? null)
       : (formStartTimeMin ?? null);
 
-  const durationMin =
-    mode === "edit" ? (task?.duration_min ?? null) : (formDurationMin ?? null);
-
   const [isDateInputOpen, setIsDateInputOpen] = useState(false);
   const [selected, setSelected] = useState<IsoDate | null>(startDate);
 
@@ -87,13 +80,6 @@ const DateFormSheet = () => {
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
 
   const startTimeLabel = formatTimeFromMin(startTimeMin, locale, is24Hour);
-
-  const endTimeMin =
-    startTimeMin !== null && durationMin !== null
-      ? startTimeMin + durationMin
-      : null;
-
-  const endTimeLabel = formatTimeFromMin(endTimeMin, locale, is24Hour);
 
   const maxDateValue = minDate("start_date", deadline);
 
@@ -136,7 +122,6 @@ const DateFormSheet = () => {
       dispatch(
         setTime({
           start_time_min: null,
-          duration_min: null,
         }),
       );
     }
@@ -277,17 +262,9 @@ const DateFormSheet = () => {
                 <Text style={styles.buttonText}>Time</Text>
               </View>
               <View style={styles.buttonContent}>
-                {!startTimeLabel && !endTimeLabel && (
-                  <Text style={styles.sideButtonText}>None</Text>
-                )}
-                {startTimeLabel && !endTimeLabel && (
-                  <Text style={styles.sideButtonText}>{startTimeLabel}</Text>
-                )}
-                {startTimeLabel && endTimeLabel && (
-                  <Text style={styles.sideButtonText}>
-                    {startTimeLabel} - {endTimeLabel}
-                  </Text>
-                )}
+                <Text style={styles.sideButtonText}>
+                  {startTimeLabel ?? "None"}
+                </Text>
                 <SymbolView
                   name="chevron.right"
                   weight="light"

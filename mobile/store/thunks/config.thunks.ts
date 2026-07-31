@@ -58,4 +58,3 @@ export const updateScreenViewAction =
       dispatch(setUserConfigError(message));
     }
   };
-

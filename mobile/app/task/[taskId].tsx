@@ -19,7 +19,7 @@ import { isBefore, parseISO, startOfToday } from "date-fns";
 import {
   formatTimeFromMin,
   getDateLabel,
-  getDurationFromDurationMin,
+  getDurationLabel,
   getRepeatLabel,
 } from "@/utils/date";
 import { useCalendars, useLocales } from "expo-localization";
@@ -99,12 +99,6 @@ const TaskScreen = () => {
     });
   };
 
-  const time = formatTimeFromMin(task.start_time_min, locale, is24Hour);
-  const duration = getDurationFromDurationMin(task.duration_min);
-
-  const status =
-    STATUS_OPTIONS.find((option) => option.value === task.status) ?? null;
-
   const addDetails: ChipType[] = [];
   const meta: ChipType[] = [];
 
@@ -140,7 +134,27 @@ const TaskScreen = () => {
     });
   }
 
-  if (status) {
+  if (task.status) {
+    const status =
+      STATUS_OPTIONS.find((option) => option.value === task.status) ?? null;
+
+    if (!status) {
+      addDetails.push({
+        id: "status",
+        icon: "tag",
+        label: "Status",
+        onPress: () =>
+          router.push({
+            pathname: routes.form_task_status.href,
+            params: {
+              mode: "edit",
+              taskId: task.id,
+            },
+          }),
+      });
+      return;
+    }
+
     meta.push({
       id: "status",
       icon: status.icon,
@@ -188,6 +202,38 @@ const TaskScreen = () => {
           },
         }),
     });
+
+    if (task.start_time_min) {
+      const time = formatTimeFromMin(task.start_time_min, locale, is24Hour);
+
+      meta.push({
+        id: "time",
+        icon: "clock",
+        label: time ?? "Time",
+        onPress: () =>
+          router.push({
+            pathname: routes.form_task_time.href,
+            params: {
+              mode: "edit",
+              taskId,
+            },
+          }),
+      });
+    } else {
+      addDetails.push({
+        id: "time",
+        icon: "clock",
+        label: "Time",
+        onPress: () =>
+          router.push({
+            pathname: routes.form_task_time.href,
+            params: {
+              mode: "edit",
+              taskId,
+            },
+          }),
+      });
+    }
   } else {
     addDetails.push({
       id: "start_date",
@@ -234,46 +280,36 @@ const TaskScreen = () => {
     });
   }
 
-  if (task.start_date) {
-    if (time) {
-      meta.push({
-        id: "time",
-        icon: "clock",
-        label: time,
-        onPress: () => router.push(routes.form_task_time.href),
-      });
-    } else {
-      addDetails.push({
-        id: "time",
-        icon: "clock",
-        label: "Time",
-        onPress: () => router.push(routes.form_task_time.href),
-      });
-    }
+  if (task.duration_min) {
+    const label = getDurationLabel(task.duration_min);
 
-    if (duration) {
-      const { hours, minutes } = duration;
-      const label =
-        hours && minutes
-          ? `${hours}h ${minutes}m`
-          : hours
-            ? `${hours}h`
-            : `${minutes}m`;
-
-      meta.push({
-        id: "duration",
-        icon: "timer",
-        label,
-        onPress: () => router.push(routes.form_task_time.href),
-      });
-    } else {
-      addDetails.push({
-        id: "duration",
-        icon: "timer",
-        label: "Duration",
-        onPress: () => router.push(routes.form_task_time.href),
-      });
-    }
+    meta.push({
+      id: "duration",
+      icon: "timer",
+      label,
+      onPress: () =>
+        router.push({
+          pathname: routes.form_task_duration.href,
+          params: {
+            mode: "edit",
+            taskId,
+          },
+        }),
+    });
+  } else {
+    addDetails.push({
+      id: "duration",
+      icon: "timer",
+      label: "Duration",
+      onPress: () =>
+        router.push({
+          pathname: routes.form_task_duration.href,
+          params: {
+            mode: "edit",
+            taskId,
+          },
+        }),
+    });
   }
 
   if (task.repeat?.length) {

@@ -351,43 +351,22 @@ export const validateTaskDeadline = ({
   };
 };
 
-type ValidatedTaskTime = {
+type ValidateTaskTime = {
   start_time_min: number | null;
-  duration_min: number | null;
-};
-
-type ValidateTaskTimeArgs = {
-  start_time_min: unknown;
-  duration_min: unknown;
 };
 
 export const validateTaskTime = ({
   start_time_min,
-  duration_min,
-}: ValidateTaskTimeArgs): ValidationResult<ValidatedTaskTime> => {
+}: ValidateTaskTime): ValidationResult<number | null> => {
   const minStart = 0;
-  const maxStart = 1439;
-  const maxDuration = 1439;
-
-  // A duration of 0 is treated as no duration.
-  const normalizedDuration = duration_min === 0 ? null : duration_min;
+  const maxStart = 23 * 60 + 55;
+  const minuteStep = 5;
 
   if (start_time_min === null || start_time_min === undefined) {
-    if (normalizedDuration !== null && normalizedDuration !== undefined) {
-      return {
-        ok: false,
-        data: null,
-        message: "Duration can't be set without a start time",
-      };
-    }
-
     return {
       ok: true,
-      data: {
-        start_time_min: null,
-        duration_min: null,
-      },
-      message: "Time cleared successfully",
+      data: null,
+      message: "Start time cleared successfully",
     };
   }
 
@@ -403,18 +382,42 @@ export const validateTaskTime = ({
     return {
       ok: false,
       data: null,
-      message: "Start time must be between 00:00 and 23:59",
+      message: "Start time must be between 00:00 and 23:55",
     };
   }
+
+  if (start_time_min % minuteStep !== 0) {
+    return {
+      ok: false,
+      data: null,
+      message: "Start time must be in 5-minute increments",
+    };
+  }
+
+  return {
+    ok: true,
+    data: start_time_min,
+    message: "Start time saved successfully",
+  };
+};
+
+type ValidateTaskDuration = {
+  duration_min: number | null;
+};
+
+export const validateTaskDuration = ({
+  duration_min,
+}: ValidateTaskDuration): ValidationResult<number | null> => {
+  const maxDuration = 24 * 60 - 1;
+  const durationStep = 5;
+
+  const normalizedDuration = duration_min === 0 ? null : duration_min;
 
   if (normalizedDuration === null || normalizedDuration === undefined) {
     return {
       ok: true,
-      data: {
-        start_time_min,
-        duration_min: null,
-      },
-      message: "Start time saved successfully",
+      data: null,
+      message: "Duration cleared successfully",
     };
   }
 
@@ -445,13 +448,18 @@ export const validateTaskTime = ({
     };
   }
 
+  if (normalizedDuration % durationStep !== 0) {
+    return {
+      ok: false,
+      data: null,
+      message: "Duration must be in 5-minute increments",
+    };
+  }
+
   return {
     ok: true,
-    data: {
-      start_time_min,
-      duration_min: normalizedDuration,
-    },
-    message: "Time saved successfully",
+    data: normalizedDuration,
+    message: "Duration saved successfully",
   };
 };
 

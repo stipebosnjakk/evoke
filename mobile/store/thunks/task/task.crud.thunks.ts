@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import { RootState } from "@/store/store";
-import { CreatedTask, RejectWithValue, TaskStatus } from "@/types/task.types";
 import { getErrorMessage } from "@/utils/error";
+import { CreatedTask, RejectWithValue, TaskStatus } from "@/types/task.types";
 import {
   createTaskRepo,
   UpdateTaskReturnType,
@@ -24,6 +24,12 @@ import {
   UpdateTaskRepeatDaysReturnType,
   UpdateTaskRepeatDays,
   updateTaskRepeatDaysRepo,
+  updateTaskTimeRepo,
+  UpdateTaskTimeReturnType,
+  UpdateTaskTimeArgs,
+  UpdateTaskDurationReturnType,
+  UpdateTaskDurationArgs,
+  updateTaskDurationRepo,
 } from "@/db/repositories/task/task.crud.repo";
 
 export const createTaskAction = createAsyncThunk<
@@ -66,12 +72,6 @@ export const updateTaskAction = createAsyncThunk<
   }
 >("tasks/updateTask", async ({ taskId }, { getState, rejectWithValue }) => {
   try {
-    if (!taskId.trim()) {
-      return rejectWithValue({
-        message: "Task ID is required",
-      });
-    }
-
     const state = getState();
     const { formTask } = state;
 
@@ -81,15 +81,15 @@ export const updateTaskAction = createAsyncThunk<
       });
     }
 
-    const result = await updateTaskRepo(taskId, formTask.task);
+    const res = await updateTaskRepo(taskId, formTask.task);
 
-    if (!result.task) {
+    if (!res.task) {
       return rejectWithValue({
         message: "Task was not updated properly",
       });
     }
 
-    return result;
+    return res;
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to update task"),
@@ -103,8 +103,8 @@ export const deleteTaskAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/deleteTask", async ({ taskId }, { rejectWithValue }) => {
   try {
-    const data = await deleteTaskRepo(taskId);
-    return data;
+    const res = await deleteTaskRepo(taskId);
+    return res;
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to delete task"),
@@ -124,8 +124,8 @@ export const updateTaskInputsAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/updateInputs", async (taskInfo, { rejectWithValue }) => {
   try {
-    const data = await updateTaskInputsRepo(taskInfo);
-    return data;
+    const res = await updateTaskInputsRepo(taskInfo);
+    return res;
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to update task inputs"),
@@ -144,8 +144,8 @@ export const updateTaskStatusAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/updateStatus", async (taskInfo, { rejectWithValue }) => {
   try {
-    const data = await updateTaskStatusRepo(taskInfo);
-    return data;
+    const res = await updateTaskStatusRepo(taskInfo);
+    return res;
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to update task status"),
@@ -164,13 +164,8 @@ export const updateTaskProjectAction = createAsyncThunk<
   { rejectValue: RejectWithValue }
 >("tasks/updateProject", async (taskInfo, { rejectWithValue }) => {
   try {
-    if (!taskInfo.taskId.trim()) {
-      return rejectWithValue({
-        message: "Task ID is required",
-      });
-    }
-
-    return await updateTaskProjectRepo(taskInfo);
+    const res = await updateTaskProjectRepo(taskInfo);
+    return res;
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to update task project"),
@@ -219,6 +214,36 @@ export const updateTaskRepeatDaysAction = createAsyncThunk<
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to update task repeat days"),
+    });
+  }
+});
+
+export const updateTaskTimeAction = createAsyncThunk<
+  UpdateTaskTimeReturnType,
+  UpdateTaskTimeArgs,
+  { rejectValue: RejectWithValue }
+>("tasks/updateTime", async (data, { rejectWithValue }) => {
+  try {
+    const res = await updateTaskTimeRepo(data);
+    return res;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task time"),
+    });
+  }
+});
+
+export const updateTaskDurationAction = createAsyncThunk<
+  UpdateTaskDurationReturnType,
+  UpdateTaskDurationArgs,
+  { rejectValue: RejectWithValue }
+>("tasks/updateDuration", async (data, { rejectWithValue }) => {
+  try {
+    const res = await updateTaskDurationRepo(data);
+    return res;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to update task duration"),
     });
   }
 });

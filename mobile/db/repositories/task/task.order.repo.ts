@@ -37,6 +37,8 @@ export const updateTaskOrderKeysRepo = async (
           );
       }
     });
+
+    return { scopeId, orderArray };
   } catch (error: unknown) {
     return throwDbError(error, "Failed to update order keys");
   }

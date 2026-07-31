@@ -15,6 +15,7 @@ import {
   clearCreateTaskErrorReducer,
   setProjectIdReducer,
   editTaskReducer,
+  setDurationReducer,
 } from "@/store/reducers/formTask.reducer";
 
 const formTaskSlice = createSlice({
@@ -27,6 +28,7 @@ const formTaskSlice = createSlice({
     setRepeat: setRepeatReducer,
     setStartDate: setStartDateReducer,
     setTime: setTimeReducer,
+    setDuration: setDurationReducer,
     setDeadline: setDeadlineReducer,
     setProjectId: setProjectIdReducer,
     validateTextInputs: validateTextInputsReducer,
@@ -44,6 +46,7 @@ export const {
   setRepeat,
   setStartDate,
   setTime,
+  setDuration,
   setDeadline,
   setProjectId,
   validateTextInputs,

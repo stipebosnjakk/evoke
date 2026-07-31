@@ -10,6 +10,8 @@ import Task from "@/components/task/Task";
 import { TODAY_SCOPE_ID } from "@/constants/scopeIds";
 import ErrorView from "@/components/ui/ErrorView";
 
+// TODO: after selecting duration we can't select 31 or today date on start date
+
 const TodayScreen = () => {
   const insets = useSafeAreaInsets();
 

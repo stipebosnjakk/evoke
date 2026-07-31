@@ -272,3 +272,51 @@ export const getNextRepeatDate = (
   return toIsoDate(addDays(fromDate, closestOffset));
 };
 
+/**
+ * Converts minutes from midnight into a Date suitable for a time picker.
+ * When no time is provided, it returns the current time.
+ */
+export const getTimePickerDate = (startTimeMin: number | null): Date => {
+  const date = new Date();
+
+  if (startTimeMin !== null) {
+    const hours = Math.floor(startTimeMin / 60);
+    const minutes = startTimeMin % 60;
+
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  }
+
+  const minuteStep = 5;
+  const currentTimeMin = date.getHours() * 60 + date.getMinutes();
+  const roundedTimeMin = Math.min(
+    Math.ceil(currentTimeMin / minuteStep) * minuteStep,
+    23 * 60 + 55,
+  );
+
+  date.setHours(Math.floor(roundedTimeMin / 60), roundedTimeMin % 60, 0, 0);
+
+  return date;
+};
+
+/**
+ * Turns duration minutes into a UI label.
+ * Examples: 260 becomes "4h 20m", 20 becomes "20m", and 240 becomes "4h".
+ * @param durationMin Duration in minutes
+ */
+export const getDurationLabel = (
+  durationMin: number | null | undefined,
+): string => {
+  if (durationMin == null || durationMin <= 0) return "Duration";
+
+  const duration = getDurationFromDurationMin(durationMin);
+
+  if (!duration) return "Duration";
+
+  const parts = [
+    duration.hours > 0 ? `${duration.hours}h` : null,
+    duration.minutes > 0 ? `${duration.minutes}m` : null,
+  ];
+
+  return parts.filter((part): part is string => part !== null).join(" ");
+};

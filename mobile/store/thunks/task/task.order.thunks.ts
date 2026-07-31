@@ -17,8 +17,8 @@ export const updateOrderKeysAction = createAsyncThunk<
   "order/updateOrderKeys",
   async ({ orderArray, scopeId }, { rejectWithValue }) => {
     try {
-      await updateTaskOrderKeysRepo(orderArray, scopeId);
-      return { orderArray, scopeId };
+      const res = await updateTaskOrderKeysRepo(orderArray, scopeId);
+      return res;
     } catch (error) {
       return rejectWithValue({
         message: getErrorMessage(error, "Failed to update order keys"),
