@@ -5,7 +5,7 @@ import { IsoDate, TaskStatusOptionsArray, Weekday } from "@/types/task.types";
 import { isValidIsoDate } from "@/utils/date";
 
 type ValidateTaskStatusArgs = {
-  status: unknown;
+  status: TaskStatusOptionsArray | null;
 };
 
 export const validateTaskStatus = ({
@@ -47,13 +47,26 @@ export const validateTaskStatus = ({
 };
 
 type ValidateTaskRepeatArgs = {
-  repeatDays: unknown;
+  repeatDays: Weekday[] | null;
+  start_date: IsoDate | null;
+  start_time_min: number | null;
 };
 
 export const validateTaskRepeat = ({
   repeatDays,
+  start_date,
+  start_time_min,
 }: ValidateTaskRepeatArgs): ValidationResult<Weekday[] | null> => {
   if (repeatDays === null || repeatDays === undefined) {
+    if (start_time_min && !start_date) {
+      return {
+        ok: false,
+        data: null,
+        message:
+          "Select a start date or recurrence before setting a start time",
+      };
+    }
+
     return {
       ok: true,
       data: null,
@@ -104,7 +117,7 @@ export const validateTaskRepeat = ({
 };
 
 type ValidateTaskTitleArgs = {
-  title: unknown;
+  title: string | null;
 };
 
 export const validateTaskTitle = ({
@@ -144,7 +157,7 @@ export const validateTaskTitle = ({
 };
 
 type ValidateTaskDescriptionArgs = {
-  description: unknown;
+  description: string | null;
 };
 
 export const validateTaskDescription = ({
@@ -192,22 +205,25 @@ export const validateTaskDescription = ({
 };
 
 type ValidateTaskStartDateArgs = {
-  start_date: unknown;
-  deadline: unknown;
+  start_date: IsoDate | null;
+  deadline: IsoDate | null;
   start_time_min: number | null;
+  repeat: Weekday[] | null;
 };
 
 export const validateTaskStartDate = ({
   start_date,
   deadline,
   start_time_min,
+  repeat,
 }: ValidateTaskStartDateArgs): ValidationResult<IsoDate | null> => {
-  if (start_date === null || start_date === undefined || start_date === "") {
-    if (start_time_min) {
+  if (start_date === null || start_date === undefined) {
+    if (start_time_min && (!repeat || !repeat.length)) {
       return {
         ok: false,
         data: null,
-        message: "Time can't be selected without date",
+        message:
+          "Select a start date or recurrence before setting a start time",
       };
     }
 
@@ -244,7 +260,7 @@ export const validateTaskStartDate = ({
     };
   }
 
-  if (deadline !== null && deadline !== undefined && deadline !== "") {
+  if (deadline !== null && deadline !== undefined) {
     if (typeof deadline !== "string") {
       return {
         ok: false,
@@ -282,15 +298,15 @@ export const validateTaskStartDate = ({
 };
 
 type ValidateTaskDeadlineArgs = {
-  deadline: unknown;
-  startDate?: unknown;
+  deadline: IsoDate | null;
+  startDate?: IsoDate | null;
 };
 
 export const validateTaskDeadline = ({
   deadline,
   startDate,
 }: ValidateTaskDeadlineArgs): ValidationResult<IsoDate | null> => {
-  if (deadline === null || deadline === undefined || deadline === "") {
+  if (deadline === null || deadline === undefined) {
     return {
       ok: true,
       data: null,
@@ -324,7 +340,7 @@ export const validateTaskDeadline = ({
     };
   }
 
-  if (startDate !== null && startDate !== undefined && startDate !== "") {
+  if (startDate !== null && startDate !== undefined) {
     if (typeof startDate !== "string") {
       return {
         ok: false,
@@ -363,10 +379,14 @@ export const validateTaskDeadline = ({
 
 type ValidateTaskTime = {
   start_time_min: number | null;
+  start_date: IsoDate | null;
+  repeat: Weekday[] | null;
 };
 
 export const validateTaskTime = ({
   start_time_min,
+  start_date,
+  repeat,
 }: ValidateTaskTime): ValidationResult<number | null> => {
   const minStart = 0;
   const maxStart = 23 * 60 + 55;
@@ -404,6 +424,13 @@ export const validateTaskTime = ({
     };
   }
 
+  if (start_time_min && (!repeat || !repeat.length) && !start_date) {
+    return {
+      ok: false,
+      data: null,
+      message: "Select a start date or recurrence before setting a start time",
+    };
+  }
   return {
     ok: true,
     data: start_time_min,
@@ -474,7 +501,7 @@ export const validateTaskDuration = ({
 };
 
 type ValidateProjectNameArgs = {
-  name: unknown;
+  name: string | null;
 };
 
 export const validateProjectName = ({
@@ -514,7 +541,7 @@ export const validateProjectName = ({
 };
 
 type ValidateProjectColorArgs = {
-  color: unknown;
+  color: string | null;
 };
 
 export const validateProjectColor = ({
