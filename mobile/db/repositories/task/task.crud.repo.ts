@@ -188,7 +188,7 @@ export const updateTaskRepo = async (
         project_id: task.project_id ?? null,
         start_date: task.start_date ?? null,
         start_time_min: task.start_date ? (task.start_time_min ?? null) : null,
-        duration_min: task.start_date ? (task.duration_min ?? null) : null,
+        duration_min: task.duration_min ?? null,
         deadline: task.deadline ?? null,
         repeat: normalizedStatus === "next" ? normalizedRepeat : null,
       };
@@ -199,14 +199,6 @@ export const updateTaskRepo = async (
         normalizedTask.start_date > normalizedTask.deadline
       ) {
         throw new Error("Start date cannot be after deadline");
-      }
-
-      if (
-        normalizedTask.duration_min !== null &&
-        normalizedTask.duration_min !== undefined &&
-        normalizedTask.start_time_min === null
-      ) {
-        throw new Error("Duration cannot be set without a start time");
       }
 
       if (normalizedTask.project_id) {

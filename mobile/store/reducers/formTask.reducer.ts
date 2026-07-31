@@ -101,7 +101,6 @@ export const setStartDateReducer = (
   if (res.ok && res.data === null) {
     state.task.start_date = null;
     state.task.start_time_min = null;
-    state.task.duration_min = null;
     state.error = null;
     return;
   }
