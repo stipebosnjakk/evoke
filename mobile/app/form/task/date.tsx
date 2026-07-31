@@ -127,34 +127,29 @@ const DateFormSheet = () => {
     }
   };
 
-  const handleNewStartDateSelect = (date: IsoDate | null) => {
-    const validation = validateTaskStartDate({
-      start_date: date,
-      deadline: deadline,
-    });
-
-    if (!validation.ok) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Start Date",
-        text2: validation.message,
-      });
-
-      return;
-    }
-
-    setSelected(validation.data);
-  };
-
   const handleSubmitDate = async () => {
     if (isDateInputOpen) {
       inputRef.current?.blur();
       setIsDateInputOpen(false);
     }
 
-    try {
-      await handleSaveStartDate(selected);
+    const validation = validateTaskStartDate({
+      start_date: selected,
+      deadline,
+      start_time_min: startTimeMin,
+    });
 
+    if (!validation.ok) {
+      Toast.show({
+        type: "error",
+        text1: validation.message,
+      });
+
+      return;
+    }
+
+    try {
+      await handleSaveStartDate(validation.data);
       handleCloseSheet();
     } catch (error) {
       Toast.show({
@@ -229,7 +224,7 @@ const DateFormSheet = () => {
         isOpen={isDateInputOpen}
         setIsOpen={setIsDateInputOpen}
         dateValue={selected}
-        handleNewDateSelect={handleNewStartDateSelect}
+        handleNewDateSelect={setSelected}
       />
       {!isDateInputOpen && (
         <>
@@ -238,12 +233,12 @@ const DateFormSheet = () => {
               type="start_date"
               selectedStartDate={selected}
               selectedDeadline={deadline}
-              handleNewDateSelect={handleNewStartDateSelect}
+              handleNewDateSelect={setSelected}
             />
             <CalendarView
               maxDate={maxDateValue}
               selected={selected}
-              setSelected={handleNewStartDateSelect}
+              setSelected={setSelected}
             />
           </View>
           <View style={styles.buttonsContainer}>

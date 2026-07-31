@@ -101,9 +101,14 @@ const DeadlineFormSheet = () => {
     );
   };
 
-  const handleNewDeadlineSelect = (date: IsoDate | null) => {
+  const handleSubmitDeadline = async () => {
+    if (isDateInputOpen) {
+      inputRef.current?.blur();
+      setIsDateInputOpen(false);
+    }
+
     const validation = validateTaskDeadline({
-      deadline: date,
+      deadline: selected,
       startDate,
     });
 
@@ -115,15 +120,6 @@ const DeadlineFormSheet = () => {
       });
 
       return;
-    }
-
-    setSelected(validation.data);
-  };
-
-  const handleSubmitDeadline = async () => {
-    if (isDateInputOpen) {
-      inputRef.current?.blur();
-      setIsDateInputOpen(false);
     }
 
     try {
@@ -181,7 +177,7 @@ const DeadlineFormSheet = () => {
         isOpen={isDateInputOpen}
         setIsOpen={setIsDateInputOpen}
         dateValue={selected}
-        handleNewDateSelect={handleNewDeadlineSelect}
+        handleNewDateSelect={setSelected}
       />
       {!isDateInputOpen && (
         <>
@@ -190,12 +186,12 @@ const DeadlineFormSheet = () => {
               type="deadline"
               selectedStartDate={startDate}
               selectedDeadline={selected}
-              handleNewDateSelect={handleNewDeadlineSelect}
+              handleNewDateSelect={setSelected}
             />
             <CalendarView
               minDate={minDeadlineDate}
               selected={selected}
-              setSelected={handleNewDeadlineSelect}
+              setSelected={setSelected}
             />
           </View>
           <View style={styles.buttonsContainer}>

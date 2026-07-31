@@ -91,6 +91,7 @@ export const setStartDateReducer = (
   const res = validateTaskStartDate({
     start_date: action.payload.start_date,
     deadline: state.task.deadline ?? null,
+    start_time_min: state.task.start_time_min ?? null,
   });
 
   if (!res.ok) {
@@ -140,10 +141,6 @@ export const setTimeReducer = (
   if (!res.ok) {
     state.error = res.message;
     return;
-  }
-
-  if (res.data !== null && !state.task.start_date) {
-    state.task.start_date = toIsoDate(new Date());
   }
 
   state.task.start_time_min = res.data;

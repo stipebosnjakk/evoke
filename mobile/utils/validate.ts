@@ -194,13 +194,23 @@ export const validateTaskDescription = ({
 type ValidateTaskStartDateArgs = {
   start_date: unknown;
   deadline: unknown;
+  start_time_min: number | null;
 };
 
 export const validateTaskStartDate = ({
   start_date,
   deadline,
+  start_time_min,
 }: ValidateTaskStartDateArgs): ValidationResult<IsoDate | null> => {
   if (start_date === null || start_date === undefined || start_date === "") {
+    if (start_time_min) {
+      return {
+        ok: false,
+        data: null,
+        message: "Time can't be selected without date",
+      };
+    }
+
     return {
       ok: true,
       data: null,

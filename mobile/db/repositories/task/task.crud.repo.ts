@@ -720,6 +720,7 @@ export const updateTaskStartDateRepo = async ({
           const validation = validateTaskStartDate({
             start_date,
             deadline: task.deadline,
+            start_time_min: task.start_time_min,
           });
 
           if (!validation.ok) {
