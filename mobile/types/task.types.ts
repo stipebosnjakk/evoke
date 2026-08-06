@@ -13,7 +13,8 @@ export type TaskStatusOption = (typeof STATUS_OPTIONS)[number];
 
 export type CreatedTask = {
   task: TaskStateData;
-  order_key: number | null;
+  inboxOrderKey: number | null;
+  projectOrderKey: number | null;
 };
 
 export type TaskWithOrderKey = {

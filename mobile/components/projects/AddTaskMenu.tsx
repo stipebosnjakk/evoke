@@ -24,7 +24,12 @@ const AddTaskMenu = ({ projectId }: AddTaskMenuType) => {
 
   const navigateToTaskCreate = () => {
     dispatch(setProjectId({ projectId }));
-    router.push(routes.form_task.href);
+    router.push({
+      pathname: routes.form_task.href,
+      params: {
+        mode: "create",
+      },
+    });
   };
 
   const navigateToAddExistingTasks = () => {

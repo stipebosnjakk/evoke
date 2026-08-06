@@ -68,9 +68,9 @@ export const addCreateProjectTaskExtraReducers = (
   builder: ActionReducerMapBuilder<ProjectsState>,
 ) => {
   builder.addCase(createTaskAction.fulfilled, (state, action) => {
-    const { task, order_key } = action.payload;
+    const { task, projectOrderKey } = action.payload;
 
-    if (!task.project_id || order_key === null) return;
+    if (!task.project_id || projectOrderKey === null) return;
 
     const project = state.projects.byId[task.project_id];
 
@@ -78,7 +78,7 @@ export const addCreateProjectTaskExtraReducers = (
 
     project.tasks.push({
       id: task.id,
-      order_key,
+      order_key: projectOrderKey,
     });
   });
 };

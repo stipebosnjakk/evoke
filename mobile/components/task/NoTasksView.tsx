@@ -18,7 +18,12 @@ const NoTasksView = ({
   const router = useRouter();
 
   const navigateToCreateModal = () => {
-    router.push(routes.form_task.href);
+    router.push({
+      pathname: routes.form_task.href,
+      params: {
+        mode: "create",
+      },
+    });
   };
 
   const navigateToUpcoming = () => {

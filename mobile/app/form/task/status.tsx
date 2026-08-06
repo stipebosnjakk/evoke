@@ -15,10 +15,10 @@ import Info from "@/components/ui/Info";
 import { updateTaskStatusAction } from "@/store/thunks/task/task.crud.thunks";
 import { getErrorMessage } from "@/utils/error";
 import { selectTaskById } from "@/store/selectors/task.selector";
-import { ModeType } from "@/types/initialState.types";
+import { ScopeParams } from "@/types/initialState.types";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  scope?: ScopeParams;
   taskId?: string;
 };
 
@@ -26,39 +26,36 @@ const StatusFormSheet = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+  const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
   const formRepeat = useAppSelector((state) => state.formTask.task.repeat);
   const formStatus = useAppSelector((state) => state.formTask.task.status);
-
   const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+    taskId ? selectTaskById(state, taskId) : null,
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedStatus = mode === "edit" ? task?.status : formStatus;
+  const selectedStatus =
+    formStatus !== undefined ? formStatus : (task?.status ?? null);
+  const repeat = formRepeat !== undefined ? formRepeat : (task?.repeat ?? null);
+
+  const hasRepeat = Boolean(repeat?.length);
 
   const handleCreateStatus = (option: TaskStatusOption) => {
     const nextOption = formStatus === option.value ? null : option;
+    const validation = validateTaskStatus({ status: nextOption, repeat });
 
-    const result = validateTaskStatus({ status: nextOption });
-
-    if (!result.ok) {
-      throw new Error(result.message || "Invalid task status");
-    }
-
-    if (formRepeat?.length && result?.data?.value !== "next") {
+    if (!validation.ok) {
       Toast.show({
-        type: "info",
-        text1: "A repeating task must have the Next status",
+        type: "error",
+        text1: validation.message || "Invalid task status",
       });
-      return;
     }
 
     dispatch(
       setStatus({
-        status: result.data,
+        status: validation.data,
       }),
     );
 
@@ -72,24 +69,21 @@ const StatusFormSheet = () => {
 
     const nextOption = task?.status === option.value ? null : option;
 
-    const result = validateTaskStatus({ status: nextOption });
+    const validation = validateTaskStatus({ status: nextOption, repeat });
 
-    if (!result.ok) {
-      throw new Error(result.message || "Invalid task status");
-    }
-
-    if (task?.repeat?.length && result.data?.value !== "next") {
+    if (!validation.ok) {
       Toast.show({
-        type: "info",
-        text1: "A repeating task must have the Next status",
+        type: "error",
+        text1: validation.message || "Invalid task status",
       });
-      return;
     }
+
+    const status = validation.data?.value ?? null;
 
     await dispatch(
       updateTaskStatusAction({
         taskId,
-        status: result.data?.value ?? null,
+        status,
       }),
     ).unwrap();
 
@@ -97,14 +91,14 @@ const StatusFormSheet = () => {
   };
 
   const handleSubmitStatus = async (option: TaskStatusOption) => {
-    if (isSubmitting) {
+    if (isSubmitting || hasRepeat) {
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      if (mode === "edit") {
+      if (scope === "field") {
         await handleEditStatus(option);
         return;
       }
@@ -120,7 +114,9 @@ const StatusFormSheet = () => {
     }
   };
 
-  if (mode === "edit" && (!taskId || !task)) {
+  const hasInvalidTask = !taskId || !task;
+
+  if (scope === "field" && hasInvalidTask) {
     return null;
   }
 
@@ -132,16 +128,17 @@ const StatusFormSheet = () => {
           {STATUS_OPTIONS.map((item, index) => {
             const isSelected = selectedStatus === item.value;
             const isLast = index === STATUS_OPTIONS.length - 1;
+            const disabled = hasRepeat && item.value !== "next";
 
             return (
               <TouchableOpacity
                 key={item.value}
                 onPress={() => handleSubmitStatus(item)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || disabled}
                 activeOpacity={0.7}
                 style={[
                   styles.optionsButton,
-                  isSubmitting && styles.disabledButton,
+                  (isSubmitting || disabled) && styles.disabledButton,
                 ]}
               >
                 <SymbolView
@@ -174,7 +171,13 @@ const StatusFormSheet = () => {
             );
           })}
         </View>
-        <Info text="A task must have Next status to appear in Today." />
+        <Info
+          text={
+            hasRepeat
+              ? "A repeating task must have the Next status"
+              : "A task must have Next status to appear in Today."
+          }
+        />
       </View>
     </SheetWrapper>
   );

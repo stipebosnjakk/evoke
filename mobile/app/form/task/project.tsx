@@ -14,7 +14,7 @@ import { selectProjects } from "@/store/selectors/projects.selector";
 import { selectTaskById } from "@/store/selectors/task.selector";
 import { setProjectId } from "@/store/slices/formTask.slice";
 import { updateTaskProjectAction } from "@/store/thunks/task/task.crud.thunks";
-import { ModeType } from "@/types/initialState.types";
+import { ScopeParams } from "@/types/initialState.types";
 import { ProjectStateData } from "@/types/project.types";
 import { getErrorMessage } from "@/utils/error";
 
@@ -23,7 +23,7 @@ type RenderItemType = {
 };
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  scope?: ScopeParams;
   taskId?: string;
 };
 
@@ -31,7 +31,7 @@ const ProjectFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+  const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
   const projects = useAppSelector((state) => selectProjects(state).list);
 
@@ -40,17 +40,17 @@ const ProjectFormSheet = () => {
   );
 
   const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+    taskId ? selectTaskById(state, taskId) : null,
   );
 
   const projectId =
-    mode === "edit" ? (task?.project_id ?? null) : (formProjectId ?? null);
+    formProjectId !== undefined ? formProjectId : (task?.project_id ?? null);
 
   const [selected, setSelected] = useState<string | null>(projectId);
 
   useEffect(() => {
     setSelected(projectId);
-  }, [projectId, mode, taskId]);
+  }, [projectId, taskId]);
 
   const handleCloseSheet = () => {
     if (router.canGoBack()) {
@@ -62,7 +62,7 @@ const ProjectFormSheet = () => {
   };
 
   const handleSaveProject = async (nextProjectId: string | null) => {
-    if (mode === "edit") {
+    if (scope === "field") {
       if (!taskId) {
         throw new Error("Task ID is missing");
       }
@@ -115,6 +115,14 @@ const ProjectFormSheet = () => {
     />
   );
 
+  const isProjectUnchanged = selected === projectId;
+  const hasInvalidTask = !taskId || !task;
+
+  const submitDisabled =
+    scope === "field"
+      ? hasInvalidTask || isProjectUnchanged
+      : isProjectUnchanged;
+
   return (
     <SheetWrapper>
       <SheetHeader
@@ -122,9 +130,7 @@ const ProjectFormSheet = () => {
         onClose={handleCloseSheet}
         onSubmit={handleSubmitProject}
         submitButtonVisible={projects.length > 0}
-        submitDisabled={
-          (mode === "edit" && (!taskId || !task)) || selected === projectId
-        }
+        submitDisabled={submitDisabled}
       />
       {projects.length > 0 ? (
         <FlatList

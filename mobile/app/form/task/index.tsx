@@ -41,10 +41,11 @@ import {
   getTaskScreenText,
 } from "@/utils/taskPlacement";
 import { TaskScreen } from "@/types/scope.types";
-import { ModeType } from "@/types/initialState.types";
+import { ModeParams } from "@/types/initialState.types";
+import { TaskStateData } from "@/types/task.types";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  mode?: ModeParams;
   taskId?: string;
 };
 
@@ -56,58 +57,34 @@ const TaskFormSheet = () => {
 
   const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
+  const formTask = useAppSelector((state) => state.formTask.task);
+  const task = useAppSelector((state) =>
+    taskId ? selectTaskById(state, taskId) : null,
+  );
+
   const loading = useAppSelector((state) => state.formTask.loading);
   const title = useAppSelector((state) => state.formTask.inputs.title);
   const description = useAppSelector(
     (state) => state.formTask.inputs.description,
   );
 
-  const formStartDate = useAppSelector(
-    (state) => state.formTask.task.start_date,
-  );
-  const formDeadline = useAppSelector((state) => state.formTask.task.deadline);
-  const formStatusValue = useAppSelector((state) => state.formTask.task.status);
-  const formRepeatValue = useAppSelector((state) => state.formTask.task.repeat);
-  const formStartTimeMin = useAppSelector(
-    (state) => state.formTask.task.start_time_min,
-  );
-  const formDurationMin = useAppSelector(
-    (state) => state.formTask.task.duration_min,
-  );
+  const startDateValue =
+    formTask.start_date !== undefined
+      ? formTask.start_date
+      : (task?.start_date ?? null);
 
-  const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
-  );
-
-  const startDate =
-    mode === "edit" ? (task?.start_date ?? null) : (formStartDate ?? null);
-
-  const deadline =
-    mode === "edit" ? (task?.deadline ?? null) : (formDeadline ?? null);
+  const deadlineValue =
+    formTask.deadline !== undefined
+      ? formTask.deadline
+      : (task?.deadline ?? null);
 
   const statusValue =
-    mode === "edit" ? (task?.status ?? null) : (formStatusValue ?? null);
+    formTask.status !== undefined ? formTask.status : (task?.status ?? null);
 
   const repeatValue =
-    mode === "edit" ? (task?.repeat ?? null) : (formRepeatValue ?? null);
-
-  const startTimeMin =
-    mode === "edit"
-      ? (task?.start_time_min ?? null)
-      : (formStartTimeMin ?? null);
-
-  const durationMin =
-    mode === "edit" ? (task?.duration_min ?? null) : (formDurationMin ?? null);
+    formTask.repeat !== undefined ? formTask.repeat : (task?.repeat ?? null);
 
   const status = STATUS_OPTIONS.find((s) => s.value === statusValue);
-  const locale = locales[0]?.languageTag ?? "en-US";
-  const is24Hour = calendars[0]?.uses24hourClock ?? false;
-
-  const startTimeLabel = formatTimeFromMin(startTimeMin, locale, is24Hour);
-  const startDateLabel = startDate
-    ? [getDateLabel(startDate), startTimeLabel].filter(Boolean).join(" ")
-    : "Date";
-  const durationLabel = getDurationLabel(durationMin);
 
   useEffect(() => {
     return () => {
@@ -141,58 +118,56 @@ const TaskFormSheet = () => {
   const handleOpenTaskForm = (pathname: string) => {
     router.push({
       pathname,
-      params: taskId
-        ? {
-            mode,
-            taskId,
-          }
-        : {
-            mode,
-          },
+      params:
+        mode === "edit"
+          ? {
+              scope: "task",
+              taskId,
+            }
+          : {
+              scope: "task",
+            },
     } as any);
+  };
+
+  const handleShowToast = (task: TaskStateData) => {
+    const placement = getTaskPlacement(task);
+
+    Toast.show({
+      type: "info",
+      text1: task.title!,
+      text2: mode === "edit" ? "Task updated" : getTaskScreenText(placement),
+      props: {
+        icon: "chevron.right",
+        onPress: () =>
+          mode === "edit"
+            ? handleUpdateNavigation(task.id)
+            : handleCreateNavigation(placement),
+      },
+    });
+
+    dispatch(clearTaskState());
   };
 
   const onSubmit = async () => {
     if (loading) return;
     try {
-      let results;
-
       await dispatch(validateTextInputs());
-
-      // TODO: toast is not showing for update task
 
       if (mode === "edit") {
         if (!taskId) {
           throw new Error("Task ID is required");
         }
 
-        results = await dispatch(updateTaskAction({ taskId })).unwrap();
+        const { task } = await dispatch(updateTaskAction({ taskId })).unwrap();
 
-        if (router.canGoBack()) {
-          router.back();
-        } else {
-          router.replace(routes.today.href);
-        }
-      } else {
-        results = await dispatch(createTaskAction()).unwrap();
+        router.back();
+        handleShowToast(task);
+        return;
       }
 
-      const placement = getTaskPlacement(results.task);
-
-      Toast.show({
-        type: "info",
-        text1: results.task.title!,
-        text2: mode === "edit" ? "Task updated" : getTaskScreenText(placement),
-        props: {
-          icon: "chevron.right",
-          onPress: () =>
-            mode === "edit"
-              ? handleUpdateNavigation(taskId)
-              : handleCreateNavigation(placement),
-        },
-      });
-
-      dispatch(clearTaskState());
+      const { task } = await dispatch(createTaskAction()).unwrap();
+      handleShowToast(task);
     } catch (error: unknown) {
       Toast.show({
         type: "error",
@@ -202,6 +177,23 @@ const TaskFormSheet = () => {
       });
     }
   };
+
+  const startTimeMin = formTask.start_time_min ?? task?.start_time_min ?? null;
+  const durationMin = formTask.duration_min ?? task?.duration_min ?? null;
+
+  const locale = locales[0]?.languageTag ?? "en-US";
+  const is24Hour = calendars[0]?.uses24hourClock ?? false;
+
+  const startDateLabel = startDateValue ? getDateLabel(startDateValue) : "Date";
+  const repeatLabel = getRepeatLabel(repeatValue);
+  const deadlineLabel = deadlineValue
+    ? getDateLabel(deadlineValue)
+    : "Deadline";
+  const durationLabel = durationMin
+    ? getDurationLabel(durationMin)
+    : "Duration";
+  const startTimeLabel =
+    formatTimeFromMin(startTimeMin, locale, is24Hour) ?? "Time";
 
   return (
     <SheetWrapper>
@@ -255,21 +247,28 @@ const TaskFormSheet = () => {
               />
               <Chip
                 icon="calendar.badge.clock"
-                label={deadline ? getDateLabel(deadline) : "Deadline"}
+                label={deadlineLabel}
                 onPress={() =>
                   handleOpenTaskForm(routes.form_task_deadline.href)
                 }
               />
+              {(startDateValue || repeatValue) && (
+                <Chip
+                  icon="clock"
+                  label={startTimeLabel}
+                  onPress={() => handleOpenTaskForm(routes.form_task_time.href)}
+                />
+              )}
               <Chip
                 icon="timer"
-                label={durationLabel ?? "Duration"}
+                label={durationLabel}
                 onPress={() =>
                   handleOpenTaskForm(routes.form_task_duration.href)
                 }
               />
               <Chip
                 icon="repeat"
-                label={getRepeatLabel(repeatValue)}
+                label={repeatLabel}
                 onPress={() => handleOpenTaskForm(routes.form_task_repeat.href)}
               />
             </View>

@@ -20,17 +20,16 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { selectTaskById } from "@/store/selectors/task.selector";
 import { setTime } from "@/store/slices/formTask.slice";
 import { updateTaskTimeAction } from "@/store/thunks/task/task.crud.thunks";
-import { ModeType } from "@/types/initialState.types";
+import { ScopeParams } from "@/types/initialState.types";
 import {
   formatTimeFromMin,
   getStartTimeMin,
   getTimePickerDate,
 } from "@/utils/date";
 import { getErrorMessage } from "@/utils/error";
-import { validateTaskTime } from "@/utils/validate";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  scope?: ScopeParams;
   taskId?: string;
 };
 
@@ -41,20 +40,19 @@ const TimeFormSheet = () => {
   const locales = useLocales();
   const calendars = useCalendars();
 
-  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+  const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
   const formStartTimeMin = useAppSelector(
     (state) => state.formTask.task.start_time_min,
   );
-
   const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+    taskId ? selectTaskById(state, taskId) : null,
   );
 
   const startTimeMin =
-    mode === "edit"
-      ? (task?.start_time_min ?? null)
-      : (formStartTimeMin ?? null);
+    formStartTimeMin !== undefined
+      ? formStartTimeMin
+      : (task?.start_time_min ?? null);
 
   const [selected, setSelected] = useState<Date>(() =>
     getTimePickerDate(startTimeMin),
@@ -62,17 +60,7 @@ const TimeFormSheet = () => {
 
   useEffect(() => {
     setSelected(getTimePickerDate(startTimeMin));
-  }, [startTimeMin, mode, taskId]);
-
-  const locale = locales[0]?.languageTag ?? "en-US";
-  const is24Hour = calendars[0]?.uses24hourClock ?? false;
-
-  const selectedTimeMin = getStartTimeMin(selected);
-  const selectedTimeLabel = formatTimeFromMin(
-    selectedTimeMin,
-    locale,
-    is24Hour,
-  );
+  }, [startTimeMin, taskId]);
 
   const handleCloseSheet = () => {
     if (router.canGoBack()) {
@@ -84,7 +72,7 @@ const TimeFormSheet = () => {
   };
 
   const handleSaveStartTime = async (value: number | null) => {
-    if (mode === "edit") {
+    if (scope === "field") {
       if (!taskId) {
         throw new Error("Task ID is missing");
       }
@@ -119,26 +107,13 @@ const TimeFormSheet = () => {
   };
 
   const handleSubmitTime = async () => {
-    const validation = validateTaskTime({ start_time_min: selectedTimeMin });
-
-    if (!validation.ok) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Time",
-        text2: validation.message,
-      });
-
-      return;
-    }
-
     try {
-      await handleSaveStartTime(validation.data);
+      await handleSaveStartTime(selectedTimeMin);
       handleCloseSheet();
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Unable to Save Time",
-        text2: getErrorMessage(error, "Failed to update task start time"),
+        text1: getErrorMessage(error, "Failed to update task start time"),
       });
     }
   };
@@ -150,11 +125,26 @@ const TimeFormSheet = () => {
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Unable to Clear Time",
-        text2: getErrorMessage(error, "Failed to clear task start time"),
+        text1: getErrorMessage(error, "Failed to clear task start time"),
       });
     }
   };
+
+  const locale = locales[0]?.languageTag ?? "en-US";
+  const is24Hour = calendars[0]?.uses24hourClock ?? false;
+
+  const selectedTimeMin = getStartTimeMin(selected);
+  const selectedTimeLabel = formatTimeFromMin(
+    selectedTimeMin,
+    locale,
+    is24Hour,
+  );
+
+  const isTimeUnchanged = selectedTimeMin === startTimeMin;
+  const hasInvalidTask = !taskId || !task;
+
+  const submitDisabled =
+    scope === "field" ? hasInvalidTask || isTimeUnchanged : isTimeUnchanged;
 
   return (
     <SheetWrapper>
@@ -163,10 +153,7 @@ const TimeFormSheet = () => {
         onClose={handleCloseSheet}
         onSubmit={handleSubmitTime}
         submitButtonVisible
-        submitDisabled={
-          (mode === "edit" && (!taskId || !task)) ||
-          selectedTimeMin === startTimeMin
-        }
+        submitDisabled={submitDisabled}
       />
       <View style={styles.pickerContainer}>
         <View style={styles.pickerHeader}>

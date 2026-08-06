@@ -29,7 +29,7 @@ export const addCreateTaskExtraReducers = (
       state.status = "succeeded";
       state.error = null;
 
-      const { task, order_key } = action.payload;
+      const { task, inboxOrderKey } = action.payload;
 
       if (!task) {
         state.error = "Failed to create task";
@@ -40,8 +40,8 @@ export const addCreateTaskExtraReducers = (
         state.tasks.ids.unshift(task.id);
       }
 
-      if (order_key !== null) {
-        state.taskOrder.inbox[task.id] = order_key;
+      if (inboxOrderKey !== null) {
+        state.taskOrder.inbox[task.id] = inboxOrderKey;
       }
 
       state.tasks.byId[task.id] = task;
@@ -270,7 +270,7 @@ export const addUpdateTaskRepeatDaysExtraReducers = (
         action.payload?.message ?? "Failed to update task repeat days";
     })
     .addCase(updateTaskRepeatDaysAction.fulfilled, (state, action) => {
-      const { taskId, repeat, updated_at } = action.payload;
+      const { taskId, repeat, start_time_min, updated_at } = action.payload;
 
       if (!taskId) {
         state.status = "failed";
@@ -287,6 +287,7 @@ export const addUpdateTaskRepeatDaysExtraReducers = (
       }
 
       task.repeat = repeat;
+      task.start_time_min = start_time_min;
       task.updated_at = updated_at;
 
       state.status = "succeeded";

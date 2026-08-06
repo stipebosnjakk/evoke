@@ -127,8 +127,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_project.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -147,8 +147,8 @@ const TaskScreen = () => {
           router.push({
             pathname: routes.form_task_status.href,
             params: {
-              mode: "edit",
               taskId: task.id,
+              scope: "field",
             },
           }),
       });
@@ -163,8 +163,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_status.href,
           params: {
-            mode: "edit",
             taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -177,8 +177,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_status.href,
           params: {
-            mode: "edit",
             taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -197,43 +197,11 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_date.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
-
-    if (task.start_time_min) {
-      const time = formatTimeFromMin(task.start_time_min, locale, is24Hour);
-
-      meta.push({
-        id: "time",
-        icon: "clock",
-        label: time ?? "Time",
-        onPress: () =>
-          router.push({
-            pathname: routes.form_task_time.href,
-            params: {
-              mode: "edit",
-              taskId,
-            },
-          }),
-      });
-    } else {
-      addDetails.push({
-        id: "time",
-        icon: "clock",
-        label: "Time",
-        onPress: () =>
-          router.push({
-            pathname: routes.form_task_time.href,
-            params: {
-              mode: "edit",
-              taskId,
-            },
-          }),
-      });
-    }
   } else {
     addDetails.push({
       id: "start_date",
@@ -243,8 +211,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_date.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -259,8 +227,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_deadline.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -273,11 +241,45 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_deadline.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
+  }
+
+  if (task.start_date || task.repeat) {
+    if (task.start_time_min) {
+      const time = formatTimeFromMin(task.start_time_min, locale, is24Hour);
+
+      meta.push({
+        id: "time",
+        icon: "clock",
+        label: time ?? "Time",
+        onPress: () =>
+          router.push({
+            pathname: routes.form_task_time.href,
+            params: {
+              taskId: task.id,
+              scope: "field",
+            },
+          }),
+      });
+    } else {
+      addDetails.push({
+        id: "time",
+        icon: "clock",
+        label: "Time",
+        onPress: () =>
+          router.push({
+            pathname: routes.form_task_time.href,
+            params: {
+              taskId: task.id,
+              scope: "field",
+            },
+          }),
+      });
+    }
   }
 
   if (task.duration_min) {
@@ -291,8 +293,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_duration.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -305,8 +307,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_duration.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -321,8 +323,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_repeat.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });
@@ -335,8 +337,8 @@ const TaskScreen = () => {
         router.push({
           pathname: routes.form_task_repeat.href,
           params: {
-            mode: "edit",
-            taskId,
+            taskId: task.id,
+            scope: "field",
           },
         }),
     });

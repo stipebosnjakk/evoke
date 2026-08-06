@@ -14,11 +14,9 @@ import {
   validateTaskRepeat,
   validateTaskStartDate,
   validateTaskStatus,
-  validateTaskTime,
   validateTaskTitle,
 } from "@/utils/validate";
 import { initialState } from "@/store/initialStates/formTask.initialState";
-import { toIsoDate } from "@/utils/date";
 
 export const setTitleReducer = (
   state: FormTaskInitialState,
@@ -38,7 +36,10 @@ export const setStatusReducer = (
   state: FormTaskInitialState,
   action: PayloadAction<{ status: TaskStatusOption | null }>,
 ) => {
-  const res = validateTaskStatus({ status: action.payload.status });
+  const res = validateTaskStatus({
+    status: action.payload.status,
+    repeat: state.task.repeat ?? null,
+  });
 
   if (!res.ok) {
     state.error = res.message;
@@ -64,7 +65,10 @@ export const setRepeatReducer = (
   state: FormTaskInitialState,
   action: PayloadAction<{ repeat: Weekday[] | null }>,
 ) => {
-  const res = validateTaskRepeat({ repeatDays: action.payload.repeat });
+  const res = validateTaskRepeat({
+    repeatDays: action.payload.repeat,
+    status: state.task.status ?? null,
+  });
 
   if (!res.ok) {
     state.error = res.message;
@@ -74,6 +78,11 @@ export const setRepeatReducer = (
   if (!res.data || res.data.length === 0) {
     state.task.repeat = null;
     state.error = null;
+
+    if (!state.task.start_date) {
+      state.task.start_time_min = null;
+    }
+
     return;
   }
 
@@ -91,7 +100,6 @@ export const setStartDateReducer = (
   const res = validateTaskStartDate({
     start_date: action.payload.start_date,
     deadline: state.task.deadline ?? null,
-    start_time_min: state.task.start_time_min ?? null,
   });
 
   if (!res.ok) {
@@ -101,8 +109,12 @@ export const setStartDateReducer = (
 
   if (res.ok && res.data === null) {
     state.task.start_date = null;
-    state.task.start_time_min = null;
     state.error = null;
+
+    if (!state.task.repeat || state.task.repeat.length === 0) {
+      state.task.start_time_min = null;
+    }
+
     return;
   }
 
@@ -134,16 +146,7 @@ export const setTimeReducer = (
     start_time_min: number | null;
   }>,
 ) => {
-  const { start_time_min } = action.payload;
-
-  const res = validateTaskTime({ start_time_min });
-
-  if (!res.ok) {
-    state.error = res.message;
-    return;
-  }
-
-  state.task.start_time_min = res.data;
+  state.task.start_time_min = action.payload.start_time_min;
   state.error = null;
 };
 

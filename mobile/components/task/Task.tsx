@@ -44,7 +44,9 @@ const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
       onPress={navigateToTask}
     >
       <View style={styles.taskHeader}>
-        <CompleteTask task={task} isPreview={isPreview} />
+        <View style={styles.completeTaskContainer}>
+          <CompleteTask task={task} isPreview={isPreview} />
+        </View>
         {onDrag && (
           <TouchableOpacity
             style={styles.menuIcon}
@@ -128,6 +130,10 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     flexShrink: 0,
+  },
+  completeTaskContainer: {
+    flex: 1,
+    minWidth: 0,
   },
 });
 

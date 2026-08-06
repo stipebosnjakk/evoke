@@ -24,10 +24,10 @@ import {
   setName,
   validateNameAndColor,
 } from "@/store/slices/formProject.slice";
-import { ModeType } from "@/types/initialState.types";
+import { ModeParams } from "@/types/initialState.types";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  mode?: ModeParams;
   projectId?: string;
 };
 

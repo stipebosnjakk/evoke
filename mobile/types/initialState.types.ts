@@ -68,4 +68,5 @@ export type ValidationResult<T> =
       message: string;
     };
 
-export type ModeType = "create" | "edit"
+export type ScopeParams = "task" | "field";
+export type ModeParams = "edit" | "create";

@@ -26,7 +26,12 @@ const NoProjectTasksView = ({
 
   const navigateToCreateTask = () => {
     dispatch(setProjectId({ projectId }));
-    router.push(routes.form_task.href);
+    router.push({
+      pathname: routes.form_task.href,
+      params: {
+        mode: "create",
+      },
+    });
   };
 
   return (

@@ -27,6 +27,8 @@ type ToastCardProps = {
   containerStyle?: StyleProp<ViewStyle>;
 };
 
+// TODO: center text with no icons, and too long text is overflowing instead of wrap
+
 const ToastCard = ({
   text1,
   text2,

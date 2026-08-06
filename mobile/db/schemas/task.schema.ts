@@ -26,7 +26,7 @@ export const tasks = t.sqliteTable("tasks", {
   start_time_min: t.integer("start_time_min"),
   duration_min: t.integer("duration_min"),
   deadline: t.text("deadline").$type<IsoDate | null>(),
-  repeat: t.text("repeat", { mode: "json" }).$type<Weekday[]>(),
+  repeat: t.text("repeat", { mode: "json" }).$type<Weekday[] | null>(),
 });
 
 export type Task = InferSelectModel<typeof tasks>;

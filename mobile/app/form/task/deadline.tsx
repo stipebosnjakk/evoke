@@ -25,10 +25,10 @@ import { IsoDate } from "@/types/task.types";
 import { minDate } from "@/utils/date";
 import { getErrorMessage } from "@/utils/error";
 import { validateTaskDeadline } from "@/utils/validate";
-import { ModeType } from "@/types/initialState.types";
+import { ScopeParams } from "@/types/initialState.types";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  scope?: ScopeParams;
   taskId?: string;
 };
 
@@ -38,30 +38,29 @@ const DeadlineFormSheet = () => {
 
   const inputRef = useRef<TextInput>(null);
 
-  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+  const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+
+  const task = useAppSelector((state) =>
+    taskId ? selectTaskById(state, taskId) : null,
+  );
 
   const formDeadline = useAppSelector((state) => state.formTask.task.deadline);
-
   const formStartDate = useAppSelector(
     (state) => state.formTask.task.start_date,
   );
 
-  const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
-  );
-
   const deadline =
-    mode === "edit" ? (task?.deadline ?? null) : (formDeadline ?? null);
+    formDeadline !== undefined ? formDeadline : (task?.deadline ?? null);
 
   const startDate =
-    mode === "edit" ? (task?.start_date ?? null) : (formStartDate ?? null);
+    formStartDate !== undefined ? formStartDate : (task?.start_date ?? null);
 
   const [isDateInputOpen, setIsDateInputOpen] = useState(false);
   const [selected, setSelected] = useState<IsoDate | null>(deadline);
 
   useEffect(() => {
     setSelected(deadline);
-  }, [deadline, mode, taskId]);
+  }, [deadline, taskId]);
 
   const minDeadlineDate = minDate("deadline", startDate);
 
@@ -75,7 +74,7 @@ const DeadlineFormSheet = () => {
   };
 
   const handleSaveDeadline = async (date: IsoDate | null) => {
-    if (mode === "edit") {
+    if (scope === "field") {
       if (!taskId) {
         throw new Error("Task ID is missing");
       }
@@ -160,6 +159,14 @@ const DeadlineFormSheet = () => {
     handleCloseSheet();
   };
 
+  const isDeadlineUnchanged = selected === deadline;
+  const hasInvalidTask = !taskId || !task;
+
+  const submitDisabled =
+    scope === "field"
+      ? hasInvalidTask || isDeadlineUnchanged
+      : isDeadlineUnchanged;
+
   return (
     <SheetWrapper>
       <SheetHeader
@@ -167,9 +174,7 @@ const DeadlineFormSheet = () => {
         onClose={handleGoBack}
         onSubmit={handleSubmitDeadline}
         submitButtonVisible
-        submitDisabled={
-          (mode === "edit" && (!taskId || !task)) || selected === deadline
-        }
+        submitDisabled={submitDisabled}
       />
       <DateInput
         type="deadline"
@@ -194,8 +199,8 @@ const DeadlineFormSheet = () => {
               setSelected={setSelected}
             />
           </View>
-          <View style={styles.buttonsContainer}>
-            {selected !== null && (
+          {deadline !== null && (
+            <View style={styles.buttonsContainer}>
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleNoDeadline}
@@ -209,8 +214,8 @@ const DeadlineFormSheet = () => {
                 />
                 <Text style={styles.buttonText}>No Deadline</Text>
               </TouchableOpacity>
-            )}
-          </View>
+            </View>
+          )}
         </>
       )}
     </SheetWrapper>

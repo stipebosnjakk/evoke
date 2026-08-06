@@ -15,7 +15,12 @@ const NoAvailableTasksView = ({ projectId }: NoAvailableTasksViewProps) => {
 
   const navigateToCreateTask = () => {
     dispatch(setProjectId({ projectId }));
-    router.replace(routes.form_task.href);
+    router.replace({
+      pathname: routes.form_task.href,
+      params: {
+        mode: "create",
+      },
+    });
   };
 
   return (

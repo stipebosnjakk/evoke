@@ -1,16 +1,42 @@
 import { projectColors } from "@/constants/colors";
 import { STATUS_OPTIONS } from "@/constants/status";
+import { FormTask } from "@/db";
 import { ValidationResult } from "@/types/initialState.types";
-import { IsoDate, TaskStatusOptionsArray, Weekday } from "@/types/task.types";
+import {
+  IsoDate,
+  TaskStatus,
+  TaskStatusOptionsArray,
+  Weekday,
+} from "@/types/task.types";
 import { isValidIsoDate } from "@/utils/date";
+
+type InvalidTaskReturnType = {
+  ok: false;
+  data: null;
+  message: string;
+};
+
+const validationError = (message: string): InvalidTaskReturnType => ({
+  ok: false,
+  data: null,
+  message,
+});
 
 type ValidateTaskStatusArgs = {
   status: TaskStatusOptionsArray | null;
+  repeat: Weekday[] | null;
 };
 
 export const validateTaskStatus = ({
   status,
+  repeat,
 }: ValidateTaskStatusArgs): ValidationResult<TaskStatusOptionsArray | null> => {
+  const hasRepeat = Boolean(repeat?.length);
+
+  if (hasRepeat && status?.value !== "next") {
+    return validationError("A repeating task must have the Next status");
+  }
+
   if (status === null || status === undefined) {
     return {
       ok: true,
@@ -20,11 +46,7 @@ export const validateTaskStatus = ({
   }
 
   if (typeof status !== "object" || !("value" in status)) {
-    return {
-      ok: false,
-      data: null,
-      message: "Status is not valid",
-    };
+    return validationError("Status is not valid");
   }
 
   const validStatus = STATUS_OPTIONS.find(
@@ -32,11 +54,7 @@ export const validateTaskStatus = ({
   );
 
   if (!validStatus) {
-    return {
-      ok: false,
-      data: null,
-      message: "Status is not valid",
-    };
+    return validationError("Status is not valid");
   }
 
   return {
@@ -48,25 +66,14 @@ export const validateTaskStatus = ({
 
 type ValidateTaskRepeatArgs = {
   repeatDays: Weekday[] | null;
-  start_date: IsoDate | null;
-  start_time_min: number | null;
+  status: TaskStatus | null;
 };
 
 export const validateTaskRepeat = ({
   repeatDays,
-  start_date,
-  start_time_min,
+  status,
 }: ValidateTaskRepeatArgs): ValidationResult<Weekday[] | null> => {
   if (repeatDays === null || repeatDays === undefined) {
-    if (start_time_min && !start_date) {
-      return {
-        ok: false,
-        data: null,
-        message:
-          "Select a start date or recurrence before setting a start time",
-      };
-    }
-
     return {
       ok: true,
       data: null,
@@ -75,11 +82,7 @@ export const validateTaskRepeat = ({
   }
 
   if (!Array.isArray(repeatDays)) {
-    return {
-      ok: false,
-      data: null,
-      message: "Repeat option is not valid",
-    };
+    return validationError("Repeat option is not valid");
   }
 
   if (repeatDays.length === 0) {
@@ -94,19 +97,15 @@ export const validateTaskRepeat = ({
     typeof day === "number" && Number.isInteger(day) && day >= 0 && day <= 6;
 
   if (!repeatDays.every(isValidDay)) {
-    return {
-      ok: false,
-      data: null,
-      message: "Repeat option is not valid",
-    };
+    return validationError("Repeat option is not valid");
   }
 
   if (new Set(repeatDays).size !== repeatDays.length) {
-    return {
-      ok: false,
-      data: null,
-      message: "Repeat option contains duplicate days",
-    };
+    return validationError("Repeat option contains duplicate days");
+  }
+
+  if (repeatDays.length > 0 && status !== "next") {
+    validationError("A repeating task must have the Next status");
   }
 
   return {
@@ -124,29 +123,17 @@ export const validateTaskTitle = ({
   title,
 }: ValidateTaskTitleArgs): ValidationResult<string> => {
   if (typeof title !== "string") {
-    return {
-      ok: false,
-      data: null,
-      message: "Title is required",
-    };
+    return validationError("Title is required");
   }
 
   const trimmedTitle = title.trim();
 
   if (!trimmedTitle) {
-    return {
-      ok: false,
-      data: null,
-      message: "Title is required",
-    };
+    return validationError("Title is required");
   }
 
   if (trimmedTitle.length > 255) {
-    return {
-      ok: false,
-      data: null,
-      message: "Title must be 255 characters or less",
-    };
+    return validationError("Title must be 255 characters or less");
   }
 
   return {
@@ -172,11 +159,7 @@ export const validateTaskDescription = ({
   }
 
   if (typeof description !== "string") {
-    return {
-      ok: false,
-      data: null,
-      message: "Description is not valid",
-    };
+    return validationError("Description is not valid");
   }
 
   const trimmedDescription = description.trim();
@@ -190,11 +173,7 @@ export const validateTaskDescription = ({
   }
 
   if (trimmedDescription.length > 2000) {
-    return {
-      ok: false,
-      data: null,
-      message: "Description must be 2000 characters or less",
-    };
+    return validationError("Description must be 2000 characters or less");
   }
 
   return {
@@ -207,26 +186,13 @@ export const validateTaskDescription = ({
 type ValidateTaskStartDateArgs = {
   start_date: IsoDate | null;
   deadline: IsoDate | null;
-  start_time_min: number | null;
-  repeat: Weekday[] | null;
 };
 
 export const validateTaskStartDate = ({
   start_date,
   deadline,
-  start_time_min,
-  repeat,
 }: ValidateTaskStartDateArgs): ValidationResult<IsoDate | null> => {
   if (start_date === null || start_date === undefined) {
-    if (start_time_min && (!repeat || !repeat.length)) {
-      return {
-        ok: false,
-        data: null,
-        message:
-          "Select a start date or recurrence before setting a start time",
-      };
-    }
-
     return {
       ok: true,
       data: null,
@@ -235,11 +201,9 @@ export const validateTaskStartDate = ({
   }
 
   if (typeof start_date !== "string") {
-    return {
-      ok: false,
-      data: null,
-      message: "Start date must be a valid date in YYYY-MM-DD format",
-    };
+    return validationError(
+      "Start date must be a valid date in YYYY-MM-DD format",
+    );
   }
 
   const startDate = start_date.trim();
@@ -253,39 +217,25 @@ export const validateTaskStartDate = ({
   }
 
   if (!isValidIsoDate(startDate)) {
-    return {
-      ok: false,
-      data: null,
-      message: "Start date must be a valid date in YYYY-MM-DD format",
-    };
+    return validationError(
+      "Start date must be a valid date in YYYY-MM-DD format",
+    );
   }
 
   if (deadline !== null && deadline !== undefined) {
     if (typeof deadline !== "string") {
-      return {
-        ok: false,
-        data: null,
-        message: "Deadline is not valid",
-      };
+      return validationError("Deadline is not valid");
     }
 
     const taskDeadline = deadline.trim();
 
     if (taskDeadline) {
       if (!isValidIsoDate(taskDeadline)) {
-        return {
-          ok: false,
-          data: null,
-          message: "Deadline is not valid",
-        };
+        return validationError("Deadline is not valid");
       }
 
       if (startDate > taskDeadline) {
-        return {
-          ok: false,
-          data: null,
-          message: "Start date cannot be after deadline",
-        };
+        return validationError("Start date cannot be after deadline");
       }
     }
   }
@@ -315,11 +265,9 @@ export const validateTaskDeadline = ({
   }
 
   if (typeof deadline !== "string") {
-    return {
-      ok: false,
-      data: null,
-      message: "Deadline must be a valid date in YYYY-MM-DD format",
-    };
+    return validationError(
+      "Deadline must be a valid date in YYYY-MM-DD format",
+    );
   }
 
   const trimmedDeadline = deadline.trim();
@@ -333,39 +281,25 @@ export const validateTaskDeadline = ({
   }
 
   if (!isValidIsoDate(trimmedDeadline)) {
-    return {
-      ok: false,
-      data: null,
-      message: "Deadline must be a valid date in YYYY-MM-DD format",
-    };
+    return validationError(
+      "Deadline must be a valid date in YYYY-MM-DD format",
+    );
   }
 
   if (startDate !== null && startDate !== undefined) {
     if (typeof startDate !== "string") {
-      return {
-        ok: false,
-        data: null,
-        message: "Start date is not valid",
-      };
+      return validationError("Start date is not valid");
     }
 
     const taskStartDate = startDate.trim();
 
     if (taskStartDate) {
       if (!isValidIsoDate(taskStartDate)) {
-        return {
-          ok: false,
-          data: null,
-          message: "Start date is not valid",
-        };
+        return validationError("Start date is not valid");
       }
 
       if (trimmedDeadline < taskStartDate) {
-        return {
-          ok: false,
-          data: null,
-          message: "Deadline cannot be before start date",
-        };
+        return validationError("Deadline cannot be before start date");
       }
     }
   }
@@ -379,8 +313,8 @@ export const validateTaskDeadline = ({
 
 type ValidateTaskTime = {
   start_time_min: number | null;
-  start_date: IsoDate | null;
-  repeat: Weekday[] | null;
+  start_date?: IsoDate | null;
+  repeat?: Weekday[] | null;
 };
 
 export const validateTaskTime = ({
@@ -400,37 +334,24 @@ export const validateTaskTime = ({
     };
   }
 
+  if ((!repeat || repeat.length === 0) && !start_date) {
+    return validationError(
+      "Select a start date or recurrence before setting a start time",
+    );
+  }
+
   if (typeof start_time_min !== "number" || !Number.isInteger(start_time_min)) {
-    return {
-      ok: false,
-      data: null,
-      message: "Start time must be a whole number",
-    };
+    return validationError("Start time must be a whole number");
   }
 
   if (start_time_min < minStart || start_time_min > maxStart) {
-    return {
-      ok: false,
-      data: null,
-      message: "Start time must be between 00:00 and 23:55",
-    };
+    return validationError("Start time must be between 00:00 and 23:55");
   }
 
   if (start_time_min % minuteStep !== 0) {
-    return {
-      ok: false,
-      data: null,
-      message: "Start time must be in 5-minute increments",
-    };
+    return validationError("Start time must be in 5-minute increments");
   }
 
-  if (start_time_min && (!repeat || !repeat.length) && !start_date) {
-    return {
-      ok: false,
-      data: null,
-      message: "Select a start date or recurrence before setting a start time",
-    };
-  }
   return {
     ok: true,
     data: start_time_min,
@@ -462,35 +383,19 @@ export const validateTaskDuration = ({
     typeof normalizedDuration !== "number" ||
     !Number.isInteger(normalizedDuration)
   ) {
-    return {
-      ok: false,
-      data: null,
-      message: "Duration must be a whole number",
-    };
+    return validationError("Duration must be a whole number");
   }
 
   if (normalizedDuration < 0) {
-    return {
-      ok: false,
-      data: null,
-      message: "Duration can't be negative",
-    };
+    return validationError("Duration can't be negative");
   }
 
   if (normalizedDuration > maxDuration) {
-    return {
-      ok: false,
-      data: null,
-      message: "Duration must be less than 24 hours",
-    };
+    return validationError("Duration must be less than 24 hours");
   }
 
   if (normalizedDuration % durationStep !== 0) {
-    return {
-      ok: false,
-      data: null,
-      message: "Duration must be in 5-minute increments",
-    };
+    return validationError("Duration must be in 5-minute increments");
   }
 
   return {
@@ -508,29 +413,17 @@ export const validateProjectName = ({
   name,
 }: ValidateProjectNameArgs): ValidationResult<string> => {
   if (typeof name !== "string") {
-    return {
-      ok: false,
-      data: null,
-      message: "Project name is required",
-    };
+    return validationError("Project name is required");
   }
 
   const trimmedName = name.trim();
 
   if (!trimmedName) {
-    return {
-      ok: false,
-      data: null,
-      message: "Project name is required",
-    };
+    return validationError("Project name is required");
   }
 
   if (trimmedName.length > 250) {
-    return {
-      ok: false,
-      data: null,
-      message: "Project name must be 250 characters or less",
-    };
+    return validationError("Project name must be 250 characters or less");
   }
 
   return {
@@ -548,26 +441,136 @@ export const validateProjectColor = ({
   color,
 }: ValidateProjectColorArgs): ValidationResult<string> => {
   if (typeof color !== "string" || !color) {
-    return {
-      ok: false,
-      data: null,
-      message: "Project color is required",
-    };
+    return validationError("Project color is required");
   }
 
   const validColor = projectColors.find((item) => item.hex === color);
 
   if (!validColor) {
-    return {
-      ok: false,
-      data: null,
-      message: "Project color is invalid",
-    };
+    return validationError("Project color is invalid");
   }
 
   return {
     ok: true,
     data: validColor.hex,
     message: "Project color saved successfully",
+  };
+};
+
+export const validateTask = (
+  formTask: FormTask,
+): ValidationResult<FormTask> => {
+  const titleValidation = validateTaskTitle({
+    title: formTask.title ?? null,
+  });
+
+  if (!titleValidation.ok) {
+    return validationError(titleValidation.message);
+  }
+
+  const descriptionValidation = validateTaskDescription({
+    description: formTask.description ?? null,
+  });
+
+  if (!descriptionValidation.ok) {
+    return validationError(descriptionValidation.message);
+  }
+
+  const repeatValidation = validateTaskRepeat({
+    repeatDays: formTask.repeat ?? null,
+    status,
+  });
+
+  if (!repeatValidation.ok) {
+    return validationError(repeatValidation.message);
+  }
+
+  const repeat = repeatValidation.data;
+
+  const startDateValidation = validateTaskStartDate({
+    start_date: formTask.start_date ?? null,
+    deadline: formTask.deadline ?? null,
+  });
+
+  if (!startDateValidation.ok) {
+    return validationError(startDateValidation.message);
+  }
+
+  const startDate = startDateValidation.data;
+
+  const deadlineValidation = validateTaskDeadline({
+    deadline: formTask.deadline ?? null,
+    startDate,
+  });
+
+  if (!deadlineValidation.ok) {
+    return validationError(deadlineValidation.message);
+  }
+
+  const deadline = deadlineValidation.data;
+
+  const startTimeValidation = validateTaskTime({
+    start_time_min: formTask.start_time_min ?? null,
+    start_date: startDate,
+    repeat,
+  });
+
+  if (!startTimeValidation.ok) {
+    return validationError(startTimeValidation.message);
+  }
+
+  const startTimeMin = startTimeValidation.data;
+
+  const durationValidation = validateTaskDuration({
+    duration_min: formTask.duration_min ?? null,
+  });
+
+  if (!durationValidation.ok) {
+    return validationError(durationValidation.message);
+  }
+
+  const durationMin = durationValidation.data;
+
+  const requestedStatus =
+    formTask.status ??
+    (startDate !== null || deadline !== null ? "next" : null);
+
+  const statusOption =
+    requestedStatus === null
+      ? null
+      : (STATUS_OPTIONS.find((option) => option.value === requestedStatus) ??
+        null);
+
+  if (requestedStatus !== null && statusOption === null) {
+    return validationError("Status is not valid");
+  }
+
+  const statusValidation = validateTaskStatus({
+    status: statusOption,
+    repeat,
+  });
+
+  if (!statusValidation.ok) {
+    return validationError(statusValidation.message);
+  }
+
+  const status = statusValidation.data?.value ?? null;
+
+  const normalizedTask: FormTask = {
+    ...formTask,
+    title: titleValidation.data,
+    description: descriptionValidation.data,
+    repeat,
+    start_date: startDate,
+    deadline,
+    start_time_min: startTimeMin,
+    duration_min: durationMin,
+    status,
+  };
+
+  return {
+    ok: true,
+    data: normalizedTask,
+    message: "Task is valid",
   };
 };

@@ -9,13 +9,20 @@ import { selectProjectById } from "@/store/selectors/projects.selector";
 const SelectProjectButton = () => {
   const router = useRouter();
 
-  const newProjectId = useAppSelector((state) => state.formTask.task.project_id);
+  const newProjectId = useAppSelector(
+    (state) => state.formTask.task.project_id,
+  );
   const project = useAppSelector((state) =>
     selectProjectById(state, newProjectId),
   );
 
   const navigateToSelectProject = () => {
-    router.push(routes.form_task_project.href);
+    router.push({
+      pathname: routes.form_task_project.href,
+      params: {
+        scope: "task",
+      },
+    });
   };
 
   return (

@@ -81,7 +81,7 @@ export const updateTaskAction = createAsyncThunk<
       });
     }
 
-    const res = await updateTaskRepo(taskId, formTask.task);
+    const res = await updateTaskRepo({ taskId, formTask: formTask.task });
 
     if (!res.task) {
       return rejectWithValue({

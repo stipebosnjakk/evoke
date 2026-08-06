@@ -16,20 +16,22 @@ import DateInput from "@/components/features/DateInput";
 import Shortcuts from "@/components/features/Shortcuts";
 import SheetHeader from "@/components/custom/SheetHeader";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
-
 import { routes } from "@/constants/routes";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { selectTaskById } from "@/store/selectors/task.selector";
 import { setStartDate, setTime } from "@/store/slices/formTask.slice";
-import { updateTaskStartDateAction } from "@/store/thunks/task/task.crud.thunks";
+import {
+  updateTaskStartDateAction,
+  updateTaskTimeAction,
+} from "@/store/thunks/task/task.crud.thunks";
 import { IsoDate } from "@/types/task.types";
 import { formatTimeFromMin, minDate } from "@/utils/date";
 import { validateTaskStartDate } from "@/utils/validate";
 import { getErrorMessage } from "@/utils/error";
-import { ModeType } from "@/types/initialState.types";
+import { ScopeParams } from "@/types/initialState.types";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  scope?: ScopeParams;
   taskId?: string;
 };
 
@@ -42,48 +44,61 @@ const DateFormSheet = () => {
 
   const inputRef = useRef<TextInput>(null);
 
-  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+  const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
-  const formStartDate = useAppSelector(
-    (state) => state.formTask.task.start_date,
-  );
-
-  const formDeadline = useAppSelector((state) => state.formTask.task.deadline);
-
-  const formStartTimeMin = useAppSelector(
-    (state) => state.formTask.task.start_time_min,
-  );
-
+  const formTask = useAppSelector((state) => state.formTask.task);
   const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
+    taskId ? selectTaskById(state, taskId) : null,
   );
 
   const startDate =
-    mode === "edit" ? (task?.start_date ?? null) : (formStartDate ?? null);
+    formTask.start_date !== undefined
+      ? formTask.start_date
+      : (task?.start_date ?? null);
 
   const deadline =
-    mode === "edit" ? (task?.deadline ?? null) : (formDeadline ?? null);
+    formTask.deadline !== undefined
+      ? formTask.deadline
+      : (task?.deadline ?? null);
 
   const startTimeMin =
-    mode === "edit"
-      ? (task?.start_time_min ?? null)
-      : (formStartTimeMin ?? null);
+    formTask.start_time_min !== undefined
+      ? formTask.start_time_min
+      : (task?.start_time_min ?? null);
+
+  const repeat =
+    formTask.repeat !== undefined ? formTask.repeat : (task?.repeat ?? null);
 
   const [isDateInputOpen, setIsDateInputOpen] = useState(false);
   const [selected, setSelected] = useState<IsoDate | null>(startDate);
 
   useEffect(() => {
     setSelected(startDate);
-  }, [startDate, mode, taskId]);
+  }, [startDate, taskId]);
 
   const locale = locales[0]?.languageTag ?? "en-US";
   const is24Hour = calendars[0]?.uses24hourClock ?? false;
 
   const startTimeLabel = formatTimeFromMin(startTimeMin, locale, is24Hour);
-
   const maxDateValue = minDate("start_date", deadline);
 
-  const handleCloseSheet = () => {
+  const hasRepeat = Boolean(repeat?.length);
+  const hasStartDate = Boolean(selected ?? startDate);
+
+  const handleCloseSheet = async () => {
+    if (!hasStartDate && !hasRepeat) {
+      dispatch(setTime({ start_time_min: null }));
+      if (task?.start_time_min) {
+        if (!task.id) {
+          throw new Error("Task ID is required");
+        }
+
+        await dispatch(
+          updateTaskTimeAction({ taskId: task.id, start_time_min: null }),
+        ).unwrap();
+      }
+    }
+
     if (router.canGoBack()) {
       router.back();
       return;
@@ -93,7 +108,7 @@ const DateFormSheet = () => {
   };
 
   const handleSaveStartDate = async (date: IsoDate | null) => {
-    if (mode === "edit") {
+    if (scope === "field") {
       if (!taskId) {
         throw new Error("Task ID is missing");
       }
@@ -106,6 +121,7 @@ const DateFormSheet = () => {
         updateTaskStartDateAction({
           taskId,
           start_date: date,
+          start_time_min: startTimeMin,
         }),
       ).unwrap();
 
@@ -117,14 +133,6 @@ const DateFormSheet = () => {
         start_date: date,
       }),
     );
-
-    if (date === null) {
-      dispatch(
-        setTime({
-          start_time_min: null,
-        }),
-      );
-    }
   };
 
   const handleSubmitDate = async () => {
@@ -136,7 +144,6 @@ const DateFormSheet = () => {
     const validation = validateTaskStartDate({
       start_date: selected,
       deadline,
-      start_time_min: startTimeMin,
     });
 
     if (!validation.ok) {
@@ -150,12 +157,11 @@ const DateFormSheet = () => {
 
     try {
       await handleSaveStartDate(validation.data);
-      handleCloseSheet();
+      await handleCloseSheet();
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Unable to Save Date",
-        text2: getErrorMessage(error, "Failed to update task start date"),
+        text1: getErrorMessage(error, "Failed to update task start date"),
       });
     }
   };
@@ -165,12 +171,11 @@ const DateFormSheet = () => {
       await handleSaveStartDate(null);
       setSelected(null);
 
-      handleCloseSheet();
+      await handleCloseSheet();
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Unable to Clear Date",
-        text2: getErrorMessage(error, "Failed to clear task start date"),
+        text1: getErrorMessage(error, "Failed to clear task start date"),
       });
     }
   };
@@ -186,26 +191,23 @@ const DateFormSheet = () => {
   };
 
   const handleOpenTime = () => {
-    if (mode === "create") {
-      dispatch(
-        setStartDate({
-          start_date: selected,
-        }),
-      );
-    }
-
     router.push({
       pathname: routes.form_task_time.href,
-      params: taskId
-        ? {
-            mode,
-            taskId,
-          }
-        : {
-            mode,
-          },
+      params: {
+        taskId,
+        scope: "task",
+      },
     });
   };
+
+  const isDateUnchanged = selected === startDate;
+  const isTimeUnchanged = formTask.start_time_min === task?.start_time_min;
+  const hasInvalidTask = !taskId || !task;
+
+  const submitDisabled =
+    scope === "field"
+      ? hasInvalidTask || (isDateUnchanged && isTimeUnchanged)
+      : isDateUnchanged;
 
   return (
     <SheetWrapper>
@@ -214,9 +216,7 @@ const DateFormSheet = () => {
         onClose={handleGoBack}
         onSubmit={handleSubmitDate}
         submitButtonVisible
-        submitDisabled={
-          (mode === "edit" && (!taskId || !task)) || selected === startDate
-        }
+        submitDisabled={submitDisabled}
       />
       <DateInput
         type="start"
@@ -241,47 +241,49 @@ const DateFormSheet = () => {
               setSelected={setSelected}
             />
           </View>
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.timeButton]}
-              onPress={handleOpenTime}
-            >
-              <View style={styles.buttonContent}>
-                <SymbolView
-                  name="clock"
-                  weight="medium"
-                  size={22}
-                  type="monochrome"
-                  tintColor="rgb(67, 67, 67)"
-                />
-                <Text style={styles.buttonText}>Time</Text>
-              </View>
-              <View style={styles.buttonContent}>
-                <Text style={styles.sideButtonText}>
-                  {startTimeLabel ?? "None"}
-                </Text>
-                <SymbolView
-                  name="chevron.right"
-                  weight="light"
-                  size={16}
-                  type="monochrome"
-                  tintColor="rgb(67, 67, 67)"
-                />
-              </View>
-            </TouchableOpacity>
-            {selected !== null && (
-              <TouchableOpacity style={styles.button} onPress={handleNoDate}>
-                <SymbolView
-                  name="minus.circle"
-                  weight="medium"
-                  size={22}
-                  type="monochrome"
-                  tintColor="rgb(67, 67, 67)"
-                />
-                <Text style={styles.buttonText}>No Date</Text>
+          {(selected || startDate || hasRepeat) && (
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.timeButton]}
+                onPress={handleOpenTime}
+              >
+                <View style={styles.buttonContent}>
+                  <SymbolView
+                    name="clock"
+                    weight="medium"
+                    size={22}
+                    type="monochrome"
+                    tintColor="rgb(67, 67, 67)"
+                  />
+                  <Text style={styles.buttonText}>Time</Text>
+                </View>
+                <View style={styles.buttonContent}>
+                  <Text style={styles.sideButtonText}>
+                    {startTimeLabel ?? "None"}
+                  </Text>
+                  <SymbolView
+                    name="chevron.right"
+                    weight="light"
+                    size={16}
+                    type="monochrome"
+                    tintColor="rgb(67, 67, 67)"
+                  />
+                </View>
               </TouchableOpacity>
-            )}
-          </View>
+              {startDate && (
+                <TouchableOpacity style={styles.button} onPress={handleNoDate}>
+                  <SymbolView
+                    name="minus.circle"
+                    weight="medium"
+                    size={22}
+                    type="monochrome"
+                    tintColor="rgb(67, 67, 67)"
+                  />
+                  <Text style={styles.buttonText}>No Date</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
         </>
       )}
     </SheetWrapper>

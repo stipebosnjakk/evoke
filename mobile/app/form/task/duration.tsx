@@ -13,13 +13,13 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { selectTaskById } from "@/store/selectors/task.selector";
 import { setDuration } from "@/store/slices/formTask.slice";
 import { updateTaskDurationAction } from "@/store/thunks/task/task.crud.thunks";
-import { ModeType } from "@/types/initialState.types";
+import { ScopeParams } from "@/types/initialState.types";
 import { getDurationFromDurationMin } from "@/utils/date";
 import { getErrorMessage } from "@/utils/error";
 import { validateTaskDuration } from "@/utils/validate";
 
 type LocalSearchParamsType = {
-  mode?: ModeType;
+  scope?: ScopeParams;
   taskId?: string;
 };
 
@@ -27,18 +27,20 @@ const DurationFormSheet = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { mode, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+  const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
+
+  const task = useAppSelector((state) =>
+    taskId ? selectTaskById(state, taskId) : null,
+  );
 
   const formDurationMin = useAppSelector(
     (state) => state.formTask.task.duration_min,
   );
 
-  const task = useAppSelector((state) =>
-    mode === "edit" && taskId ? selectTaskById(state, taskId) : undefined,
-  );
-
   const durationMin =
-    mode === "edit" ? (task?.duration_min ?? null) : (formDurationMin ?? null);
+    formDurationMin !== undefined
+      ? formDurationMin
+      : (task?.duration_min ?? null);
 
   const { hours, minutes } = getDurationFromDurationMin(durationMin) ?? {
     hours: 0,
@@ -51,7 +53,7 @@ const DurationFormSheet = () => {
   useEffect(() => {
     setDurationHours(hours);
     setDurationMinutes(minutes);
-  }, [durationMin, mode, taskId, hours, minutes]);
+  }, [durationMin, taskId, hours, minutes]);
 
   const hourOptions = useMemo(
     () => Array.from({ length: 24 }, (_, hour) => hour),
@@ -80,7 +82,7 @@ const DurationFormSheet = () => {
   };
 
   const handleSaveDuration = async (value: number | null) => {
-    if (mode === "edit") {
+    if (scope === "field") {
       if (!taskId) {
         throw new Error("Task ID is missing");
       }
@@ -144,6 +146,14 @@ const DurationFormSheet = () => {
     }
   };
 
+  const isDurationUnchanged = selectedDurationMin === durationMin;
+  const hasInvalidTask = !taskId || !task;
+
+  const submitDisabled =
+    scope === "field"
+      ? hasInvalidTask || isDurationUnchanged
+      : isDurationUnchanged;
+
   return (
     <SheetWrapper>
       <SheetHeader
@@ -151,10 +161,7 @@ const DurationFormSheet = () => {
         onClose={handleCloseSheet}
         onSubmit={handleSubmitDuration}
         submitButtonVisible
-        submitDisabled={
-          (mode === "edit" && (!taskId || !task)) ||
-          selectedDurationMin === durationMin
-        }
+        submitDisabled={submitDisabled}
       />
       <View style={styles.pickerContainer}>
         <View style={styles.pickerHeader}>

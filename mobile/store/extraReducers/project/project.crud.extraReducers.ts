@@ -1,7 +1,6 @@
 import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 import { ProjectsState } from "@/types/initialState.types";
-import { createTaskAction } from "@/store/thunks/task/task.crud.thunks";
 import {
   createProjectAction,
   deleteProjectAction,

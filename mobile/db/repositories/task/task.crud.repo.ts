@@ -1,6 +1,6 @@
 import { eq, desc, and } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
-import { getUnixTime, isValid } from "date-fns";
+import { getUnixTime } from "date-fns";
 
 import { INBOX_SCOPE_ID } from "@/constants/scopeIds";
 import { db } from "@/db/client";
@@ -19,119 +19,96 @@ import {
   CreatedTask,
   IsoDate,
   RepeatTodayStatus,
+  TaskProject,
   TaskStateData,
   TaskStatus,
   Weekday,
 } from "@/types/task.types";
 import { STATUS_OPTIONS } from "@/constants/status";
 import {
+  validateTask,
   validateTaskDeadline,
   validateTaskDuration,
   validateTaskRepeat,
   validateTaskStartDate,
   validateTaskTime,
 } from "@/utils/validate";
-import { findTaskById } from "./helper.task.repo";
+import { findTaskById, handleGetOrCreateOrderKey } from "./helper.task.repo";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
-export const createTaskRepo = async (task: FormTask): Promise<CreatedTask> => {
+export const createTaskRepo = async (
+  formTask: FormTask,
+): Promise<CreatedTask> => {
+  const validation = validateTask(formTask);
+
+  if (!validation.ok) {
+    throw new Error(validation.message);
+  }
+
+  const validatedTask = validation.data;
+
   try {
     return await db.transaction(async (tx) => {
-      if (!task.title) {
-        throwDbError(null, "Title is required");
-      }
+      const taskId = createId();
 
-      const taskStatus: TaskStatus | null = !task.status
-        ? task.start_date || task.deadline
-          ? "next"
-          : null
-        : task.status;
-
-      const normalizedTask = {
-        ...task,
-        status: taskStatus,
-      };
-
-      const id = createId();
-      const isInbox = isInboxTask(normalizedTask);
-      let newOrderKey: number | null = null;
-
-      if (isInbox) {
-        const last = await tx
-          .select()
-          .from(list_order)
-          .where(eq(list_order.scope_id, INBOX_SCOPE_ID))
-          .orderBy(desc(list_order.order_key))
-          .limit(1);
-
-        const maxOrderKey = last[0]?.order_key ?? 0;
-        newOrderKey = maxOrderKey + 1000 || 1000;
-
-        await tx.insert(list_order).values({
-          scope_id: INBOX_SCOPE_ID,
-          item_id: id,
-          order_key: newOrderKey,
-        });
-      }
-
-      if (task.project_id) {
-        const last = await tx
-          .select()
-          .from(list_order)
-          .where(eq(list_order.scope_id, task.project_id))
-          .orderBy(desc(list_order.order_key))
-          .limit(1);
-
-        const maxOrderKey = last[0]?.order_key ?? 0;
-        newOrderKey = maxOrderKey + 1000 || 1000;
-
-        await tx.insert(list_order).values({
-          scope_id: task.project_id,
-          item_id: id,
-          order_key: newOrderKey,
-        });
-      }
-
-      await tx.insert(tasks).values({
-        ...normalizedTask,
-        id,
-      });
-
-      const [createdRow] = await tx
-        .select({
-          task: tasks,
-          project: {
-            id: projects.id,
-            name: projects.name,
-            color: projects.color,
-          },
+      const [createdTask] = await tx
+        .insert(tasks)
+        .values({
+          ...validatedTask,
+          id: taskId,
         })
-        .from(tasks)
-        .leftJoin(projects, eq(tasks.project_id, projects.id))
-        .where(eq(tasks.id, id))
-        .limit(1);
+        .returning();
 
-      if (!createdRow) {
+      if (!createdTask) {
         throw new Error("Failed to create task");
       }
 
-      const isRepeating = Boolean(createdRow.task.repeat?.length);
+      const { inboxOrderKey, projectOrderKey } =
+        await handleGetOrCreateOrderKey({
+          tx,
+          task: createdTask,
+        });
 
-      const repeatTodayStatus: RepeatTodayStatus = isRepeating
+      let project: TaskProject | null = null;
+
+      if (createdTask.project_id !== null) {
+        const [projectRow] = await tx
+          .select({
+            id: projects.id,
+            name: projects.name,
+            color: projects.color,
+          })
+          .from(projects)
+          .where(eq(projects.id, createdTask.project_id))
+          .limit(1);
+
+        if (!projectRow) {
+          throw new Error("Task project was not found");
+        }
+
+        project = projectRow;
+      }
+
+      const repeatTodayStatus: RepeatTodayStatus = Boolean(
+        createdTask.repeat?.length,
+      )
         ? "not_completed_today"
         : null;
 
-      const createdTask: TaskStateData = {
-        ...createdRow.task,
-        project: createdRow.project,
+      const newTask: TaskStateData = {
+        ...createdTask,
+        project,
         repeat_today_status: repeatTodayStatus,
       };
 
-      return {
-        task: createdTask,
-        order_key: newOrderKey,
+      const result: CreatedTask = {
+        task: newTask,
+        inboxOrderKey,
+        projectOrderKey,
       };
+
+      return result;
     });
   } catch (error: unknown) {
     return throwDbError(error, "Failed to create task");
@@ -145,143 +122,47 @@ export type UpdateTaskReturnType = {
   projectOrderKey: number | null;
 };
 
-export const updateTaskRepo = async (
-  taskId: string,
-  task: FormTask,
-): Promise<UpdateTaskReturnType> => {
+export type UpdateTaskType = {
+  taskId: string;
+  formTask: FormTask;
+};
+
+export const updateTaskRepo = async ({
+  taskId,
+  formTask,
+}: UpdateTaskType): Promise<UpdateTaskReturnType> => {
   try {
     if (!taskId) {
       throw new Error("Task ID is required");
     }
 
     return await db.transaction(async (tx) => {
-      const task = await findTaskById({ taskId, tx });
+      const prevTask = await findTaskById({ taskId, tx });
 
-      if (!task) {
+      if (!prevTask) {
         throw new Error(`Task "${taskId}" does not exist`);
       }
 
-      const previousProjectId = task.project_id;
+      const validation = validateTask(formTask);
 
-      const normalizedRepeat = task.repeat?.length
-        ? [...new Set(task.repeat)].sort((a, b) => a - b)
-        : null;
-
-      let normalizedStatus = task.status ?? null;
-
-      if (normalizedRepeat) {
-        normalizedStatus = "next";
+      if (!validation.ok) {
+        throw new Error(validation.message);
       }
 
-      if (!normalizedStatus && (task.start_date || task.deadline)) {
-        normalizedStatus = "next";
-      }
-
-      if (!task.title?.trim()) {
-        throw new Error("Task title is required");
-      }
-
-      const normalizedTask: FormTask = {
-        title: task.title.trim(),
-        description: task.description?.trim() || null,
-        status: normalizedStatus,
-        project_id: task.project_id ?? null,
-        start_date: task.start_date ?? null,
-        start_time_min: task.start_date ? (task.start_time_min ?? null) : null,
-        duration_min: task.duration_min ?? null,
-        deadline: task.deadline ?? null,
-        repeat: normalizedStatus === "next" ? normalizedRepeat : null,
-      };
-
-      if (
-        normalizedTask.start_date &&
-        normalizedTask.deadline &&
-        normalizedTask.start_date > normalizedTask.deadline
-      ) {
-        throw new Error("Start date cannot be after deadline");
-      }
-
-      if (normalizedTask.project_id) {
-        const [project] = await tx
-          .select({ id: projects.id })
-          .from(projects)
-          .where(eq(projects.id, normalizedTask.project_id))
-          .limit(1);
-
-        if (!project) {
-          throw new Error(
-            `Project "${normalizedTask.project_id}" does not exist`,
-          );
-        }
-      }
-
-      const now = getUnixTime(new Date());
+      const previousProjectId = prevTask.project_id;
+      const task = validation.data;
 
       const [updatedTask] = await tx
         .update(tasks)
         .set({
-          ...normalizedTask,
-          updated_at: now,
+          ...task,
+          updated_at: getUnixTime(new Date()),
         })
         .where(eq(tasks.id, taskId))
         .returning();
 
       if (!updatedTask) {
-        throw new Error(`Failed to update task "${taskId}"`);
-      }
-
-      const getOrCreateOrderKey = async (scopeId: string): Promise<number> => {
-        const [existingOrder] = await tx
-          .select({
-            order_key: list_order.order_key,
-          })
-          .from(list_order)
-          .where(
-            and(
-              eq(list_order.scope_id, scopeId),
-              eq(list_order.item_id, taskId),
-            ),
-          )
-          .limit(1);
-
-        if (existingOrder) {
-          return existingOrder.order_key;
-        }
-
-        const [lastItem] = await tx
-          .select({
-            order_key: list_order.order_key,
-          })
-          .from(list_order)
-          .where(eq(list_order.scope_id, scopeId))
-          .orderBy(desc(list_order.order_key))
-          .limit(1);
-
-        const orderKey = (lastItem?.order_key ?? 0) + 1000;
-
-        await tx.insert(list_order).values({
-          scope_id: scopeId,
-          item_id: taskId,
-          order_key: orderKey,
-          updated_at: now,
-        });
-
-        return orderKey;
-      };
-
-      let inboxOrderKey: number | null = null;
-
-      if (isInboxTask(updatedTask)) {
-        inboxOrderKey = await getOrCreateOrderKey(INBOX_SCOPE_ID);
-      } else {
-        await tx
-          .delete(list_order)
-          .where(
-            and(
-              eq(list_order.scope_id, INBOX_SCOPE_ID),
-              eq(list_order.item_id, taskId),
-            ),
-          );
+        throw new Error(`Task "${taskId}" does not exist`);
       }
 
       if (previousProjectId && previousProjectId !== updatedTask.project_id) {
@@ -295,60 +176,71 @@ export const updateTaskRepo = async (
           );
       }
 
-      let projectOrderKey: number | null = null;
+      let project: TaskProject | null = null;
 
-      if (updatedTask.project_id) {
-        projectOrderKey = await getOrCreateOrderKey(updatedTask.project_id);
-      }
-
-      const today = toIsoDate(new Date());
-
-      const [row] = await tx
-        .select({
-          task: tasks,
-          project: {
+      if (updatedTask.project_id !== null) {
+        const [projectRow] = await tx
+          .select({
             id: projects.id,
             name: projects.name,
             color: projects.color,
-          },
-          completion: {
-            id: task_completions.id,
-          },
-        })
-        .from(tasks)
-        .leftJoin(projects, eq(tasks.project_id, projects.id))
-        .leftJoin(
-          task_completions,
-          and(
-            eq(task_completions.task_id, tasks.id),
-            eq(task_completions.completion_date, today),
-          ),
-        )
-        .where(eq(tasks.id, taskId))
-        .limit(1);
+          })
+          .from(projects)
+          .where(eq(projects.id, updatedTask.project_id))
+          .limit(1);
 
-      if (!row) {
-        throw new Error(`Failed to fetch updated task "${taskId}"`);
+        if (!projectRow) {
+          throw new Error("Task project was not found");
+        }
+
+        project = projectRow;
       }
 
-      const isRepeating = Boolean(row.task.repeat?.length);
+      let repeat_today_status: RepeatTodayStatus = null;
 
-      const FormTaskInfo: TaskStateData = {
-        ...row.task,
-        project: row.project,
-        repeat_today_status: isRepeating
-          ? row.completion
-            ? "completed_today"
-            : "not_completed_today"
-          : null,
+      if (Boolean(updatedTask.repeat?.length)) {
+        const today = toIsoDate(new Date());
+
+        const [isCompletedToday] = await tx
+          .select({
+            completion_date: task_completions.completion_date,
+          })
+          .from(task_completions)
+          .where(
+            and(
+              eq(task_completions.task_id, updatedTask.id),
+              eq(task_completions.completion_date, today),
+            ),
+          )
+          .limit(1);
+
+        if (isCompletedToday) {
+          repeat_today_status = "completed_today";
+        } else {
+          repeat_today_status = "not_completed_today";
+        }
+      }
+
+      const { inboxOrderKey, projectOrderKey } =
+        await handleGetOrCreateOrderKey({
+          tx,
+          task: updatedTask,
+        });
+
+      const resultDataTask: TaskStateData = {
+        ...updatedTask,
+        project,
+        repeat_today_status,
       };
 
-      return {
-        task: FormTaskInfo,
-        previousProjectId,
+      const result: UpdateTaskReturnType = {
+        task: resultDataTask,
         inboxOrderKey,
         projectOrderKey,
+        previousProjectId,
       };
+
+      return result;
     });
   } catch (error) {
     return throwDbError(error, "Failed to update task");
@@ -674,24 +566,26 @@ export const updateTaskProjectRepo = async ({
   }
 };
 
-export type UpdateTaskStartDateArgsType = {
-  taskId: string | null;
-  start_date: IsoDate | null;
-};
-
-export type UpdateTaskStartDateType = {
+type TimeAndDate = {
   start_date: IsoDate | null;
   start_time_min: number | null;
+};
+
+export type UpdateTaskStartDateArgsType = TimeAndDate & {
+  taskId: string | null;
+};
+
+export type UpdateTaskStartDateType = TimeAndDate & {
   updated_at: number;
 };
 
-export type TaskStartDateReturnType = UpdateTaskStartDateType & {
-  taskId: string;
-};
+export type TaskStartDateReturnType = UpdateTaskStartDateType &
+  UpdateTaskStartDateArgsType;
 
 export const updateTaskStartDateRepo = async ({
   taskId,
   start_date,
+  start_time_min,
 }: UpdateTaskStartDateArgsType): Promise<TaskStartDateReturnType> => {
   try {
     if (!taskId) {
@@ -706,30 +600,49 @@ export const updateTaskStartDateRepo = async ({
           throw new Error(`Task "${taskId}" does not exist`);
         }
 
+        const validateStartDate = validateTaskStartDate({
+          deadline: task.deadline,
+          start_date,
+        });
+
+        if (!validateStartDate.ok) {
+          throw new Error(validateStartDate.message);
+        }
+
+        const date = validateStartDate.data;
+
+        let time: number | null = null;
+        const hasStartDate = Boolean(date);
+        const hasRepeat = Boolean(task.repeat?.length);
+
+        if ((hasStartDate || hasRepeat) && start_time_min) {
+          const validateTime = validateTaskTime({
+            start_time_min,
+            start_date: date,
+            repeat: task.repeat,
+          });
+
+          if (!validateTime.ok) {
+            throw new Error(validateTime.message);
+          }
+
+          time = validateTime.data;
+        }
+
         const now = getUnixTime(new Date());
 
         let updateData: UpdateTaskStartDateType;
 
-        if (start_date === null) {
+        if (!hasStartDate) {
           updateData = {
             start_date: null,
-            start_time_min: null,
+            start_time_min: hasRepeat ? time : null,
             updated_at: now,
           };
         } else {
-          const validation = validateTaskStartDate({
-            start_date,
-            deadline: task.deadline,
-            start_time_min: task.start_time_min,
-          });
-
-          if (!validation.ok) {
-            throw new Error(validation.message);
-          }
-
           updateData = {
-            start_date: validation.data,
-            start_time_min: task.start_time_min,
+            start_date: date,
+            start_time_min: time,
             updated_at: now,
           };
         }
@@ -799,9 +712,13 @@ export const updateTaskDeadlineRepo = async ({
   }
 };
 
-export type UpdateTaskRepeatDays = {
-  taskId: string | null;
+type RepeatAndTime = {
   repeat: Weekday[] | null;
+  start_time_min: number | null;
+};
+
+export type UpdateTaskRepeatDays = RepeatAndTime & {
+  taskId: string | null;
 };
 
 export type UpdateTaskRepeatDaysReturnType = UpdateTaskRepeatDays & {
@@ -811,6 +728,7 @@ export type UpdateTaskRepeatDaysReturnType = UpdateTaskRepeatDays & {
 export const updateTaskRepeatDaysRepo = async ({
   taskId,
   repeat,
+  start_time_min,
 }: UpdateTaskRepeatDays): Promise<UpdateTaskRepeatDaysReturnType> => {
   try {
     if (!taskId) {
@@ -824,16 +742,40 @@ export const updateTaskRepeatDaysRepo = async ({
         throw new Error(`Task "${taskId}" does not exist`);
       }
 
-      const validation = validateTaskRepeat({ repeatDays: repeat });
+      const validateRepeat = validateTaskRepeat({
+        repeatDays: repeat,
+        status: task.status,
+      });
 
-      if (!validation.ok) {
-        throw new Error(validation.message);
+      if (!validateRepeat.ok) {
+        throw new Error(validateRepeat.message);
+      }
+
+      const data = validateRepeat.data;
+
+      let time: number | null = null;
+      const hasRepeat = Boolean(data?.length);
+      const hasStartDate = Boolean(task.start_date);
+
+      if ((hasRepeat || hasStartDate) && start_time_min) {
+        const validateTime = validateTaskTime({
+          start_time_min,
+          repeat,
+          start_date: task.start_date,
+        });
+
+        if (!validateTime.ok) {
+          throw new Error(validateTime.message);
+        }
+
+        time = validateTime.data;
       }
 
       const now = getUnixTime(new Date());
 
       const update = {
-        repeat: validation.data,
+        repeat: data,
+        start_time_min: !hasRepeat && !hasStartDate ? null : time,
         updated_at: now,
       };
 
@@ -874,16 +816,26 @@ export const updateTaskTimeRepo = async ({
         throw new Error(`Task "${taskId}" does not exist`);
       }
 
-      const validation = validateTaskTime({ start_time_min });
+      let time: number | null = null;
 
-      if (!validation.ok) {
-        throw new Error(validation.message);
+      if (start_time_min) {
+        const validation = validateTaskTime({
+          start_time_min,
+          repeat: task.repeat,
+          start_date: task.start_date,
+        });
+
+        if (!validation.ok) {
+          throw new Error(validation.message);
+        }
+
+        time = validation.data;
       }
 
       const now = getUnixTime(new Date());
 
       const update = {
-        start_time_min: validation.data,
+        start_time_min: time,
         updated_at: now,
       };
 
