@@ -113,7 +113,7 @@ const TaskFormSheet = () => {
   const handleCreateNavigation = (placement: TaskScreen) => {
     const href = getTaskScreenHref(placement);
 
-    if (href === "/inbox") {
+    if (href === "/inbox" && mode !== "edit") {
       dispatch(
         updateScreenViewAction({
           scopeId: INBOX_SCOPE_ID,

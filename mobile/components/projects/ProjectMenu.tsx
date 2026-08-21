@@ -135,17 +135,19 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
             />
           </View>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         {project.status !== "completed" && (
-          <DropdownMenuItem onPress={confirmCompleteProject}>
-            <SymbolView
-              name="checkmark.circle"
-              size={23}
-              type="monochrome"
-              tintColor="#3F3F46"
-            />
-            <Text style={styles.itemText}>Mark as Completed</Text>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onPress={confirmCompleteProject}>
+              <SymbolView
+                name="checkmark.circle"
+                size={23}
+                type="monochrome"
+                tintColor="#3F3F46"
+              />
+              <Text style={styles.itemText}>Mark as Completed</Text>
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onPress={confirmDeleteProject}>

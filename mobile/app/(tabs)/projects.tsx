@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   StyleSheet,
   ActivityIndicator,
   FlatList,
@@ -8,7 +7,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView } from "expo-symbols";
-import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
@@ -25,9 +23,6 @@ import {
   VIEW_OPTIONS,
 } from "@/constants/scopeIds";
 
-const BUTTON_HEIGHT = 44;
-const BUTTON_GAP = 10;
-
 const ProjectsScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -37,14 +32,13 @@ const ProjectsScreen = () => {
   const groups = useAppSelector(selectProjects);
 
   const view = config?.screens[PROJECTS_SCOPE_ID].view;
+
   const selectedGroup =
-    view === VIEW_OPTIONS.completed.view
+    view === VIEW_OPTIONS.active.view
       ? groups[PROJECTS_SCOPE_ACTIVE_ID]
       : groups[PROJECTS_SCOPE_COMPLETED_ID];
-  const total = selectedGroup.data.length;
 
-  const paddingTop = insets.top + 44 + 12;
-  const paddingBottom = BUTTON_HEIGHT + BUTTON_GAP;
+  const total = selectedGroup.data.length;
 
   const navigateToCreateProject = () => {
     router.push(routes.form_project.href);
@@ -63,7 +57,7 @@ const ProjectsScreen = () => {
   }
 
   if (status === "succeeded" && total === 0) {
-    return <NoProjectsView />;
+    return <NoProjectsView completed={view === VIEW_OPTIONS.completed.view} />;
   }
 
   return (
@@ -74,29 +68,25 @@ const ProjectsScreen = () => {
           keyExtractor={(project) => project.id}
           renderItem={({ item }) => <Project project={item} />}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingTop,
-            paddingBottom,
-          }}
+          contentContainerStyle={[
+            styles.contentContainer,
+            {
+              paddingTop: insets.top + 44 + 12,
+            },
+          ]}
         />
-        <View style={[styles.createButtonContainer, { bottom: BUTTON_GAP }]}>
-          <View style={styles.createButtonShadow}>
-            <BlurView intensity={20} tint="light" style={styles.createButton}>
-              <TouchableOpacity
-                onPress={navigateToCreateProject}
-                style={styles.createButtonInner}
-              >
-                <SymbolView
-                  name="plus"
-                  size={18}
-                  type="monochrome"
-                  tintColor="#3F3F46"
-                />
-                <Text style={styles.createButtonText}>Add Project</Text>
-              </TouchableOpacity>
-            </BlurView>
-          </View>
-        </View>
+        <TouchableOpacity
+          onPress={navigateToCreateProject}
+          activeOpacity={0.8}
+          style={styles.createButton}
+        >
+          <SymbolView
+            name="plus"
+            size={22}
+            type="monochrome"
+            tintColor="#FFFFFF"
+          />
+        </TouchableOpacity>
       </View>
     </ScreenWrapper>
   );
@@ -111,43 +101,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  createButtonContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    paddingHorizontal: 10,
+  contentContainer: {
+    paddingBottom: 16,
   },
-  createButtonShadow: {
-    height: BUTTON_HEIGHT,
-    borderRadius: 34,
+  createButton: {
+    position: "absolute",
+    right: 16,
+    bottom: 16,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#000000",
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 3,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  createButton: {
-    flex: 1,
-    borderRadius: 34,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#e5e5e5",
-  },
-  createButtonInner: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 22,
-    gap: 20,
-  },
-  createButtonText: {
-    color: "#3F3F46",
-    fontSize: 15,
-    fontWeight: "700",
-    letterSpacing: 0.2,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
   },
 });
 

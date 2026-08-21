@@ -17,6 +17,7 @@ import { updateTaskProjectAction } from "@/store/thunks/task/task.crud.thunks";
 import { ScopeParams } from "@/types/initialState.types";
 import { ProjectStateData } from "@/types/project.types";
 import { getErrorMessage } from "@/utils/error";
+import { PROJECTS_SCOPE_ACTIVE_ID } from "@/constants/scopeIds";
 
 type RenderItemType = {
   item: ProjectStateData;
@@ -33,7 +34,8 @@ const ProjectFormSheet = () => {
 
   const { scope, taskId } = useLocalSearchParams<LocalSearchParamsType>();
 
-  const projects = useAppSelector((state) => selectProjects(state).list);
+  const groups = useAppSelector(selectProjects);
+  const projects = groups[PROJECTS_SCOPE_ACTIVE_ID].data;
 
   const formProjectId = useAppSelector(
     (state) => state.formTask.task.project_id,
@@ -141,7 +143,7 @@ const ProjectFormSheet = () => {
           contentContainerStyle={{ padding: 16 }}
         />
       ) : (
-        <NoProjectsView />
+        <NoProjectsView completed={false} />
       )}
     </SheetWrapper>
   );

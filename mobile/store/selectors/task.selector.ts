@@ -4,11 +4,9 @@ import { startOfToday } from "date-fns";
 import { Task } from "@/db";
 import { RootState } from "@/store/store";
 import { toIsoDate } from "@/utils/date";
-import { selectProjects } from "@/store/selectors/projects.selector";
 import {
   GroupTasks,
   InboxGroupId,
-  ProjectsGroupId,
   TodayGroupId,
   UpcomingGroupId,
 } from "@/types/scope.types";
@@ -195,19 +193,16 @@ export const selectGroupById = createSelector(
   [
     selectTodayTasks,
     selectUpcomingTasks,
-    selectProjects,
     (_: RootState, groupId: GroupTasks) => groupId,
   ],
   (
     today: SelectDataReturn<TodayGroupId>,
     upcoming: SelectDataReturn<UpcomingGroupId>,
-    projects: SelectDataReturn<ProjectsGroupId>,
     groupId: GroupTasks,
   ): GroupData => {
     const groupsById: GroupByIdType<GroupTasks> = {
       ...today.groupsById,
       ...upcoming.groupsById,
-      ...projects.groupsById,
     };
     return groupsById[groupId];
   },

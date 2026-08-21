@@ -87,12 +87,14 @@ const FormProjectFormSheet = () => {
         router.replace(routes.projects.href);
       }
 
-      dispatch(
-        updateScreenViewAction({
-          scopeId: PROJECTS_SCOPE_ID,
-          view: VIEW_OPTIONS.active.view,
-        }),
-      );
+      if (mode !== "edit") {
+        dispatch(
+          updateScreenViewAction({
+            scopeId: PROJECTS_SCOPE_ID,
+            view: VIEW_OPTIONS.active.view,
+          }),
+        );
+      }
 
       Toast.show({
         type: "info",

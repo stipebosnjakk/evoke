@@ -40,7 +40,6 @@ const InboxScreen = () => {
     );
   }
 
-  // FIX THIS
   if (status === "succeeded" && !total) {
     return (
       <NoTasksView
@@ -66,17 +65,17 @@ const InboxScreen = () => {
     return (
       <ScreenWrapper>
         {view === VIEW_OPTIONS.completed.view ? (
-          <DraggableTaskList
-            data={selectedGroup.data}
-            scopeId={INBOX_SCOPE_ID}
-          />
-        ) : (
           <FlatList
             data={selectedGroup.data}
             keyExtractor={(task) => task.id}
             renderItem={({ item }) => <Task task={item} />}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingTop: headerH + headerFadeExtra }}
+          />
+        ) : (
+          <DraggableTaskList
+            data={selectedGroup.data}
+            scopeId={INBOX_SCOPE_ID}
           />
         )}
       </ScreenWrapper>

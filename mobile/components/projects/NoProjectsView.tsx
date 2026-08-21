@@ -3,27 +3,56 @@ import { useRouter } from "expo-router";
 
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import { routes } from "@/constants/routes";
+import { updateScreenViewAction } from "@/store/thunks/config.thunks";
+import { PROJECTS_SCOPE_ID, VIEW_OPTIONS } from "@/constants/scopeIds";
+import { useAppDispatch } from "@/hooks/storeHooks";
 
-const NoProjectsView = () => {
+type NoProjectsViewProps = {
+  completed: boolean;
+};
+
+const NoProjectsView = ({ completed }: NoProjectsViewProps) => {
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const navigateToCreateProject = () => {
     router.push(routes.form_project.href);
   };
 
+  const navigateToActiveProjects = () => {
+    dispatch(
+      updateScreenViewAction({
+        scopeId: PROJECTS_SCOPE_ID,
+        view: VIEW_OPTIONS.active.view,
+      }),
+    );
+  };
+
+  const onPress = completed
+    ? navigateToActiveProjects
+    : navigateToCreateProject;
+
   return (
     <ScreenWrapper>
       <View style={styles.noProjectContainer}>
-        <Text style={styles.noProjectsTitleText}>No projects yet</Text>
-        <Text style={styles.noProjectsSubtitleText}>
-          Create your first project to organize related tasks in one place.
+        <Text style={styles.noProjectsTitleText}>
+          {completed ? "No completed projects" : "No projects yet"}
         </Text>
+
+        <Text style={styles.noProjectsSubtitleText}>
+          {completed
+            ? "You don't have any completed projects yet."
+            : "Create your first project to organize related tasks in one place."}
+        </Text>
+
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={navigateToCreateProject}
+          onPress={onPress}
           style={styles.primaryButton}
         >
-          <Text style={styles.primaryButtonText}>Create Project</Text>
+          <Text style={styles.primaryButtonText}>
+            {completed ? "View Active Projects" : "Create Project"}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScreenWrapper>

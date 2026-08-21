@@ -26,6 +26,6 @@ export type ScopeGroupId =
   | ProjectsGroupId
   | InboxGroupId;
 
-export type GroupTasks = TodayGroupId | UpcomingGroupId | ProjectsGroupId;
+export type GroupTasks = TodayGroupId | UpcomingGroupId;
 
 export type TaskScreen = "inbox" | "today" | "upcoming" | "none";
