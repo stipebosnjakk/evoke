@@ -7,7 +7,7 @@ import { selectTodayTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
-import { TODAY_SCOPE_ID } from "@/constants/scopeIds";
+import { TODAY_SCOPE_ID, VIEW_OPTIONS } from "@/constants/scopeIds";
 import ErrorView from "@/components/custom/ErrorView";
 
 const TodayScreen = () => {
@@ -46,7 +46,7 @@ const TodayScreen = () => {
   if (status === "succeeded") {
     return (
       <ScreenWrapper>
-        {view === "group" ? (
+        {view === VIEW_OPTIONS.group.view ? (
           <GroupFlatList
             groupsById={groupsById}
             scopeId={TODAY_SCOPE_ID}

@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { RootState } from "@/store/store";
 import { ProjectsGroupId } from "@/types/scope.types";
-import { GroupByIdType, SelectDataReturn } from "@/types/group.types";
+import { GroupByIdType } from "@/types/group.types";
 import {
   PROJECTS_SCOPE_ACTIVE_ID,
   PROJECTS_SCOPE_COMPLETED_ID,
@@ -16,7 +16,7 @@ export const selectProjectsById = (state: RootState) =>
 
 export const selectProjects = createSelector(
   [selectProjectIds, selectProjectsById],
-  (ids, byId): SelectDataReturn<ProjectsGroupId> => {
+  (ids, byId): GroupByIdType<ProjectsGroupId> => {
     const groupsById: GroupByIdType<ProjectsGroupId> = {
       [PROJECTS_SCOPE_ACTIVE_ID]: {
         title: "Active",
@@ -28,27 +28,25 @@ export const selectProjects = createSelector(
       },
     };
 
-    const list: ProjectStateData[] = [];
-
-    ids.forEach((id) => {
+    for (const id of ids) {
       const project = byId[id];
-
-      if (!project) return;
-
-      list.push(project);
 
       if (project.status === "completed") {
         groupsById[PROJECTS_SCOPE_COMPLETED_ID].data.push(project);
       } else if (project.status === "active") {
         groupsById[PROJECTS_SCOPE_ACTIVE_ID].data.push(project);
       }
-    });
+    }
 
-    return {
-      groupsById,
-      list,
-      total: ids.length,
-    };
+    groupsById[PROJECTS_SCOPE_ACTIVE_ID].data.sort(
+      (a, b) => (b.updated_at ?? b.created_at) - (a.updated_at ?? a.created_at),
+    );
+
+    groupsById[PROJECTS_SCOPE_COMPLETED_ID].data.sort(
+      (a, b) => b.completed_at - a.completed_at,
+    );
+
+    return groupsById;
   },
 );
 

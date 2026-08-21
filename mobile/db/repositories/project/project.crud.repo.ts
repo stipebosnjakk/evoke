@@ -70,6 +70,7 @@ export const createProjectRepo = async (
       };
     });
   } catch (error) {
+    console.error(error)
     return throwDbError(error, "Failed to create a project");
   }
 };

@@ -117,7 +117,7 @@ const TaskFormSheet = () => {
       dispatch(
         updateScreenViewAction({
           scopeId: INBOX_SCOPE_ID,
-          view: VIEW_OPTIONS.inbox.view,
+          view: VIEW_OPTIONS.active.view,
         }),
       );
     }

@@ -35,14 +35,14 @@ export const VIEW_OPTIONS: Record<ViewType, ViewOption> = {
     nextView: "group",
     icon: "rectangle.grid.1x2.fill",
   },
-  inbox: {
-    view: "inbox",
+  active: {
+    view: "active",
     nextView: "completed",
     icon: "rectangle.grid.1x2.fill",
   },
   completed: {
     view: "completed",
-    nextView: "inbox",
+    nextView: "active",
     icon: "checkmark.circle.fill",
   },
 };

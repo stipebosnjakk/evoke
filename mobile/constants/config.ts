@@ -62,27 +62,27 @@ export const defaultUserConfig: UserConfig = {
       ],
     },
     [PROJECTS_SCOPE_ID]: {
-      view: "list",
+      view: "active",
       group_order: [
         {
           id: PROJECTS_SCOPE_ACTIVE_ID,
           order_key: 2,
-          isOpen: true,
+          isOpen: false,
         },
         {
           id: PROJECTS_SCOPE_COMPLETED_ID,
           order_key: 1,
-          isOpen: true,
+          isOpen: false,
         },
       ],
     },
     [INBOX_SCOPE_ID]: {
-      view: "inbox",
+      view: "active",
       group_order: [
         {
           id: INBOX_SCOPE_ACTIVE_ID,
           order_key: 2,
-          isOpen: true,
+          isOpen: false,
         },
         {
           id: INBOX_SCOPE_COMPLETED_ID,

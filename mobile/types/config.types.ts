@@ -13,4 +13,4 @@ export type ScreenConfig = {
 
 export type UserTheme = "light" | "dark" | "system";
 
-export type ViewType = "group" | "list" | "inbox" | "completed";
+export type ViewType = "group" | "list" | "active" | "completed";

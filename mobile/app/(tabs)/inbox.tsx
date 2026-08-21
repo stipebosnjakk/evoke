@@ -10,6 +10,7 @@ import {
   INBOX_SCOPE_ACTIVE_ID,
   INBOX_SCOPE_COMPLETED_ID,
   INBOX_SCOPE_ID,
+  VIEW_OPTIONS,
 } from "@/constants/scopeIds";
 import ErrorView from "@/components/custom/ErrorView";
 import Task from "@/components/task/Task";
@@ -23,9 +24,9 @@ const InboxScreen = () => {
 
   const view = config ? config.screens[INBOX_SCOPE_ID].view : null;
   const selectedGroup =
-    view === "completed"
-      ? groups[INBOX_SCOPE_COMPLETED_ID]
-      : groups[INBOX_SCOPE_ACTIVE_ID];
+    view === VIEW_OPTIONS.active.view
+      ? groups[INBOX_SCOPE_ACTIVE_ID]
+      : groups[INBOX_SCOPE_COMPLETED_ID];
   const total = selectedGroup.data.length;
 
   const headerFadeExtra = 12;
@@ -39,12 +40,17 @@ const InboxScreen = () => {
     );
   }
 
+  // FIX THIS
   if (status === "succeeded" && !total) {
     return (
       <NoTasksView
-        title={view === "completed" ? "No completed tasks" : "Inbox is clear"}
+        title={
+          view === VIEW_OPTIONS.completed.view
+            ? "No completed tasks"
+            : "Inbox is clear"
+        }
         subtitle={
-          view === "completed"
+          view === VIEW_OPTIONS.completed.view
             ? "You don't have any completed tasks in your Inbox."
             : "No tasks are waiting in your Inbox."
         }
@@ -59,7 +65,7 @@ const InboxScreen = () => {
   if (status === "succeeded") {
     return (
       <ScreenWrapper>
-        {view === "inbox" ? (
+        {view === VIEW_OPTIONS.completed.view ? (
           <DraggableTaskList
             data={selectedGroup.data}
             scopeId={INBOX_SCOPE_ID}

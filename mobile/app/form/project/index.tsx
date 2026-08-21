@@ -25,6 +25,8 @@ import {
   validateNameAndColor,
 } from "@/store/slices/formProject.slice";
 import { ModeParams } from "@/types/initialState.types";
+import { updateScreenViewAction } from "@/store/thunks/config.thunks";
+import { PROJECTS_SCOPE_ID, VIEW_OPTIONS } from "@/constants/scopeIds";
 
 type LocalSearchParamsType = {
   mode?: ModeParams;
@@ -84,6 +86,13 @@ const FormProjectFormSheet = () => {
       } else {
         router.replace(routes.projects.href);
       }
+
+      dispatch(
+        updateScreenViewAction({
+          scopeId: PROJECTS_SCOPE_ID,
+          view: VIEW_OPTIONS.active.view,
+        }),
+      );
 
       Toast.show({
         type: "info",

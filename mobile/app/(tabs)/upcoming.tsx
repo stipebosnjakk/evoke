@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectUpcomingTasks } from "@/store/selectors/task.selector";
-import { UPCOMING_SCOPE_ID } from "@/constants/scopeIds";
+import { UPCOMING_SCOPE_ID, VIEW_OPTIONS } from "@/constants/scopeIds";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import NoTasksView from "@/components/task/NoTasksView";
 import GroupFlatList from "@/components/group/GroupFlatList";
@@ -47,7 +47,7 @@ const UpcomingScreen = () => {
 
   return (
     <ScreenWrapper>
-      {view === "group" ? (
+      {view === VIEW_OPTIONS.group.view ? (
         <GroupFlatList
           groupsById={groupsById}
           scopeId={UPCOMING_SCOPE_ID}

@@ -13,13 +13,17 @@ import { useRouter } from "expo-router";
 
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import Project from "@/components/projects/Project";
-import GroupFlatList from "@/components/group/GroupFlatList";
 import ErrorView from "@/components/custom/ErrorView";
 import NoProjectsView from "@/components/projects/NoProjectsView";
 import { routes } from "@/constants/routes";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectProjects } from "@/store/selectors/projects.selector";
-import { PROJECTS_SCOPE_ID } from "@/constants/scopeIds";
+import {
+  PROJECTS_SCOPE_ACTIVE_ID,
+  PROJECTS_SCOPE_COMPLETED_ID,
+  PROJECTS_SCOPE_ID,
+  VIEW_OPTIONS,
+} from "@/constants/scopeIds";
 
 const BUTTON_HEIGHT = 44;
 const BUTTON_GAP = 10;
@@ -30,9 +34,14 @@ const ProjectsScreen = () => {
 
   const config = useAppSelector((state) => state.user.config);
   const status = useAppSelector((state) => state.projects.status);
-  const { groupsById, list, total } = useAppSelector(selectProjects);
+  const groups = useAppSelector(selectProjects);
 
   const view = config?.screens[PROJECTS_SCOPE_ID].view;
+  const selectedGroup =
+    view === VIEW_OPTIONS.completed.view
+      ? groups[PROJECTS_SCOPE_ACTIVE_ID]
+      : groups[PROJECTS_SCOPE_COMPLETED_ID];
+  const total = selectedGroup.data.length;
 
   const paddingTop = insets.top + 44 + 12;
   const paddingBottom = BUTTON_HEIGHT + BUTTON_GAP;
@@ -60,29 +69,16 @@ const ProjectsScreen = () => {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {view === "group" ? (
-          <GroupFlatList
-            groupsById={groupsById}
-            scopeId={PROJECTS_SCOPE_ID}
-            status={status}
-            renderItem={({ item }) => <Project project={item} />}
-            style={{
-              paddingTop,
-              paddingBottom,
-            }}
-          />
-        ) : (
-          <FlatList
-            data={list}
-            keyExtractor={(project) => project.id}
-            renderItem={({ item }) => <Project project={item} />}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingTop,
-              paddingBottom,
-            }}
-          />
-        )}
+        <FlatList
+          data={selectedGroup.data}
+          keyExtractor={(project) => project.id}
+          renderItem={({ item }) => <Project project={item} />}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop,
+            paddingBottom,
+          }}
+        />
         <View style={[styles.createButtonContainer, { bottom: BUTTON_GAP }]}>
           <View style={styles.createButtonShadow}>
             <BlurView intensity={20} tint="light" style={styles.createButton}>
