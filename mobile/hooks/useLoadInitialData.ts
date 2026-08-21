@@ -3,7 +3,10 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./storeHooks";
 import { fetchActiveTasksAction } from "@/store/thunks/task/task.fetch.thunks";
 import { fetchProjectsAction } from "@/store/thunks/project/project.fetch.thunks";
-import { deleteAllTasksAction } from "@/store/thunks/test.thunks";
+import {
+  deleteAllTasksAction,
+  resetUserConfig,
+} from "@/store/thunks/test.thunks";
 
 export const useLoadInitialData = () => {
   const dispatch = useAppDispatch();
@@ -14,6 +17,7 @@ export const useLoadInitialData = () => {
       dispatch(fetchProjectsAction());
       // TODO: remove
       // dispatch(deleteAllTasksAction())
+      // dispatch(resetUserConfig());
     }
   }, [dispatch, status]);
 };

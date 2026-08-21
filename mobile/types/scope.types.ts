@@ -4,6 +4,8 @@ export type ScopeScreenId =
   | "scope:projects"
   | "scope:inbox";
 
+export type InboxGroupId = "scope:inbox:active" | "scope:inbox:completed";
+
 export type TodayGroupId =
   | "scope:today:overdue"
   | "scope:today:due_today"
@@ -18,6 +20,12 @@ export type ProjectsGroupId =
   | "scope:projects:active"
   | "scope:projects:completed";
 
-export type ScopeGroupId = TodayGroupId | UpcomingGroupId | ProjectsGroupId;
+export type ScopeGroupId =
+  | TodayGroupId
+  | UpcomingGroupId
+  | ProjectsGroupId
+  | InboxGroupId;
+
+export type GroupTasks = TodayGroupId | UpcomingGroupId | ProjectsGroupId;
 
 export type TaskScreen = "inbox" | "today" | "upcoming" | "none";

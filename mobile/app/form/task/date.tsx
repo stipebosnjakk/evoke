@@ -88,7 +88,7 @@ const DateFormSheet = () => {
   const handleCloseSheet = async () => {
     if (!hasStartDate && !hasRepeat) {
       dispatch(setTime({ start_time_min: null }));
-      if (task?.start_time_min) {
+      if (task && task.start_time_min !== null) {
         if (!task.id) {
           throw new Error("Task ID is required");
         }

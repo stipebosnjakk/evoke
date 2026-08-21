@@ -8,11 +8,11 @@ import Task from "@/components/task/Task";
 import Project from "@/components/projects/Project";
 import { useAppSelector } from "@/hooks/storeHooks";
 import { selectGroupById } from "@/store/selectors/task.selector";
-import { ScopeGroupId, ScopeScreenId } from "@/types/scope.types";
+import { GroupTasks, ScopeScreenId } from "@/types/scope.types";
 import { PROJECTS_SCOPE_ID } from "@/constants/scopeIds";
 
 type LocalSearchParamsType = {
-  groupId: ScopeGroupId;
+  groupId: GroupTasks;
   scopeId: ScopeScreenId;
 };
 

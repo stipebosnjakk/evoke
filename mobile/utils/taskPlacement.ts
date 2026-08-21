@@ -23,11 +23,7 @@ export const isActiveTask = (task: TaskStateData | FormTask): boolean =>
  * @returns
  */
 export const isInboxTask = (task: TaskStateData | FormTask): boolean =>
-  isActiveTask(task) &&
-  !task.start_date &&
-  !task.deadline &&
-  !task.status &&
-  !task.repeat;
+  !task.start_date && !task.deadline && !task.status && !task.repeat;
 
 /**
  * Checks if a task is ready for today.

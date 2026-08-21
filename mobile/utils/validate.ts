@@ -457,6 +457,8 @@ export const validateProjectColor = ({
   };
 };
 
+// TODO: fix validation
+
 export const validateTask = (
   formTask: FormTask,
 ): ValidationResult<FormTask> => {

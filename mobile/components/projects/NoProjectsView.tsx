@@ -14,7 +14,7 @@ const NoProjectsView = () => {
   return (
     <ScreenWrapper>
       <View style={styles.noProjectContainer}>
-        <Text style={styles.noProjectsTitleText}>No project yet</Text>
+        <Text style={styles.noProjectsTitleText}>No projects yet</Text>
         <Text style={styles.noProjectsSubtitleText}>
           Create your first project to organize related tasks in one place.
         </Text>

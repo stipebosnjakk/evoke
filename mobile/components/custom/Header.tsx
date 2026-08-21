@@ -9,6 +9,7 @@ import {
   UPCOMING_SCOPE_ID,
   PROJECTS_SCOPE_ID,
   TODAY_SCOPE_ID,
+  VIEW_OPTIONS,
 } from "@/constants/scopeIds";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { ScopeScreenId } from "@/types/scope.types";
@@ -51,11 +52,14 @@ const Header = () => {
   }, [activeMainScope]);
 
   const view = config ? config.screens[scope].view : null;
+  const viewOption = view ? VIEW_OPTIONS[view] : null;
 
   const toggleView = () => {
-    if (!view) return;
-    const nextView = view === "group" ? "list" : "group";
-    dispatch(updateScreenViewAction({ scopeId: scope, view: nextView }));
+    if (!viewOption) return;
+
+    dispatch(
+      updateScreenViewAction({ scopeId: scope, view: viewOption.nextView }),
+    );
   };
 
   const navigateToCreateModal = () => {
@@ -90,14 +94,10 @@ const Header = () => {
       </View>
       <View style={styles.right}>
         <View style={styles.rightActions}>
-          {view && (
+          {viewOption && (
             <CustomButton onPress={toggleView}>
               <SymbolView
-                name={
-                  view === "group"
-                    ? "rectangle.stack.fill"
-                    : "rectangle.grid.1x2.fill"
-                }
+                name={viewOption.icon as any}
                 tintColor="black"
                 size={23}
               />

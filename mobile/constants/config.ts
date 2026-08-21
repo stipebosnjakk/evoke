@@ -11,6 +11,8 @@ import {
   UPCOMING_SCOPE_SOMEDAY_ID,
   PROJECTS_SCOPE_ACTIVE_ID,
   PROJECTS_SCOPE_COMPLETED_ID,
+  INBOX_SCOPE_ACTIVE_ID,
+  INBOX_SCOPE_COMPLETED_ID,
 } from "@/constants/scopeIds";
 import { UserConfig } from "@/types/config.types";
 
@@ -75,8 +77,19 @@ export const defaultUserConfig: UserConfig = {
       ],
     },
     [INBOX_SCOPE_ID]: {
-      view: null,
-      group_order: [],
+      view: "inbox",
+      group_order: [
+        {
+          id: INBOX_SCOPE_ACTIVE_ID,
+          order_key: 2,
+          isOpen: true,
+        },
+        {
+          id: INBOX_SCOPE_COMPLETED_ID,
+          order_key: 1,
+          isOpen: false,
+        },
+      ],
     },
   },
 };
