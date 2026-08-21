@@ -11,7 +11,7 @@ import {
   INBOX_SCOPE_COMPLETED_ID,
   INBOX_SCOPE_ID,
 } from "@/constants/scopeIds";
-import ErrorView from "@/components/ui/ErrorView";
+import ErrorView from "@/components/custom/ErrorView";
 import Task from "@/components/task/Task";
 
 const InboxScreen = () => {

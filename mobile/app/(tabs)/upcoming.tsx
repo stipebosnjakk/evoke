@@ -8,7 +8,7 @@ import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import NoTasksView from "@/components/task/NoTasksView";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
-import ErrorView from "@/components/ui/ErrorView";
+import ErrorView from "@/components/custom/ErrorView";
 import { getUpcomingTaskDate } from "@/utils/taskPlacement";
 
 const UpcomingScreen = () => {

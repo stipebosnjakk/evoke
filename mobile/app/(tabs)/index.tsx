@@ -8,7 +8,7 @@ import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import GroupFlatList from "@/components/group/GroupFlatList";
 import Task from "@/components/task/Task";
 import { TODAY_SCOPE_ID } from "@/constants/scopeIds";
-import ErrorView from "@/components/ui/ErrorView";
+import ErrorView from "@/components/custom/ErrorView";
 
 const TodayScreen = () => {
   const insets = useSafeAreaInsets();

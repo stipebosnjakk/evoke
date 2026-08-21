@@ -2,7 +2,7 @@ import { StyleProp, ViewStyle, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import ScreenWrapper from "./ScreenWrapper";
-import { toastConfig } from "@/components/ui/ToastConfig";
+import { toastConfig } from "@/components/custom/ToastConfig";
 
 type SheetWrapperProps = {
   children: React.ReactNode;

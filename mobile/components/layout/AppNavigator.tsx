@@ -3,10 +3,11 @@ import { ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
-import { toastConfig } from "@/components/ui/ToastConfig";
+import { toastConfig } from "@/components/custom/ToastConfig";
 import { formSheetRoutes, routes } from "@/constants/routes";
 import { useLoadInitialData } from "@/hooks/useLoadInitialData";
 import { useLoadUserConfig } from "@/hooks/useLoadUserConfig";
@@ -21,6 +22,8 @@ const formSheetOptions = {
 } as const;
 
 const AppNavigator = () => {
+  const { top } = useSafeAreaInsets();
+
   useLoadUserConfig();
   useLoadInitialData();
 
@@ -138,7 +141,7 @@ const AppNavigator = () => {
           <PortalHost />
         </>
       )}
-      <Toast config={toastConfig} />
+      <Toast config={toastConfig} bottomOffset={92} topOffset={top - 3} />
     </GestureHandlerRootView>
   );
 };

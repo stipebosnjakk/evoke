@@ -1,3 +1,5 @@
+import { Alert } from "react-native";
+
 /**
  * It returns a error message string
  * @param error The error to handle, can be of any type
@@ -27,4 +29,34 @@ export const throwDbError: (
 ) => never = (error, fallback) => {
   const message = getErrorMessage(error, fallback ?? "Something went wrong");
   throw new Error(message);
+};
+
+type AlertVariant = "default" | "destructive";
+
+type AlertOptions = {
+  title: string;
+  message: string;
+  actionLabel?: string;
+  variant?: AlertVariant;
+  onConfirm: () => void;
+};
+
+export const showAlert = ({
+  title,
+  message,
+  actionLabel = "Confirm",
+  variant = "destructive",
+  onConfirm,
+}: AlertOptions) => {
+  Alert.alert(title, message, [
+    {
+      text: "Cancel",
+      style: "cancel",
+    },
+    {
+      text: actionLabel,
+      style: variant,
+      onPress: onConfirm,
+    },
+  ]);
 };

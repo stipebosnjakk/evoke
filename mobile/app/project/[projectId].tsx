@@ -6,7 +6,7 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import { selectProjectTasks } from "@/store/selectors/task.selector";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import DraggableTaskList from "@/components/group/DraggableTaskList";
-import CustomButton from "@/components/ui/CustomButton";
+import CustomButton from "@/components/custom/CustomButton";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 import NoProjectTasksView from "@/components/projects/NoProjectTaskView";
 import { routes } from "@/constants/routes";

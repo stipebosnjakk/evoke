@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 
 import {
   DropdownMenu,
@@ -11,13 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Text } from "@/components/ui/text";
-import Alert from "@/components/custom/Alert";
 import { useAppDispatch } from "@/hooks/storeHooks";
 import { routes } from "@/constants/routes";
 import { TaskStateData } from "@/types/task.types";
 import { removeTaskFromProjectAction } from "@/store/thunks/project/project.tasks.thunks";
 import { deleteTaskAction } from "@/store/thunks/task/task.crud.thunks";
 import { editTask } from "@/store/slices/formTask.slice";
+import { showAlert } from "@/utils/error";
 
 type TaskMenuProps = {
   task: TaskStateData;
@@ -27,11 +27,9 @@ const TaskMenu = ({ task }: TaskMenuProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const [removeAlertOpen, setRemoveAlertOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-
   const navigateToEditTask = () => {
     dispatch(editTask({ task }));
+
     router.push({
       pathname: routes.form_task.href,
       params: {
@@ -50,8 +48,6 @@ const TaskMenu = ({ task }: TaskMenuProps) => {
           taskId: task.id,
         }),
       ).unwrap();
-
-      setRemoveAlertOpen(false);
     } catch (error) {
       console.error("Failed to remove task from project:", error);
     }
@@ -65,7 +61,13 @@ const TaskMenu = ({ task }: TaskMenuProps) => {
         }),
       ).unwrap();
 
-      setDeleteAlertOpen(false);
+      Toast.hide();
+      Toast.show({
+        type: "info",
+        text1: task.title ?? undefined,
+        text2: "Task deleted",
+        position: "bottom",
+      });
 
       if (router.canGoBack()) {
         router.back();
@@ -77,81 +79,80 @@ const TaskMenu = ({ task }: TaskMenuProps) => {
     }
   };
 
+  const confirmRemoveFromProject = () => {
+    if (!task.project) return;
+
+    showAlert({
+      title: "Remove from project?",
+      message: `This task will be removed from ${task.project.name}, but it will not be deleted.`,
+      actionLabel: "Remove from Project",
+      variant: "destructive",
+      onConfirm: handleRemoveFromProject,
+    });
+  };
+
+  const confirmDeleteTask = () => {
+    showAlert({
+      title: "Delete this task?",
+      message: "This action cannot be undone.",
+      actionLabel: "Delete Task",
+      variant: "destructive",
+      onConfirm: handleDeleteTask,
+    });
+  };
+
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Pressable hitSlop={10} style={styles.trigger}>
-            <SymbolView
-              name="ellipsis"
-              weight="medium"
-              size={24}
-              type="monochrome"
-              tintColor="rgb(67, 67, 67)"
-            />
-          </Pressable>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" sideOffset={6} style={styles.content}>
-          <DropdownMenuItem onPress={navigateToEditTask}>
-            <SymbolView
-              name="square.and.pencil"
-              size={22}
-              type="monochrome"
-              tintColor="#3F3F46"
-            />
-            <Text style={styles.itemText}>Edit Task</Text>
-          </DropdownMenuItem>
-          {task.project && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onPress={() => setRemoveAlertOpen(true)}
-              >
-                <SymbolView
-                  name="folder.badge.minus"
-                  size={22}
-                  type="monochrome"
-                  tintColor="#DC2626"
-                />
-                <Text style={styles.destructiveText}>Remove from Project</Text>
-              </DropdownMenuItem>
-            </>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            variant="destructive"
-            onPress={() => setDeleteAlertOpen(true)}
-          >
-            <SymbolView
-              name="trash"
-              size={22}
-              type="monochrome"
-              tintColor="#DC2626"
-            />
-            <Text style={styles.destructiveText}>Delete Task</Text>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Alert
-        open={removeAlertOpen}
-        onOpenChange={setRemoveAlertOpen}
-        title="Remove from project?"
-        subtitle={`This task will be removed from ${task.project?.name}, but it will not be deleted.`}
-        onAction={handleRemoveFromProject}
-        actionLabel="Remove from Project"
-        buttonVariant="destructive"
-      />
-      <Alert
-        open={deleteAlertOpen}
-        onOpenChange={setDeleteAlertOpen}
-        title="Delete this task?"
-        subtitle="This action cannot be undone."
-        onAction={handleDeleteTask}
-        actionLabel="Delete Task"
-        buttonVariant="destructive"
-      />
-    </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Pressable hitSlop={10} style={styles.trigger}>
+          <SymbolView
+            name="ellipsis"
+            weight="medium"
+            size={24}
+            type="monochrome"
+            tintColor="rgb(67, 67, 67)"
+          />
+        </Pressable>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={6} style={styles.content}>
+        <DropdownMenuItem onPress={navigateToEditTask}>
+          <SymbolView
+            name="square.and.pencil"
+            size={22}
+            type="monochrome"
+            tintColor="#3F3F46"
+          />
+          <Text style={styles.itemText}>Edit Task</Text>
+        </DropdownMenuItem>
+        {task.project && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onPress={confirmRemoveFromProject}
+            >
+              <SymbolView
+                name="folder.badge.minus"
+                size={22}
+                type="monochrome"
+                tintColor="#DC2626"
+              />
+              <Text style={styles.destructiveText}>Remove from Project</Text>
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onPress={confirmDeleteTask}>
+          <SymbolView
+            name="trash"
+            size={22}
+            type="monochrome"
+            tintColor="#DC2626"
+          />
+          <Text style={styles.destructiveText}>Delete Task</Text>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

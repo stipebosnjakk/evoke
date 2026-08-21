@@ -26,7 +26,7 @@ import { useCalendars, useLocales } from "expo-localization";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import CompleteTask from "@/components/task/CompleteTask";
 import { getUpcomingTaskDate } from "@/utils/taskPlacement";
-import Chip from "@/components/ui/Chip";
+import Chip from "@/components/custom/Chip";
 import TaskMenu from "@/components/task/TaskMenu";
 
 type LocalSearchParamsType = {
@@ -345,7 +345,7 @@ const TaskScreen = () => {
   }
 
   return (
-    <SheetWrapper style={{ minHeight: height }}>
+    <SheetWrapper>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.headerSide} onPress={handleGoBack}>
           <SymbolView

@@ -11,7 +11,7 @@ import { useCalendars, useLocales } from "expo-localization";
 import { SymbolView } from "expo-symbols";
 import Toast from "react-native-toast-message";
 
-import Chip from "@/components/ui/Chip";
+import Chip from "@/components/custom/Chip";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import {
   createTaskAction,

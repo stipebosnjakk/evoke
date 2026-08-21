@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import { useDebouncedCallback } from "use-debounce";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import CustomButton from "@/components/ui/CustomButton";
+import CustomButton from "@/components/custom/CustomButton";
 import HeaderWrapper from "@/components/wrappers/HeaderWrapper";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import { routes } from "@/constants/routes";

@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import SheetWrapper from "@/components/wrappers/SheetWrapper";
 import { validateTaskStatus } from "@/utils/validate";
 import SheetHeader from "@/components/custom/SheetHeader";
-import Info from "@/components/ui/Info";
+import Info from "@/components/custom/Info";
 import { updateTaskStatusAction } from "@/store/thunks/task/task.crud.thunks";
 import { getErrorMessage } from "@/utils/error";
 import { selectTaskById } from "@/store/selectors/task.selector";

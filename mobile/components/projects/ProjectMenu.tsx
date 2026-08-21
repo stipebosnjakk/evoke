@@ -1,9 +1,8 @@
-import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 
-import Alert from "@/components/custom/Alert";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +17,7 @@ import { routes } from "@/constants/routes";
 import { completeProjectAction } from "@/store/thunks/project/project.completion.thunks";
 import { deleteProjectAction } from "@/store/thunks/project/project.crud.thunks";
 import { ProjectStateData } from "@/types/project.types";
+import { showAlert } from "@/utils/error";
 
 type ProjectMenuType = {
   project: ProjectStateData;
@@ -26,9 +26,6 @@ type ProjectMenuType = {
 const ProjectMenu = ({ project }: ProjectMenuType) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  const [completeAlertOpen, setCompleteAlertOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
 
   const navigateToEditProject = () => {
     dispatch(setName({ name: project.name }));
@@ -43,7 +40,14 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
   const handleCompleteProject = async () => {
     try {
       await dispatch(completeProjectAction({ projectId: project.id })).unwrap();
-      setCompleteAlertOpen(false);
+
+      Toast.hide();
+      Toast.show({
+        type: "info",
+        text1: project.name,
+        text2: "Project completed",
+        position: "bottom",
+      });
     } catch (error) {
       console.error("Failed to complete project:", error);
     }
@@ -52,101 +56,109 @@ const ProjectMenu = ({ project }: ProjectMenuType) => {
   const handleDeleteProject = async () => {
     try {
       await dispatch(deleteProjectAction({ projectId: project.id })).unwrap();
-      setDeleteAlertOpen(false);
+
+      Toast.hide();
+      Toast.show({
+        type: "info",
+        text1: project.name,
+        text2: "Project deleted",
+        position: "bottom",
+      });
     } catch (error) {
       console.error("Failed to delete project:", error);
     }
   };
 
+  const confirmCompleteProject = () => {
+    showAlert({
+      title: "Complete this project?",
+      message:
+        "This will also complete all unfinished tasks inside it. This action cannot be undone.",
+      actionLabel: "Complete",
+      variant: "default",
+      onConfirm: handleCompleteProject,
+    });
+  };
+
+  const confirmDeleteProject = () => {
+    showAlert({
+      title: "Delete this project?",
+      message:
+        "All tasks inside this project will also be deleted. This action cannot be undone.",
+      actionLabel: "Delete Project",
+      variant: "destructive",
+      onConfirm: handleDeleteProject,
+    });
+  };
+
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Pressable hitSlop={10}>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Pressable hitSlop={10}>
+          <SymbolView
+            name="ellipsis"
+            size={20}
+            type="monochrome"
+            tintColor="#9CA3AF"
+          />
+        </Pressable>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={6} style={styles.content}>
+        <DropdownMenuItem onPress={navigateToEditProject}>
+          <View style={styles.projectMenuItem}>
+            <View style={styles.projectMenuItemLeftSide}>
+              <View
+                style={[
+                  styles.projectColor,
+                  { backgroundColor: project.color },
+                ]}
+              />
+              <View style={styles.projectTextContainer}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={styles.projectName}
+                >
+                  {project.name}
+                </Text>
+                <Text style={styles.taskCount}>
+                  {project.tasks.length}{" "}
+                  {project.tasks.length === 1 ? "task" : "tasks"}
+                </Text>
+              </View>
+            </View>
             <SymbolView
-              name="ellipsis"
+              name="square.and.pencil"
               size={20}
               type="monochrome"
-              tintColor="#9CA3AF"
+              tintColor="#3F3F46"
             />
-          </Pressable>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" sideOffset={6} style={styles.content}>
-          <DropdownMenuItem onPress={navigateToEditProject}>
-            <View style={styles.projectMenuItem}>
-              <View style={styles.projectMenuItemLeftSide}>
-                <View
-                  style={[
-                    styles.projectColor,
-                    { backgroundColor: project.color },
-                  ]}
-                />
-                <View style={styles.projectTextContainer}>
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    style={styles.projectName}
-                  >
-                    {project.name}
-                  </Text>
-                  <Text style={styles.taskCount}>
-                    {project.tasks.length}{" "}
-                    {project.tasks.length === 1 ? "task" : "tasks"}
-                  </Text>
-                </View>
-              </View>
-              <SymbolView
-                name="square.and.pencil"
-                size={20}
-                type="monochrome"
-                tintColor="#3F3F46"
-              />
-            </View>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {project.status !== "completed" && (
-            <DropdownMenuItem onPress={() => setCompleteAlertOpen(true)}>
-              <SymbolView
-                name="checkmark.circle"
-                size={23}
-                type="monochrome"
-                tintColor="#3F3F46"
-              />
-              <Text style={styles.itemText}>Mark as Completed</Text>
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            variant="destructive"
-            onPress={() => setDeleteAlertOpen(true)}
-          >
+          </View>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {project.status !== "completed" && (
+          <DropdownMenuItem onPress={confirmCompleteProject}>
             <SymbolView
-              name="trash"
+              name="checkmark.circle"
               size={23}
               type="monochrome"
-              tintColor="#DC2626"
+              tintColor="#3F3F46"
             />
-            <Text style={styles.destructiveText}>Delete Project</Text>
+            <Text style={styles.itemText}>Mark as Completed</Text>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Alert
-        open={completeAlertOpen}
-        onOpenChange={setCompleteAlertOpen}
-        title="Complete this project?"
-        subtitle="This will also complete all unfinished tasks inside it. This action cannot be undone."
-        onAction={handleCompleteProject}
-      />
-      <Alert
-        open={deleteAlertOpen}
-        onOpenChange={setDeleteAlertOpen}
-        title="Delete this project?"
-        subtitle="All tasks inside this project will also be deleted. This action cannot be undone."
-        onAction={handleDeleteProject}
-        actionLabel="Delete Project"
-        buttonVariant="destructive"
-      />
-    </>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onPress={confirmDeleteProject}>
+          <SymbolView
+            name="trash"
+            size={23}
+            type="monochrome"
+            tintColor="#DC2626"
+          />
+          <Text style={styles.destructiveText}>Delete Project</Text>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

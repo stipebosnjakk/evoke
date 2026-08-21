@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
 import Project from "@/components/projects/Project";
 import GroupFlatList from "@/components/group/GroupFlatList";
-import ErrorView from "@/components/ui/ErrorView";
+import ErrorView from "@/components/custom/ErrorView";
 import NoProjectsView from "@/components/projects/NoProjectsView";
 import { routes } from "@/constants/routes";
 import { useAppSelector } from "@/hooks/storeHooks";
