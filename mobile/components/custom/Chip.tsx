@@ -1,14 +1,18 @@
 import { Text, Pressable, StyleSheet, View } from "react-native";
 import { SymbolView } from "expo-symbols";
 
-type ChipType = {
+type ChipComponentType = {
   label: string;
   icon?: string;
   disabled?: boolean;
   onPress?: () => void;
 };
 
-const Chip = ({ label, icon, disabled, onPress }: ChipType) => {
+export type ChipType = ChipComponentType & {
+  id?: string;
+};
+
+const Chip = ({ label, icon, disabled, onPress }: ChipComponentType) => {
   const Comp = onPress ? Pressable : View;
   return (
     <Comp
