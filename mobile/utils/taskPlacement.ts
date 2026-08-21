@@ -105,7 +105,7 @@ export const getTaskScreenText = (screen: TaskScreen): string => {
  * @param screen
  * @returns
  */
-export const getTaskScreenHref = (screen: TaskScreen): string => {
+export const getTaskScreenHref = (screen: TaskScreen) => {
   switch (screen) {
     case "inbox":
       return routes.inbox.href;

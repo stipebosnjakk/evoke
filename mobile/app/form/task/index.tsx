@@ -43,6 +43,8 @@ import {
 import { TaskScreen } from "@/types/scope.types";
 import { ModeParams } from "@/types/initialState.types";
 import { TaskStateData } from "@/types/task.types";
+import { updateScreenViewAction } from "@/store/thunks/config.thunks";
+import { INBOX_SCOPE_ID, VIEW_OPTIONS } from "@/constants/scopeIds";
 
 type LocalSearchParamsType = {
   mode?: ModeParams;
@@ -110,6 +112,15 @@ const TaskFormSheet = () => {
 
   const handleCreateNavigation = (placement: TaskScreen) => {
     const href = getTaskScreenHref(placement);
+
+    if (href === "/inbox") {
+      dispatch(
+        updateScreenViewAction({
+          scopeId: INBOX_SCOPE_ID,
+          view: VIEW_OPTIONS.inbox.view,
+        }),
+      );
+    }
 
     Toast.hide();
     router.dismissTo(href as any);
