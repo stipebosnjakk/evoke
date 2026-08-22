@@ -1,19 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
+import { SymbolView } from "expo-symbols";
 
 import { routes } from "@/constants/routes";
 import { setProjectId } from "@/store/slices/formTask.slice";
 
 type NoProjectTasksViewType = {
   projectId: string;
-  projectName?: string;
 };
 
-const NoProjectTasksView = ({
-  projectId,
-  projectName,
-}: NoProjectTasksViewType) => {
+const NoProjectTasksView = ({ projectId }: NoProjectTasksViewType) => {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -26,6 +23,7 @@ const NoProjectTasksView = ({
 
   const navigateToCreateTask = () => {
     dispatch(setProjectId({ projectId }));
+
     router.push({
       pathname: routes.form_task.href,
       params: {
@@ -37,25 +35,24 @@ const NoProjectTasksView = ({
   return (
     <View style={styles.emptyContainer}>
       <Text style={styles.titleText}>No tasks in this project</Text>
-      <Text style={styles.subtitleText}>
-        {projectName
-          ? `${projectName} does not have any tasks yet. Add existing tasks or create a new one for this project.`
-          : "This project does not have any tasks yet. Add existing tasks or create a new one."}
-      </Text>
+
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={navigateToAddTasks}
-          style={styles.primaryButton}
+          style={styles.button}
         >
-          <Text style={styles.primaryButtonText}>Add Tasks</Text>
+          <SymbolView name="plus" size={16} tintColor="#555" />
+          <Text style={styles.buttonText}>Add tasks</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={navigateToCreateTask}
-          style={styles.secondaryButton}
+          style={styles.button}
         >
-          <Text style={styles.secondaryButtonText}>Create Task</Text>
+          <SymbolView name="checkmark.circle" size={16} tintColor="#555" />
+          <Text style={styles.buttonText}>Create task</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -68,52 +65,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
+    gap: 10,
   },
   titleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#0F172A",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  subtitleText: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "600",
-    color: "#7B8798",
-    textAlign: "center",
+    fontSize: 14,
+    color: "#999",
+    fontWeight: "400",
   },
   buttonsContainer: {
-    width: "100%",
-    marginTop: 28,
+    flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 10,
   },
-  primaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#191919",
+  button: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: 7,
+    borderWidth: 1,
+    borderColor: "#C7C7C7",
+    borderStyle: "dashed",
+    borderRadius: 999,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
   },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#FFFFFF",
-  },
-  secondaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#efefef",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#0F172A",
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#555",
   },
 });
 

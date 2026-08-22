@@ -32,13 +32,7 @@ const UpcomingScreen = () => {
   }
 
   if (status === "succeeded" && !total) {
-    return (
-      <NoTasksView
-        isUpcoming={true}
-        title="Upcoming is clear"
-        subtitle={`Upcoming shows tasks planned for later.\nWaiting and Someday tasks also appear here.`}
-      />
-    );
+    return <NoTasksView />;
   }
 
   if (status === "failed") {

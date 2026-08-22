@@ -1,4 +1,10 @@
-import { ActivityIndicator, FlatList } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  View,
+  Text,
+  StyleSheet,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppSelector } from "@/hooks/storeHooks";
@@ -14,6 +20,7 @@ import {
 } from "@/constants/scopeIds";
 import ErrorView from "@/components/custom/ErrorView";
 import Task from "@/components/task/Task";
+import NoCompletedTasks from "@/components/task/NoCompletedTasks";
 
 const InboxScreen = () => {
   const insets = useSafeAreaInsets();
@@ -41,20 +48,13 @@ const InboxScreen = () => {
   }
 
   if (status === "succeeded" && !total) {
-    return (
-      <NoTasksView
-        title={
-          view === VIEW_OPTIONS.completed.view
-            ? "No completed tasks"
-            : "Inbox is clear"
-        }
-        subtitle={
-          view === VIEW_OPTIONS.completed.view
-            ? "You don't have any completed tasks in your Inbox."
-            : "No tasks are waiting in your Inbox."
-        }
-      />
-    );
+    if (view === VIEW_OPTIONS.active.view) {
+      return <NoTasksView />;
+    }
+
+    if (view === VIEW_OPTIONS.completed.view) {
+      return <NoCompletedTasks />;
+    }
   }
 
   if (status === "failed") {

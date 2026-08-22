@@ -54,7 +54,7 @@ const ProjectTasksScreen = () => {
         <View style={styles.sidePlaceholder} />
       </HeaderWrapper>
       {!data.length && status === "succeeded" ? (
-        <NoProjectTasksView projectId={projectId} projectName={name} />
+        <NoProjectTasksView projectId={projectId} />
       ) : (
         <DraggableTaskList
           data={data}

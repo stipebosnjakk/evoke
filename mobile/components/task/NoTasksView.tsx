@@ -3,18 +3,9 @@ import { useRouter } from "expo-router";
 
 import { routes } from "@/constants/routes";
 import ScreenWrapper from "@/components/wrappers/ScreenWrapper";
+import { SymbolView } from "expo-symbols";
 
-type NoTasksViewType = {
-  title: string;
-  subtitle?: string;
-  isUpcoming?: boolean;
-};
-
-const NoTasksView = ({
-  title,
-  subtitle,
-  isUpcoming = false,
-}: NoTasksViewType) => {
+const NoTasksView = () => {
   const router = useRouter();
 
   const navigateToCreateModal = () => {
@@ -26,45 +17,13 @@ const NoTasksView = ({
     });
   };
 
-  const navigateToUpcoming = () => {
-    router.push(routes.upcoming.href);
-  };
-
-  const navigateToInbox = () => {
-    router.push(routes.inbox.href);
-  };
-
   return (
     <ScreenWrapper>
       <View style={styles.emptyContainer}>
-        <Text style={styles.titleText}>{title}</Text>
-        <Text style={styles.subtitleText}>{subtitle}</Text>
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={navigateToCreateModal}
-            style={styles.primaryButton}
-          >
-            <Text style={styles.primaryButtonText}>Create Task</Text>
-          </TouchableOpacity>
-          {isUpcoming ? (
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={navigateToInbox}
-              style={styles.secondaryButton}
-            >
-              <Text style={styles.secondaryButtonText}>Go to Inbox</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={navigateToUpcoming}
-              style={styles.secondaryButton}
-            >
-              <Text style={styles.secondaryButtonText}>Go to Upcoming</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <TouchableOpacity onPress={navigateToCreateModal} style={styles.button}>
+          <SymbolView name="plus" size={16} tintColor="#555" />
+          <Text style={styles.buttonText}>Add task</Text>
+        </TouchableOpacity>
       </View>
     </ScreenWrapper>
   );
@@ -76,52 +35,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
+    gap: 10,
   },
-  titleText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#0F172A",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  subtitleText: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "600",
-    color: "#7B8798",
-    textAlign: "center",
-  },
-  buttonsContainer: {
-    width: "100%",
-    marginTop: 28,
-    alignItems: "center",
-    gap: 14,
-  },
-  primaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#191919",
+  button: {
+    borderWidth: 1,
+    borderColor: "#C7C7C7",
+    borderStyle: "dashed",
+    borderRadius: 999,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    flexDirection: "row",
+    gap: 12,
     alignItems: "center",
     justifyContent: "center",
   },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#FFFFFF",
-  },
-  secondaryButton: {
-    width: "86%",
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#efefef",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#0F172A",
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#555",
   },
 });
 

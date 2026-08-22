@@ -31,12 +31,7 @@ const TodayScreen = () => {
   }
 
   if (status === "succeeded" && !total) {
-    return (
-      <NoTasksView
-        title="Today is clear"
-        subtitle={`Today shows tasks that are ready now.\nOnly tasks marked as Next appear here.`}
-      />
-    );
+    return <NoTasksView />;
   }
 
   if (status === "failed") {

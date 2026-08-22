@@ -22,6 +22,7 @@ import {
   PROJECTS_SCOPE_ID,
   VIEW_OPTIONS,
 } from "@/constants/scopeIds";
+import NoCompletedProjects from "@/components/projects/NoCompletedProjects";
 
 const ProjectsScreen = () => {
   const router = useRouter();
@@ -57,7 +58,13 @@ const ProjectsScreen = () => {
   }
 
   if (status === "succeeded" && total === 0) {
-    return <NoProjectsView completed={view === VIEW_OPTIONS.completed.view} />;
+    if (view === VIEW_OPTIONS.active.view) {
+      return <NoProjectsView />;
+    }
+
+    if (view === VIEW_OPTIONS.completed.view) {
+      return <NoCompletedProjects />;
+    }
   }
 
   return (

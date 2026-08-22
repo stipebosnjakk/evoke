@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 
 import { routes } from "@/constants/routes";
 import { useAppDispatch } from "@/hooks/storeHooks";
@@ -15,6 +16,7 @@ const NoAvailableTasksView = ({ projectId }: NoAvailableTasksViewProps) => {
 
   const navigateToCreateTask = () => {
     dispatch(setProjectId({ projectId }));
+
     router.replace({
       pathname: routes.form_task.href,
       params: {
@@ -26,16 +28,14 @@ const NoAvailableTasksView = ({ projectId }: NoAvailableTasksViewProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>No available tasks</Text>
-      <Text style={styles.subtitle}>
-        There are no unassigned tasks available. Create a new task and it will
-        be added directly to this project.
-      </Text>
+
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={navigateToCreateTask}
-        style={styles.primaryButton}
+        style={styles.button}
       >
-        <Text style={styles.primaryButtonText}>Create Task</Text>
+        <SymbolView name="plus" size={16} tintColor="#555" />
+        <Text style={styles.buttonText}>Add task</Text>
       </TouchableOpacity>
     </View>
   );
@@ -47,35 +47,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    gap: 10,
   },
   title: {
-    marginBottom: 10,
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#0F172A",
-    textAlign: "center",
+    fontSize: 14,
+    color: "#999",
+    fontWeight: "400",
   },
-  subtitle: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "600",
-    color: "#7B8798",
-    textAlign: "center",
-  },
-  primaryButton: {
-    width: "86%",
-    height: 56,
-    marginTop: 28,
-    borderRadius: 28,
-    backgroundColor: "#191919",
+  button: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: 7,
+    borderWidth: 1,
+    borderColor: "#C7C7C7",
+    borderStyle: "dashed",
+    borderRadius: 999,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
   },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#FFFFFF",
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#555",
   },
 });
 
