@@ -172,7 +172,8 @@ const CompleteTask = ({
           fontSize,
           lineHeight,
         },
-        isDisabled && styles.completedTitle,
+        (isCompleting || (isDisabled && !isRepeatTask)) &&
+          styles.completedTitle,
       ]}
       numberOfLines={variant === "detail" ? undefined : 1}
       ellipsizeMode={variant === "detail" ? undefined : "tail"}
