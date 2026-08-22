@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   View,
   Text,
@@ -10,26 +9,24 @@ import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
 
 import { TaskStateData } from "@/types/task.types";
-import CompleteTask from "./CompleteTask";
-import TaskMeta from "./TaskMeta";
+import CompleteTask from "@/components/task/CompleteTask";
+import TaskMeta from "@/components/task/TaskMeta";
 import { routes } from "@/constants/routes";
 
 type TaskGroupType = {
   task: TaskStateData;
   onDrag?: () => void;
   isPreview?: boolean;
+  isDragging?: boolean;
 };
 
-const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
+const Task = ({
+  task,
+  onDrag,
+  isPreview = false,
+  isDragging = false,
+}: TaskGroupType) => {
   const router = useRouter();
-
-  const [isDragging, setIsDragging] = useState(false);
-
-  const handleOnLongPress = () => {
-    if (!onDrag) return;
-    setIsDragging(true);
-    onDrag();
-  };
 
   const navigateToTask = () => {
     router.push({
@@ -40,7 +37,7 @@ const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
 
   return (
     <Pressable
-      style={[styles.taskContainer, isDragging && { opacity: 0.4 }]}
+      style={[styles.taskContainer, isDragging && styles.draggingTask]}
       onPress={navigateToTask}
     >
       <View style={styles.taskHeader}>
@@ -50,8 +47,7 @@ const Task = ({ task, onDrag, isPreview = false }: TaskGroupType) => {
         {onDrag && (
           <TouchableOpacity
             style={styles.menuIcon}
-            onLongPress={handleOnLongPress}
-            onPressOut={() => setIsDragging(false)}
+            onLongPress={onDrag}
             delayLongPress={100}
           >
             <SymbolView
@@ -97,6 +93,11 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#efefef",
     marginBottom: 12,
+  },
+  draggingTask: {
+    borderColor: "#CFCFC7",
+    borderWidth: 1,
+    opacity: 0.45,
   },
   taskMetaContainer: {
     width: "100%",

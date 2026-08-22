@@ -18,6 +18,7 @@ import Task from "@/components/task/Task";
 type RenderDraggableTask = {
   item: TaskWithOrderKey;
   drag: () => void;
+  isActive: boolean;
 };
 
 type DraggableTaskListProps = {
@@ -79,9 +80,12 @@ const DraggableTaskList = ({
     dispatch(updateOrderKeysAction({ orderArray, scopeId }));
   };
 
-  const renderItem = useCallback(({ item, drag }: RenderDraggableTask) => {
-    return <Task task={item.task} onDrag={drag} />;
-  }, []);
+  const renderItem = useCallback(
+    ({ item, drag, isActive }: RenderDraggableTask) => {
+      return <Task task={item.task} onDrag={drag} isDragging={isActive} />;
+    },
+    [],
+  );
 
   const ListFooterComponent = () => {
     return (

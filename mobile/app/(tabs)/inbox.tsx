@@ -1,10 +1,4 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  View,
-  Text,
-  StyleSheet,
-} from "react-native";
+import { ActivityIndicator, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppSelector } from "@/hooks/storeHooks";
