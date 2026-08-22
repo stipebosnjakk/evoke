@@ -56,11 +56,13 @@ const ProjectTasksScreen = () => {
       {!data.length && status === "succeeded" ? (
         <NoProjectTasksView projectId={projectId} />
       ) : (
-        <DraggableTaskList
-          data={data}
-          scopeId={projectId}
-          isLoading={status === "loading"}
-        />
+        <View style={styles.tasksContainer}>
+          <DraggableTaskList
+            data={data}
+            scopeId={projectId}
+            isLoading={status === "loading"}
+          />
+        </View>
       )}
     </ScreenWrapper>
   );
@@ -87,6 +89,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#111827",
+  },
+  tasksContainer: {
+    flex: 1,
   },
 });
 

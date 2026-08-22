@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
@@ -26,16 +25,6 @@ const TaskScreen = () => {
   const task = useAppSelector((state) =>
     taskId ? selectTaskById(state, taskId) : undefined,
   );
-
-  useEffect(() => {
-    if (!task) {
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace(routes.today.href);
-      }
-    }
-  }, [task, router]);
 
   const handleGoBack = () => {
     if (router.canGoBack()) {

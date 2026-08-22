@@ -69,11 +69,7 @@ const TaskMenu = ({ task }: TaskMenuProps) => {
         position: "bottom",
       });
 
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.push(routes.today.href);
-      }
+      router.dismiss();
     } catch (error) {
       console.error("Failed to delete task:", error);
     }
