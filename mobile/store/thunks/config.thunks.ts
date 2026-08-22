@@ -5,6 +5,7 @@ import {
   setUserConfigError,
   updateIsOpenGroup,
   updateScreenView,
+  updateHasLaunched,
 } from "@/store/slices/config.slice";
 import { storeData } from "@/utils/storage";
 import { USER_CONFIG } from "@/constants/config";
@@ -53,6 +54,26 @@ export const updateScreenViewAction =
 
       const config = getState().user.config;
       await storeData(USER_CONFIG, JSON.stringify(config));
+    } catch (error) {
+      const message = getErrorMessage(error, "Failed to update view");
+      dispatch(setUserConfigError(message));
+    }
+  };
+
+export const updateHasLaunchedAction =
+  () => async (dispatch: AppDispatch, getState: () => RootState) => {
+    try {
+      const config = getState().user.config;
+
+      if (config && config.has_launched === "not_launched") {
+        const updatedConfig = {
+          ...config,
+          has_launched: "launched",
+        };
+
+        await storeData(USER_CONFIG, JSON.stringify(updatedConfig));
+        dispatch(updateHasLaunched());
+      }
     } catch (error) {
       const message = getErrorMessage(error, "Failed to update view");
       dispatch(setUserConfigError(message));

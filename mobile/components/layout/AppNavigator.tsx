@@ -11,7 +11,9 @@ import { toastConfig } from "@/components/custom/ToastConfig";
 import { formSheetRoutes, routes } from "@/constants/routes";
 import { useLoadInitialData } from "@/hooks/useLoadInitialData";
 import { useLoadUserConfig } from "@/hooks/useLoadUserConfig";
-import { useAppSelector } from "@/hooks/storeHooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { updateHasLaunchedAction } from "@/store/thunks/config.thunks";
+import { seedDefaultTasksAction } from "@/store/thunks/task/task.crud.thunks";
 
 const formSheetOptions = {
   presentation: "formSheet",
@@ -22,10 +24,13 @@ const formSheetOptions = {
 } as const;
 
 const AppNavigator = () => {
+  const dispatch = useAppDispatch();
   const { top } = useSafeAreaInsets();
 
   useLoadUserConfig();
   useLoadInitialData();
+
+  const config = useAppSelector((state) => state.user.config);
 
   const userStatus = useAppSelector((state) => state.user.status);
   const userError = useAppSelector((state) => state.user.error);
@@ -49,6 +54,13 @@ const AppNavigator = () => {
       setHasFinishedInitialLoad(true);
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (config && config.has_launched === "not_launched") {
+      dispatch(seedDefaultTasksAction());
+      dispatch(updateHasLaunchedAction());
+    }
+  }, [config, dispatch]);
 
   useEffect(() => {
     if (userError) {

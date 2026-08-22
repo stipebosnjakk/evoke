@@ -13,6 +13,7 @@ import {
   addRemoveTaskFromProjectExtraReducers,
   addRestoreRepeatTaskExtraReducers,
   addRestoreTaskExtraReducers,
+  addSeedDefaultTasksExtraReducers,
   addTasksToProjectExtraReducers,
   addUpdateInboxOrderExtraReducers,
   addUpdateTaskDeadlineExtraReducers,
@@ -54,6 +55,7 @@ const tasksSlice = createSlice({
     addUpdateTaskRepeatDaysExtraReducers(builder);
     addUpdateTaskTimeExtraReducers(builder);
     addUpdateTaskDurationExtraReducers(builder);
+    addSeedDefaultTasksExtraReducers(builder);
   },
 });
 

@@ -20,6 +20,7 @@ export const USER_CONFIG = process.env.EXPO_PUBLIC_USER_CONFIG ?? "USER_CONFIG";
 
 export const defaultUserConfig: UserConfig = {
   theme: "system",
+  has_launched: "not_launched",
   screens: {
     [TODAY_SCOPE_ID]: {
       view: "list",
@@ -93,3 +94,4 @@ export const defaultUserConfig: UserConfig = {
     },
   },
 };
+

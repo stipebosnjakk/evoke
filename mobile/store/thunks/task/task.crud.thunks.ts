@@ -2,7 +2,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import { RootState } from "@/store/store";
 import { getErrorMessage } from "@/utils/error";
-import { CreatedTask, RejectWithValue, TaskStatus } from "@/types/task.types";
+import {
+  CreatedTask,
+  RejectWithValue,
+  TaskStateData,
+  TaskStatus,
+} from "@/types/task.types";
 import {
   createTaskRepo,
   UpdateTaskReturnType,
@@ -30,6 +35,7 @@ import {
   UpdateTaskDurationReturnType,
   UpdateTaskDurationArgs,
   updateTaskDurationRepo,
+  seedDefaultTasksRepo,
 } from "@/db/repositories/task/task.crud.repo";
 
 export const createTaskAction = createAsyncThunk<
@@ -244,6 +250,21 @@ export const updateTaskDurationAction = createAsyncThunk<
   } catch (error) {
     return rejectWithValue({
       message: getErrorMessage(error, "Failed to update task duration"),
+    });
+  }
+});
+
+export const seedDefaultTasksAction = createAsyncThunk<
+  TaskStateData[],
+  void,
+  { rejectValue: RejectWithValue }
+>("tasks/seedDefaultTasks", async (_, { rejectWithValue }) => {
+  try {
+    const res = seedDefaultTasksRepo();
+    return res;
+  } catch (error: unknown) {
+    return rejectWithValue({
+      message: getErrorMessage(error, "Failed to seed default tasks"),
     });
   }
 });

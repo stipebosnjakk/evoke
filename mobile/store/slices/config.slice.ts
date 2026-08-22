@@ -9,6 +9,7 @@ import {
   setUserConfigReducer,
   updateIsOpenGroupReducer,
   updateScreenViewReducer,
+  updateHasLaunchedReducer,
 } from "@/store/reducers/formUserConfig.reducer";
 
 const configSlice = createSlice({
@@ -21,6 +22,7 @@ const configSlice = createSlice({
     updateGroupOrder: updateGroupOrderReducer,
     updateScreenView: updateScreenViewReducer,
     updateIsOpenGroup: updateIsOpenGroupReducer,
+    updateHasLaunched: updateHasLaunchedReducer,
     clearUserConfigError: clearUserConfigErrorReducer,
   },
 });
@@ -32,6 +34,7 @@ export const {
   updateGroupOrder,
   updateScreenView,
   updateIsOpenGroup,
+  updateHasLaunched,
   clearUserConfigError,
 } = configSlice.actions;
 

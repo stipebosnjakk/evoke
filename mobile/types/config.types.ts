@@ -1,8 +1,11 @@
 import { GroupConfig } from "@/types/group.types";
 import { ScopeScreenId } from "@/types/scope.types";
 
+export type HasLaunchedType = "launched" | "not_launched";
+
 export type UserConfig = {
   theme: UserTheme;
+  has_launched: HasLaunchedType;
   screens: Record<ScopeScreenId, ScreenConfig>;
 };
 

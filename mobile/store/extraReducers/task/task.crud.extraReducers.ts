@@ -4,6 +4,7 @@ import { TasksState } from "@/types/initialState.types";
 import {
   createTaskAction,
   deleteTaskAction,
+  seedDefaultTasksAction,
   updateTaskAction,
   updateTaskDeadlineAction,
   updateTaskDurationAction,
@@ -361,6 +362,34 @@ export const addUpdateTaskDurationExtraReducers = (
 
       task.duration_min = duration_min;
       task.updated_at = updated_at;
+
+      state.status = "succeeded";
+      state.error = null;
+    });
+};
+
+export const addSeedDefaultTasksExtraReducers = (
+  builder: ActionReducerMapBuilder<TasksState>,
+) => {
+  builder
+    .addCase(seedDefaultTasksAction.pending, (state) => {
+      state.status = "loading";
+      state.error = null;
+    })
+    .addCase(seedDefaultTasksAction.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload?.message ?? "Failed to seed default tasks";
+    })
+    .addCase(seedDefaultTasksAction.fulfilled, (state, action) => {
+      const tasks = action.payload;
+
+      for (const task of tasks) {
+        state.tasks.byId[task.id] = task;
+
+        if (!state.tasks.ids.includes(task.id)) {
+          state.tasks.ids.push(task.id);
+        }
+      }
 
       state.status = "succeeded";
       state.error = null;

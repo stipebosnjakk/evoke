@@ -34,6 +34,7 @@ import {
   validateTaskTime,
 } from "@/utils/validate";
 import { findTaskById, handleGetOrCreateOrderKey } from "./helper.task.repo";
+import { DEFAULT_TASKS } from "@/constants/data";
 
 // TODO: for some reason all of my tasks has order key around 5000
 
@@ -900,5 +901,50 @@ export const updateTaskDurationRepo = async ({
     });
   } catch (error) {
     return throwDbError(error, "Failed to update duration");
+  }
+};
+
+export const seedDefaultTasksRepo = async (): Promise<TaskStateData[]> => {
+  try {
+    return await db.transaction(async (tx) => {
+      const now = Date.now();
+      const createdTasks: TaskStateData[] = [];
+
+      for (const defaultTask of DEFAULT_TASKS) {
+        const id = createId();
+
+        const [task] = await tx
+          .insert(tasks)
+          .values({
+            id,
+            title: defaultTask.title,
+            description: defaultTask.description ?? null,
+            created_at: now,
+            updated_at: now,
+            is_completed: false,
+            completed_at_utc: null,
+            status: defaultTask.status as TaskStatus,
+            project_id: null,
+            start_date: null,
+            start_time_min: null,
+            duration_min: null,
+            deadline: null,
+            repeat: null,
+          })
+          .returning();
+
+        const taskState: TaskStateData = {
+          ...task,
+          project: null,
+          repeat_today_status: null,
+        };
+
+        createdTasks.push(taskState);
+      }
+
+      return createdTasks;
+    });
+  } catch (error) {
+    return throwDbError(error, "Failed to create default data");
   }
 };

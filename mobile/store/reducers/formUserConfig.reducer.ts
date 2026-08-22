@@ -91,3 +91,11 @@ export const updateScreenViewReducer = (
 
   screen.view = view;
 };
+
+export const updateHasLaunchedReducer = (state: UserState) => {
+  const config = state.config;
+
+  if (!config) return;
+
+  config.has_launched = "launched";
+};
