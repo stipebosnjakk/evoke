@@ -48,11 +48,7 @@ const HeaderWrapper = ({ children }: HeaderWrapperType) => {
         </MaskedView>
       </View>
       <View
-        style={[
-          styles.row,
-          styles.container,
-          { height: headerH, paddingTop: insets.top },
-        ]}
+        style={[styles.container, { height: headerH, paddingTop: insets.top }]}
       >
         {children}
       </View>
@@ -74,8 +70,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-  },
-  row: {
     height: "100%",
     flexDirection: "row",
     alignItems: "center",

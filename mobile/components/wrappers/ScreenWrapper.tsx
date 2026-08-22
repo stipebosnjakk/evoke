@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
 import { useColorTheme } from "@/hooks/useColorTheme";
@@ -13,19 +13,19 @@ const ScreenWrapper = ({ children, style }: ScreenWrapperProps) => {
 
   return (
     <View
-      style={[
-        {
-          flex: 1,
-          backgroundColor: colors.background,
-          paddingHorizontal: 16,
-          paddingTop: 16,
-        },
-        style,
-      ]}
+      style={[styles.container, { backgroundColor: colors.background }, style]}
     >
       {children}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+});
 
 export default ScreenWrapper;
